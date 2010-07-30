@@ -1,0 +1,1 @@
+INSERT INTO authentication.session (user_id, token, started, refreshed) VALUES (?,?,?,?);

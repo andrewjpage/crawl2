@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<project name="crawl" basedir="." 
+    xmlns:ivy="antlib:org.apache.ivy.ant" 
+    default="compile"
+>
+
+<property file="property-file.${config}" />
+
+<property name="build.war.home" value="${basedir}/dist" />
+<property name="build.war.name" value="crawl"  />
+<property name="build.classes.home" value="${basedir}/ant-build" />
+
+<property name="lib.dir" value="${basedir}/lib" />
+<property name="ivy.lib.dir" value="${basedir}/lib/ivy" />
+
+<path id="lib.compile.path">
+	<fileset dir="${ivy.lib.dir}/compile" />
+	<fileset dir="${lib.dir}/local" />
+</path>
+
+<path id="lib.jar.path">
+    <fileset dir="${ivy.lib.dir}/jar" />
+	<fileset dir="${lib.dir}/local" />
+</path>
+
+
+<!-- <setproxy proxyhost="wwwcache.sanger.ac.uk" proxyport="3128"/> -->
+
+
+<target name="setup">
+    <mkdir dir="${build.war.home}"/>
+    <mkdir dir="${build.classes.home}"/>
+    <mkdir dir="${ivy.lib.dir}" />
+</target>
+
+<target name="clean">
+    <delete dir="${build.war.home}" includeEmptyDirs="true"/>
+    <delete dir="${build.classes.home}" includeEmptyDirs="true"/>
+    <delete dir="${ivy.lib.dir}" includeEmptyDirs="true"/>
+</target>
+
+
+<target name="resolve-compile" unless="disable.library.resolution" description="retrieves package-dependencies" >  
+    <ivy:resolve conf="compile"/>
+    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" />  
+</target>
+
+<target name="resolve-war" unless="disable.library.resolution" description="retrieves build-dependencies" >  
+    <ivy:resolve conf="war"/>
+    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" />
+</target>
+	
+<target name="resolve-jar" unless="disable.library.resolution" description="retrieves build-dependencies" >  
+    <ivy:resolve conf="jar"/>
+    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" />
+</target>
+
+<!--
+<target name="flatten-local-files"  >
+	
+	<copy todir="${lib.dir}/local-flattened/">
+        <fileset dir="${lib.dir}/local">
+            <include name="**/*.jar"/>
+            <exclude name="**/*-sources.jar" />
+        </fileset>
+        <mapper type="flatten"/>
+    </copy>
+    
+</target>
+-->
+
+<target name="compile" depends="setup,resolve-compile" >
+    <javac fork="true"
+        debug="true"
+        verbose="${verbose}"
+        includes="**"
+        destdir="${build.classes.home}"
+        srcdir="${basedir}/src" 
+        classpathref="lib.compile.path"
+        />
+</target>
+
+<target name="package-war" depends="compile,resolve-war" >
+    
+	<copy file="property-file.${config}" tofile="war/WEB-INF/classes/project.properties" overwrite="true" />
+	
+	<copy todir="war/WEB-INF/classes/sql">
+        <fileset dir="sql/">
+            <include name="**/*.sql"/>
+        </fileset>
+        <mapper type="flatten"/>
+    </copy>
+	
+	<mkdir dir="${lib.dir}/wartmp" />
+	
+	<copy todir="${lib.dir}/wartmp" >
+		<fileset dir="${lib.dir}/local">
+            <include name="**/*.jar"/>
+            <exclude name="**/*-sources.jar" />
+        </fileset>
+        <mapper type="flatten"/>
+	</copy>
+	
+	<copy todir="${lib.dir}/wartmp" >
+        <fileset dir="${ivy.lib.dir}/war">
+            <include name="**/*.jar"/>
+            <exclude name="**/*-sources.jar" />
+        </fileset>
+        <mapper type="flatten"/>
+    </copy>
+	
+    <war warfile="${build.war.home}/${build.war.name}.war" webxml="${basedir}/war/WEB-INF/web.xml" >
+    	
+    	<lib dir="${lib.dir}/wartmp" >
+    		<include name="**/*.jar"/>
+        </lib>
+    	
+        <fileset dir="war/"/>
+        <classes dir="${build.classes.home}">
+            <include name="**"/>
+        </classes>
+    </war>
+	
+	<delete dir="${lib.dir}/wartmp" includeEmptyDirs="true"/>
+	
+</target>
+	
+<target name="package-jar" depends="compile,resolve-jar" >
+	
+	<!-- generate a path string for use in the crawl.jar manifest -->
+	<pathconvert property="jarclasspath" pathsep=" ">
+	    <path refid="lib.jar.path" />
+	    <flattenmapper />
+	</pathconvert>
+    
+	<jar destfile="${build.war.home}/${build.war.name}.jar"  >
+		
+		<fileset dir=".">
+			  <include name="sql/**.sql" />
+		</fileset>
+		
+		<fileset dir="${build.classes.home}">
+			  <include name="**"/>
+		</fileset>
+		
+		<manifest>
+			<attribute name="Main-Class" value="org.genedb.crawl.Main"/>
+			<!--<attribute name="Class-Path" value="log4j.jar" />-->  
+			<attribute name="Class-Path" value="${jarclasspath}" />
+		</manifest>
+	</jar>
+	
+	<!-- copy all the dependencies into the dist folder, so that the craw.jar can access them-->
+	<copy todir="${build.war.home}">
+		<path refid="lib.jar.path" />
+		<mapper type="flatten"/>
+	</copy>
+	
+	<!-- don't keep the generated project.properties file when we're done packaging -->
+	<delete file="war/WEB-INF/classes/project.properties" />
+</target>
+
+<target name="undeploy">
+	<delete dir="${deploy.dir}/${build.war.name}" includeEmptyDirs="true"/>
+    <delete file="${deploy.dir}/${build.war.name}.war" />
+</target>
+	
+<target name="deploy" depends="package-war, undeploy" >
+    <copy file="${build.war.home}/${build.war.name}.war" todir="${deploy.dir}/"/>
+</target>
+
+</project>

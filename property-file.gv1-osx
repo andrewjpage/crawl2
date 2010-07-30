@@ -1,0 +1,8 @@
+deploy.dir=/Users/gv1/bin/tomcat/webapps/
+dbhost=localhost
+dbport=5437
+dbname=pathogens
+dbuser=pathdb
+dbpassword=pathdb
+sqlPath=/sql
+fileStorePath=/Volumes/us/db/heirarchy

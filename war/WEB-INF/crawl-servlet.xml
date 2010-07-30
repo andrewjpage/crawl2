@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans 
+    xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+            xmlns:oxm="http://www.springframework.org/schema/oxm"
+            xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+                    http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd"
+    >
+    
+    <!--
+        - The controllers are autodetected POJOs labeled with the @Controller annotation.
+    -->
+    
+     <context:component-scan base-package="org.genedb.crawl" />
+    <!-- <context:property-placeholder location="classpath:project.properties" /> -->
+    
+    
+    <bean class="org.genedb.crawl.view.CrawlMappingExceptionResolver">
+		<property name="defaultErrorView" value="suffix"/>
+	</bean>
+    
+     
+    <bean id="xmlView" class="org.springframework.web.servlet.view.xml.MarshallingView">
+      <property name="contentType" value="application/xml" />
+      <property name="modelKey" value="model" />
+      <property name="marshaller">
+        <bean class="org.springframework.oxm.xstream.XStreamMarshaller">
+          <property name="autodetectAnnotations" value="true" />
+        </bean>
+      </property>
+    </bean>
+    
+    <bean id="jsonView" class="org.springframework.web.servlet.view.xml.MarshallingView">
+     <property name="contentType" value="application/json" />
+     <property name="modelKey" value="model" />
+     <property name="marshaller">
+       <bean class="org.springframework.oxm.xstream.XStreamMarshaller">
+         <property name="autodetectAnnotations" value="true" />
+         <property name="streamDriver">
+           <bean class="com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver" />
+         </property>
+       </bean>
+     </property>
+   </bean>
+    
+    <bean class="org.genedb.crawl.view.SuffixViewResolver"  >
+	    <property name="order" value="2" />
+	     
+	     <!-- 
+	    <property name="viewResolverMap">
+            <map>
+               <entry key="jsp" value-ref="internalResourceViewResolver" />
+            </map>
+        </property>  -->
+        
+	    <property name="viewMap">
+	      <map>
+	        <entry key="xml" value-ref="xmlView" />
+	        <entry key="json" value-ref="jsonView" />
+	      </map>
+	    </property>
+  </bean>
+  
+   <!--<bean id="jspCheckingViewResolver" class="org.genedb.web.mvc.view.FileCheckingInternalResourceViewResolver"
+    init-method="postConstruction">
+    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+    <property name="prefix" value="/WEB-INF/jsp/" />
+    <property name="suffix" value=".jsp" />
+    <property name="order" value="2" />
+  </bean>
+    
+    -->
+    
+    <bean id="internalResourceViewResolver" 
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver" 
+        p:prefix="/WEB-INF/jsp/"
+        p:suffix=".jsp" 
+        p:order="3" />
+    
+    
+    
+    
+    <!-- 
+    <bean id="organisms" class="org.genedb.crawl.Organisms" >
+        <property name="sqlResource" value="classpath:sql/get_all_organisms_and_taxon_ids.sql" /> 
+        <property name="queryMap" ref="queryMap" />
+    </bean>
+    -->     
+    
+</beans>

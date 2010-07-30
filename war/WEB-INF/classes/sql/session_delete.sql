@@ -1,0 +1,1 @@
+DELETE FROM authentication.session WHERE token = ? 

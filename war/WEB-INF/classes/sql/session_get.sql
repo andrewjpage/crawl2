@@ -1,0 +1,1 @@
+SELECT * from authentication.session where token = ?
