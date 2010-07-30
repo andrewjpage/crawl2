@@ -1,8 +1,7 @@
 package org.genedb.crawl.model;
 
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -14,6 +13,7 @@ public class MappedQuery extends BaseResult {
 	public int end;
 	public String sequence;
 	
-	public Map<String, List<Object>> records = new HashMap<String, List<Object>>();
+	public Hashtable<String, List<Object>> records = new Hashtable<String, List<Object>>();
+	
 	
 }

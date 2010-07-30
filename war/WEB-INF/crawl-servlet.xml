@@ -21,15 +21,15 @@
 		<property name="defaultErrorView" value="suffix"/>
 	</bean>
     
-     
     <bean id="xmlView" class="org.springframework.web.servlet.view.xml.MarshallingView">
       <property name="contentType" value="application/xml" />
       <property name="modelKey" value="model" />
       <property name="marshaller">
         <bean class="org.springframework.oxm.xstream.XStreamMarshaller">
           <property name="autodetectAnnotations" value="true" />
-        </bean>
+         </bean>
       </property>
+      
     </bean>
     
     <bean id="jsonView" class="org.springframework.web.servlet.view.xml.MarshallingView">
@@ -39,8 +39,8 @@
        <bean class="org.springframework.oxm.xstream.XStreamMarshaller">
          <property name="autodetectAnnotations" value="true" />
          <property name="streamDriver">
-           <bean class="com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver" />
-         </property>
+            <bean class="com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver" />
+           </property>
        </bean>
      </property>
    </bean>
