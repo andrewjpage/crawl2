@@ -6,12 +6,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
+import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.model.BaseResult;
 import org.genedb.crawl.model.CrawlError;
 
 public class CrawlMappingExceptionResolver extends SimpleMappingExceptionResolver {
-	
+	private Logger logger = Logger.getLogger(CrawlMappingExceptionResolver.class);
 	@Override
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
 		ModelAndView mav = new ModelAndView("service:");
@@ -27,6 +28,8 @@ public class CrawlMappingExceptionResolver extends SimpleMappingExceptionResolve
 		}
 		
 		result.addResult(error);
+		
+		ex.printStackTrace();
 		
 		mav.addObject("model" , result);
 		return mav;
