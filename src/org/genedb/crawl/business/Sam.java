@@ -14,10 +14,14 @@ import net.sf.samtools.AlignmentBlock;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
+import net.sf.samtools.SAMSequenceRecord;
 
 import org.apache.log4j.Logger;
+import org.genedb.crawl.model.BaseResult;
 import org.genedb.crawl.model.MappedCoverage;
 import org.genedb.crawl.model.MappedQuery;
+import org.genedb.crawl.model.MappedSAMHeader;
+import org.genedb.crawl.model.MappedSAMSequence;
 
 
 public class Sam {
@@ -25,22 +29,55 @@ public class Sam {
 	private Logger logger = Logger.getLogger(Sam.class);
 	public HeirarchyIndex heirarchyIndex;
 	
-	private final String[] properties = {"alignmentStart", "alignmentEnd", "flags", "readName"};
+	private final String[] defaultProperties = {"alignmentStart", "alignmentEnd", "flags", "readName"};
+	private final Method[] methods = SAMRecord.class.getDeclaredMethods();
 	
-	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties) throws Exception {
-
+	private SAMFileReader getSamOrBam(int fileID) throws Exception {
 		final SAMFileReader inputSam = heirarchyIndex.getSamOrBam(fileID);
 		if (inputSam == null) {
 			throw new Exception ("Could not find the file " + fileID);
 		}
+		return inputSam;
+	}
+	
+	public MappedSAMHeader header(int fileID) throws Exception {
+		MappedSAMHeader model = new MappedSAMHeader();
 		
+		SAMFileReader inputSam = getSamOrBam(fileID);
+		
+		for (Map.Entry<String, Object> entry : inputSam.getFileHeader().getAttributes()) {
+			model.attributes.put(entry.getKey(), entry.getValue().toString());
+		}
+		
+		return model;
+	}
+	
+	public BaseResult sequence(int fileID) throws Exception {
+		BaseResult model = new BaseResult();
+		for (SAMSequenceRecord ssr : getSamOrBam(fileID).getFileHeader().getSequenceDictionary().getSequences()) {
+			MappedSAMSequence mss = new MappedSAMSequence();
+			mss.length = ssr.getSequenceLength();
+			mss.name = ssr.getSequenceName();
+			mss.index = ssr.getSequenceIndex();
+			model.addResult(mss);
+		}
+		return model;
+	}
+	
+	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained) throws Exception {
+		return query(fileID, sequence, start, end, contained, defaultProperties);		
+	}
+	
+	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties) throws Exception {
+
+		SAMFileReader inputSam = getSamOrBam(fileID);
 		
 		MappedQuery model = new MappedQuery();
 		
 		Set<String> propertySet = new HashSet<String>(Arrays.asList(properties));
 		Map<Method,String> methods2properties = new HashMap<Method,String>();
 		
-		Method[] methods = SAMRecord.class.getDeclaredMethods();
+		
 		for (Method method : methods) {
 			String methodName = method.getName();
 			if (methodName.startsWith("get")) {
@@ -85,13 +122,10 @@ public class Sam {
 					Method method = entry.getKey();
 					String propertyName = entry.getValue();
 					Object result = method.invoke(record, new Object[]{});
-					List list = model.records.get(propertyName);
+					List<Object> list = model.records.get(propertyName);
 					list.add(result);
 				}
 				
-				//MappedSAMRecord m = new MappedSAMRecord(record);
-				//model.addResult(m);
-				//logger.info("Adding " + m);
 			}
 		
 		} catch (Exception e) {
@@ -112,16 +146,11 @@ public class Sam {
 		return model;
 	}
 	
-	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained) throws Exception {
-		return query(fileID, sequence, start, end, contained, properties);		
-	}
+	
 	
 	public synchronized MappedCoverage coverage(int fileID, String sequence, int start, int end, int window) throws Exception {
 		
-		final SAMFileReader inputSam = heirarchyIndex.getSamOrBam(fileID);
-		if (inputSam == null) {
-			throw new Exception ("Could not find the file " + fileID);
-		}
+		SAMFileReader inputSam = getSamOrBam(fileID);
 		
 		int max = 0;
 		final int nBins = Math.round((end-start+1.f)/window);
@@ -152,11 +181,6 @@ public class Sam {
 						
 						final int pos = block.getReferenceStart() + k - start;
 						final float fbin =  pos / (float) window;
-						
-						if ( record.getReadName().equals("IL6_4415:2:54:17521:5107#11")) {
-							logger.debug(pos + " / " + window + " = " + fbin);
-							//debug(record.getReadName() + " " + record.getAlignmentStart() + " " + pos + " " + bin + " = " + k + " " + window + " " + (bin < 0) + " " + (bin > nBins-1));
-						}
 						
 						if ((fbin < 0) || (fbin > nBins-1)) {
 							continue;
