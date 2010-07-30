@@ -14,6 +14,6 @@ public class MappedQuery extends BaseResult {
 	public int end;
 	public String sequence;
 	
-	public Map<String, List> records = new HashMap<String, List>();
+	public Map<String, List<Object>> records = new HashMap<String, List<Object>>();
 	
 }
