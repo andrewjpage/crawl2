@@ -27,6 +27,9 @@
       <property name="marshaller">
         <bean class="org.springframework.oxm.xstream.XStreamMarshaller">
           <property name="autodetectAnnotations" value="true" />
+          <property name="converters">
+                <bean class="org.genedb.crawl.model.HashConverter" ></bean>
+          </property>
          </bean>
       </property>
       
@@ -39,8 +42,12 @@
        <bean class="org.springframework.oxm.xstream.XStreamMarshaller">
          <property name="autodetectAnnotations" value="true" />
          <property name="streamDriver">
-            <bean class="com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver" />
-           </property>
+            <!-- <bean class="com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver" />  -->
+            <bean class="com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver" />
+         </property>
+         <property name="converters">
+                <bean class="org.genedb.crawl.model.HashConverter" ></bean>
+          </property>
        </bean>
      </property>
    </bean>
