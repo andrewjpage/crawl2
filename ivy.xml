@@ -11,6 +11,8 @@
              -->
         </configurations>
     <dependencies>
+    
+        <!--  having more luck retrieving jars from http://mvnrepository.com/ -->
         
         <!-- shared by all -->
         <dependency org="org.springframework" name="org.springframework.jdbc" rev="3.0.2.RELEASE" conf="*->compile" />
@@ -18,6 +20,15 @@
         <!--  <dependency org="postgresql" name="postgresql" rev="8.4-701.jdbc3" />  -->
         <dependency org="org.postgresql" name="com.springsource.org.postgresql.jdbc4" rev="8.3.604" conf="*->compile" />
         <dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15"  conf="*->compile" />
+        
+        <dependency org="com.google.code.gson" name="gson" rev="1.4" />
+        
+        <dependency org="org.apache.lucene" name="lucene-core" rev="3.0.2" />
+        <!-- <dependency org="org.apache.lucene" name="com.springsource.org.apache.lucene" rev="2.4.1" />-->
+        
+        <dependency org="commons-lang" name="commons-lang" rev="2.5"  />
+        <!--  <dependency org="org.apache.commons" name="com.springsource.org.apache.commons.lang" rev="2.1.0" conf="*->compile"  /> -->
+        
         
         <!-- only used in the compile -->
         <dependency org="javax.servlet" name="servlet-api" rev="2.5" conf="compile->default" />

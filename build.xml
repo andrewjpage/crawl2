@@ -10,8 +10,12 @@
 <property name="build.war.name" value="crawl"  />
 <property name="build.classes.home" value="${basedir}/ant-build" />
 
+<property name="log4j.config" value="${basedir}/war/WEB-INF/log4j.properties"/> 	
+	
 <property name="lib.dir" value="${basedir}/lib" />
 <property name="ivy.lib.dir" value="${basedir}/lib/ivy" />
+	
+	
 
 <path id="lib.compile.path">
 	<fileset dir="${ivy.lib.dir}/compile" />
@@ -40,19 +44,19 @@
 </target>
 
 
-<target name="resolve-compile" unless="disable.library.resolution" description="retrieves package-dependencies" >  
+<target name="resolve-compile" unless="disable.library.resolution"  >  
     <ivy:resolve conf="compile"/>
-    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" />  
+    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />  
 </target>
 
-<target name="resolve-war" unless="disable.library.resolution" description="retrieves build-dependencies" >  
+<target name="resolve-war" unless="disable.library.resolution"  >  
     <ivy:resolve conf="war"/>
-    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" />
+    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
 </target>
 	
-<target name="resolve-jar" unless="disable.library.resolution" description="retrieves build-dependencies" >  
+<target name="resolve-jar" unless="disable.library.resolution"  >  
     <ivy:resolve conf="jar"/>
-    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[artifact].[ext]" />
+    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
 </target>
 
 <!--
@@ -156,6 +160,12 @@
 		<mapper type="flatten"/>
 	</copy>
 	
+	<copy todir="${build.war.home}" >
+		<path>
+		    <fileset dir="${basedir}/etc/" />
+		</path>
+	</copy>
+	
 	<!-- don't keep the generated project.properties file when we're done packaging -->
 	<delete file="war/WEB-INF/classes/project.properties" />
 </target>
@@ -167,6 +177,35 @@
 	
 <target name="deploy" depends="package-war, undeploy" >
     <copy file="${build.war.home}/${build.war.name}.war" todir="${deploy.dir}/"/>
+</target>
+
+
+	
+<target name="GenerateLuceneIndices" >
+	<fail message="The 'tabix' property must be set" unless="tabix"/> 
+	<echo>${tabix}</echo>
+	<fail message="The 'lucene' property must be set" unless="lucene"/> 
+	<echo>${lucene}</echo>
+	<fail message="The 'log4j.config' property must be set" unless="log4j.config"/> 
+	<echo>${log4j.config}</echo>
+	
+	<mkdir dir="${lucene}" />
+	
+    <java fork="true" maxmemory="1024m" failonerror="true" classname="org.genedb.crawl.business.GenerateLuceneIndex"  >
+        <classpath>
+            <path >
+            	<fileset dir="${build.war.home}" >
+            		<include name="**/*.jar"/>
+            	 </fileset>
+            </path>
+        </classpath>
+
+    	<arg line="-t '${tabix}' -l '${lucene}' "/>
+        <jvmarg line="-server -Djava.awt.headless=true" />
+    	<jvmarg value="-Dlog4j.configuration=file://${log4j.config}"/>
+
+    </java>
+	
 </target>
 
 </project>
