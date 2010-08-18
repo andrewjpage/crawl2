@@ -13,7 +13,6 @@
     <dependencies>
     
         <!--  having more luck retrieving jars from http://mvnrepository.com/ -->
-        
         <!-- shared by all -->
         <dependency org="org.springframework" name="org.springframework.jdbc" rev="3.0.2.RELEASE" conf="*->compile" />
         <dependency org="org.apache.commons" name="com.springsource.org.apache.commons.dbcp" rev="1.2.2.osgi" conf="*->compile" />
@@ -22,6 +21,10 @@
         <dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.15"  conf="*->compile" />
         
         <dependency org="com.google.code.gson" name="gson" rev="1.4" />
+        <dependency org="org.jyaml" name="jyaml" rev="1.3"/>
+        
+        <dependency org="org.mortbay.jetty" name="jetty-runner" rev="7.1.6.v20100715"/>
+        
         
         <dependency org="org.apache.lucene" name="lucene-core" rev="3.0.2" />
         <!-- <dependency org="org.apache.lucene" name="com.springsource.org.apache.lucene" rev="2.4.1" />-->

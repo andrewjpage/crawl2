@@ -6,3 +6,5 @@ dbuser=pathdb
 dbpassword=pathdb
 sqlPath=/sql
 fileStorePath=/Volumes/us/db/heirarchy
+luceneDirectory=/Users/gv1/Documents/Data/lucene
+tabixDirectory=/Users/gv1/Documents/Data/out

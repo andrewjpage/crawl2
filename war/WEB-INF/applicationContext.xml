@@ -34,6 +34,9 @@
         <property name="fileStorePath" ><value>${fileStorePath}</value></property>
     </bean>
     
-    
+    <bean id="annotationRepository" class="org.genedb.crawl.business.AnnotationRepository" >
+        <property name="luceneDirectory"><value>${luceneDirectory}</value></property>
+        <property name="tabixDirectory"><value>${tabixDirectory}</value></property>
+    </bean>
     
 </beans>

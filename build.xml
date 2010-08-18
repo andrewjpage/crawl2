@@ -129,6 +129,14 @@
 	
 </target>
 	
+<target name="run-jetty">
+	<!--java -jar lib/ivy/compile/jar-jetty-runner-jetty-runner-7.1.6.v20100715.jar dist/crawl.war -->
+	<java fork="true" maxmemory="128m" failonerror="true" jar="${ivy.lib.dir}/compile/jar-jetty-runner-jetty-runner-7.1.6.v20100715.jar"  >
+		<arg line=" ${build.war.home}/${build.war.name}.war "/>
+	</java>
+	
+</target>
+	
 <target name="package-jar" depends="compile,resolve-jar" >
 	
 	<!-- generate a path string for use in the crawl.jar manifest -->
