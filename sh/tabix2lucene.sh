@@ -25,11 +25,12 @@ then
      exit 1
 fi
 
-
-java -server -Djava.awt.headless=true -Xmx1024m \
+exec="java -server -Djava.awt.headless=true -Xmx1024m \
 	-Dlog4j.configuration=file://$CRAWL_HOME/log4j.properties \
 	-cp $CRAWL_HOME/crawl.jar \
 	org.genedb.crawl.business.GenerateLuceneIndex \
 	-t $TABIX_DIR \
-	-l $LUCENE_DIR
+	-l $LUCENE_DIR"
 
+echo $exec
+eval $exec
