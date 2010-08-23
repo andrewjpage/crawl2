@@ -1,4 +1,4 @@
-package org.genedb.crawl;
+package org.genedb.crawl.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;

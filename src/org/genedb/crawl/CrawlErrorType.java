@@ -9,5 +9,6 @@ public enum CrawlErrorType {
 	    UNKOWN_QUERY,
 	    MISC_ERROR,
 	    DATA_PARSING_ERROR,
+	    QUERY_FAILURE
 
 }

@@ -3,14 +3,9 @@ package org.genedb.crawl;
 import java.io.File;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.log4j.Appender;
-import org.apache.log4j.WriterAppender;
-import org.apache.log4j.helpers.QuietWriter;
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.genedb.security.ChadoSession;
-import org.genedb.security.ChadoUser;
+import org.genedb.crawl.business.postgres.QueryMap;
 
 public class Main {
 	
@@ -40,12 +35,7 @@ public class Main {
 		dataSource.setUsername("pathdb");
 		dataSource.setPassword("pathdb");
 		
-		ChadoSession cs = new ChadoSession();
-		cs.setDataSource(dataSource);
-		cs.queryMap = queryMap;
 		
-		ChadoUser user = cs.userGet("admin");
-		System.out.println(user.email);
 	}
 
 }

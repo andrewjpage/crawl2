@@ -27,9 +27,6 @@ public class GFFIndexer {
 	private File indexDirectory;
 	private IndexWriter writer;
 	
-	public static void main(String[] args) {
-		
-	}
 	
 	public void setIndexDirectory(File indexDirectory) throws IOException {
 		this.indexDirectory = indexDirectory;

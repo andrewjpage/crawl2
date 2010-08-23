@@ -23,7 +23,7 @@ public class FileStoreHeirarchyIndex implements HeirarchyIndex {
 		
 		try {
 			this.fileStorePath = fileStorePath;
-			logger.info(this.fileStorePath);
+			logger.debug(this.fileStorePath);
 			
 			File dir = new File(this.fileStorePath);
 			

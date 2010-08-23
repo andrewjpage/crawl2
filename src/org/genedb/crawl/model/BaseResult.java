@@ -19,6 +19,9 @@ public class BaseResult {
         results.add(br);
     }
     
+    public static String bool(boolean bool) {
+    	return (bool) ? "True" : "False";
+    }
     
     
 }

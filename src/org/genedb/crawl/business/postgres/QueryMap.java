@@ -1,4 +1,4 @@
-package org.genedb.crawl;
+package org.genedb.crawl.business.postgres;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,8 +26,8 @@ public class QueryMap {
 	}
 	
 	/*
-	 * For use in a servlet environment.
-	 * */
+	 * For use in a servlet environment. 
+	 */
 	public void setSqlPath(String path) throws Exception {
 		URL pathURL = getClass().getClassLoader().getResource(path);
 		logger.debug(pathURL);
@@ -41,7 +41,7 @@ public class QueryMap {
 	private void storeSQLs(File dir) throws IOException {
 		
 		for (File file : dir.listFiles()) {
-			logger.info(file.getAbsolutePath());
+			logger.debug(file.getAbsolutePath());
 			String fileName = file.getName();
 			if (! fileName.contains(".sql")) {
 				continue;
@@ -53,7 +53,7 @@ public class QueryMap {
 	}
 	
 	public String getQuery(String name) {
-		logger.info(name);
+		logger.debug(name);
 		return queries.get(name);
 	}
 	

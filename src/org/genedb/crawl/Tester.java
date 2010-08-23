@@ -20,7 +20,6 @@ public class Tester {
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 	    this.jdbcTemplate = new JdbcTemplate(dataSource);
-	    logger.info(this.jdbcTemplate);
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value={"/jquery", "/jquery.*"})
