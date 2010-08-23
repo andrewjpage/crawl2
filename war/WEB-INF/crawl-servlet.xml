@@ -13,9 +13,17 @@
         - The controllers are autodetected POJOs labeled with the @Controller annotation.
     -->
     
-     <context:component-scan base-package="org.genedb.crawl" />
-    <!-- <context:property-placeholder location="classpath:project.properties" /> -->
+     
+   <context:property-placeholder location="classpath:project.properties" />
     
+   <import resource="crawl-repository.xml"/>
+   
+   <context:component-scan base-package="org.genedb.crawl.controller" />
+   
+   
+   <bean id="samHeirarchyIndex" class="org.genedb.crawl.business.FileStoreHeirarchyIndex" >
+        <property name="fileStorePath" ><value>${fileStorePath}</value></property>
+    </bean>
     
     <bean class="org.genedb.crawl.view.CrawlMappingExceptionResolver">
 		<property name="defaultErrorView" value="suffix"/>

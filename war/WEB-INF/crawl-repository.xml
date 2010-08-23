@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:util="http://www.springframework.org/schema/util"
@@ -13,14 +13,18 @@
          http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd"
 
     default-init-method="postConstruction">
+    
+    
+    <context:property-placeholder location="classpath:project.properties" />
+    
+    <context:component-scan base-package="org.genedb.crawl.business.lucene" />    
+    
+    <bean id="annotationRepository" class="org.genedb.crawl.business.AnnotationRepository" >
+        <property name="luceneDirectory"><value>${luceneDirectory}</value></property>
+        <property name="tabixDirectory"><value>${tabixDirectory}</value></property>
+    </bean>
+    
+     
+    
 
-    <!-- <context:component-scan base-package="org.genedb.crawl,org.genedb.security" />  -->
-    <!--  <context:property-placeholder location="classpath:project.properties" />  -->
-    
-    
-    
-    
-    
-    
-    
 </beans>

@@ -4,10 +4,10 @@
     default="compile"
 >
 
-<property file="property-file.${config}" />
+<property file="${config}.properties" />
 
 <property name="build.war.home" value="${basedir}/dist" />
-<property name="build.war.name" value="crawl"  />
+<property name="build.war.name" value="${config}"  />
 <property name="build.classes.home" value="${basedir}/ant-build" />
 
 <property name="log4j.config" value="${basedir}/war/WEB-INF/log4j.properties"/> 	
@@ -45,18 +45,18 @@
 
 
 <target name="resolve-compile" unless="disable.library.resolution"  >  
-    <ivy:resolve conf="compile"/>
-    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />  
+    <ivy:resolve log="quiet" conf="compile"/>
+    <ivy:retrieve log="quiet" validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />  
 </target>
 
 <target name="resolve-war" unless="disable.library.resolution"  >  
-    <ivy:resolve conf="war"/>
-    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
+    <ivy:resolve log="quiet" conf="war"/>
+    <ivy:retrieve log="quiet" validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
 </target>
 	
 <target name="resolve-jar" unless="disable.library.resolution"  >  
-    <ivy:resolve conf="jar"/>
-    <ivy:retrieve validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
+    <ivy:resolve log="quiet" conf="jar"/>
+    <ivy:retrieve log="quiet" validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
 </target>
 
 <!--
@@ -86,7 +86,12 @@
 
 <target name="package-war" depends="compile,resolve-war" >
     
-	<copy file="property-file.${config}" tofile="war/WEB-INF/classes/project.properties" overwrite="true" />
+	<fail message="The 'config' property must be set" unless="config"/>
+	<fail message="The 'resource.type' property must be set" unless="resource.type"/>
+	
+	<copy file="etc/config/crawl-${resource.type}.xml" tofile="war/WEB-INF/crawl-repository.xml" overwrite="true" />
+	
+	<copy file="${config}.properties" tofile="war/WEB-INF/classes/project.properties" overwrite="true" />
 	
 	<copy todir="war/WEB-INF/classes/sql">
         <fileset dir="sql/">
@@ -130,6 +135,9 @@
 </target>
 	
 <target name="run-jetty">
+	
+	<fail message="The 'config' property must be set" unless="config"/>
+	
 	<!--java -jar lib/ivy/compile/jar-jetty-runner-jetty-runner-7.1.6.v20100715.jar dist/crawl.war -->
 	<java fork="true" maxmemory="128m" failonerror="true" jar="${ivy.lib.dir}/compile/jar-jetty-runner-jetty-runner-7.1.6.v20100715.jar"  >
 		<arg line=" ${build.war.home}/${build.war.name}.war "/>
@@ -145,7 +153,7 @@
 	    <flattenmapper />
 	</pathconvert>
     
-	<jar destfile="${build.war.home}/${build.war.name}.jar"  >
+	<jar destfile="${build.war.home}/crawl.jar"  >
 		
 		<fileset dir=".">
 			  <include name="sql/**.sql" />
