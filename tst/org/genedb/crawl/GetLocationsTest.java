@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.genedb.crawl.business.AnnotationRepository;
 import org.genedb.crawl.business.GetLocations;
 import org.genedb.crawl.model.Locations;
+import org.ho.yaml.Yaml;
 
 import com.google.gson.Gson;
 //import com.thoughtworks.xstream.XStream;
@@ -113,6 +114,8 @@ public class GetLocationsTest extends TestCase {
 		String json = gson.toJson(locations);
 		
 		logger.info(json);
+		
+		logger.info(Yaml.dump(locations));
 		
 		//final long t2_2 = System.currentTimeMillis();
 		
