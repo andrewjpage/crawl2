@@ -1,1 +1,0 @@
-select * from authentication.role where rolename = ?
