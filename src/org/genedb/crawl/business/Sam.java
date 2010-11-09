@@ -64,11 +64,11 @@ public class Sam {
 		return model;
 	}
 	
-	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained) throws Exception {
-		return query(fileID, sequence, start, end, contained, defaultProperties);		
+	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, int filter) throws Exception {
+		return query(fileID, sequence, start, end, contained, defaultProperties, filter);		
 	}
 	
-	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties) throws Exception {
+	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
 
 		SAMFileReader inputSam = getSamOrBam(fileID);
 		
@@ -117,6 +117,12 @@ public class Sam {
 			
 			while ( i.hasNext() )  {
 				SAMRecord record = i.next();
+				
+				if (filter > 0) {
+					if ((record.getFlags() & filter) > 0) {
+						continue;
+					}
+				}
 				
 				for (Entry<Method, String> entry : methods2properties.entrySet()) {
 					Method method = entry.getKey();

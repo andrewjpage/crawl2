@@ -49,9 +49,10 @@ public class SamController {
 			@RequestParam("sequence") String sequence,
 			@RequestParam("start") int start,
 			@RequestParam("end") int end,
-			@RequestParam("contained") boolean contained) throws Exception {
+			@RequestParam("contained") boolean contained,
+			@RequestParam("filter") int filter) throws Exception {
 		ModelAndView mav = new ModelAndView("service:");
-		mav.addObject("model", sam.query(fileID, sequence, start, end, contained));
+		mav.addObject("model", sam.query(fileID, sequence, start, end, contained, filter));
 		return mav;
 	}
 	
