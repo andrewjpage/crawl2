@@ -68,6 +68,9 @@ public class Sam {
 		return query(fileID, sequence, start, end, contained, defaultProperties, filter);		
 	}
 	
+	
+	
+	
 	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
 
 		SAMFileReader inputSam = getSamOrBam(fileID);
@@ -94,12 +97,14 @@ public class Sam {
 			}
 		}
 		
+		logger.debug(String.format("fileID: %d\tlocation: '%s:%d-%d'\tcontained?%s\tfilter: %d(%s)", fileID, sequence, start, end, contained, filter, padLeft(Integer.toBinaryString(filter), 8)));
+		
 		SAMRecordIterator i = null;
 		try {
 			
 			/**
 			 * 
-			 * According to the BAMFileReader2 docs:
+			 * According to the BAMFileReader2 doc:
 			 * 
 		     * "Prepare to iterate through the SAMRecords in file order.
 		     * Only a single iterator on a BAM file can be extant at a time.  If getIterator() or a query method has been called once,
@@ -113,15 +118,22 @@ public class Sam {
 		     * 
 		     */
 			
-			i = inputSam.query(sequence, start, end, true);
+			i = inputSam.query(sequence, start, end, contained);
 			
 			while ( i.hasNext() )  {
 				SAMRecord record = i.next();
 				
-				if (filter > 0) {
-					if ((record.getFlags() & filter) > 0) {
-						continue;
-					}
+				/*
+				int toFilter = record.getFlags() & filter;
+				logger.debug(String.format("Read: %s, Filter: %s, Flags: %s, Result: %s", record.getReadName(), filter, record.getFlags(), toFilter ));
+				logger.debug(padLeft(Integer.toBinaryString(filter), 8));
+				logger.debug(padLeft(Integer.toBinaryString(record.getFlags()), 8));
+				logger.debug(padLeft(Integer.toBinaryString(toFilter), 8));
+				*/
+				
+				if ((record.getFlags() & filter) > 0) {
+					//logger.debug("some matches ... skipping");
+					continue;
 				}
 				
 				for (Entry<Method, String> entry : methods2properties.entrySet()) {
@@ -229,6 +241,10 @@ public class Sam {
 		
 		return mc;
 		
+	}
+	
+	private String padLeft(String s, int n) {
+	    return String.format("%1$#" + n + "s", s);  
 	}
 	
 }
