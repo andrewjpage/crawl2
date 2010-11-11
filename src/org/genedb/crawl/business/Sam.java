@@ -41,11 +41,13 @@ public class Sam {
 	}
 	
 	public MappedSAMHeader header(int fileID) throws Exception {
+		return this.header(getSamOrBam(fileID));
+	}
+	
+	public MappedSAMHeader header(SAMFileReader file) throws Exception {
 		MappedSAMHeader model = new MappedSAMHeader();
 		
-		SAMFileReader inputSam = getSamOrBam(fileID);
-		
-		for (Map.Entry<String, Object> entry : inputSam.getFileHeader().getAttributes()) {
+		for (Map.Entry<String, Object> entry : file.getFileHeader().getAttributes()) {
 			model.attributes.put(entry.getKey(), entry.getValue().toString());
 		}
 		
@@ -53,8 +55,12 @@ public class Sam {
 	}
 	
 	public BaseResult sequence(int fileID) throws Exception {
+		return this.sequence(getSamOrBam(fileID));
+	}
+	
+	public BaseResult sequence(SAMFileReader file) throws Exception {
 		BaseResult model = new BaseResult();
-		for (SAMSequenceRecord ssr : getSamOrBam(fileID).getFileHeader().getSequenceDictionary().getSequences()) {
+		for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
 			MappedSAMSequence mss = new MappedSAMSequence();
 			mss.length = ssr.getSequenceLength();
 			mss.name = ssr.getSequenceName();
@@ -69,11 +75,13 @@ public class Sam {
 	}
 	
 	
-	
-	
 	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
+		logger.debug(String.format("fileID: %d\tlocation: '%s:%d-%d'\tcontained?%s\tfilter: %d(%s)", fileID, sequence, start, end, contained, filter, padLeft(Integer.toBinaryString(filter), 8)));
+		return this.query(getSamOrBam(fileID), sequence, start, end, contained, properties, filter);
+	}
+	
+	public synchronized MappedQuery query(SAMFileReader file, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
 
-		SAMFileReader inputSam = getSamOrBam(fileID);
 		
 		MappedQuery model = new MappedQuery();
 		
@@ -97,7 +105,7 @@ public class Sam {
 			}
 		}
 		
-		logger.debug(String.format("fileID: %d\tlocation: '%s:%d-%d'\tcontained?%s\tfilter: %d(%s)", fileID, sequence, start, end, contained, filter, padLeft(Integer.toBinaryString(filter), 8)));
+		
 		
 		SAMRecordIterator i = null;
 		try {
@@ -118,7 +126,7 @@ public class Sam {
 		     * 
 		     */
 			
-			i = inputSam.query(sequence, start, end, contained);
+			i = file.query(sequence, start, end, contained);
 			
 			while ( i.hasNext() )  {
 				SAMRecord record = i.next();
@@ -165,10 +173,13 @@ public class Sam {
 	}
 	
 	
-	
 	public synchronized MappedCoverage coverage(int fileID, String sequence, int start, int end, int window) throws Exception {
+		return this.coverage(getSamOrBam(fileID), sequence, start, end, window);
+	}
+	
+	public synchronized MappedCoverage coverage(SAMFileReader file, String sequence, int start, int end, int window) throws Exception {
 		
-		SAMFileReader inputSam = getSamOrBam(fileID);
+		
 		
 		int max = 0;
 		final int nBins = Math.round((end-start+1.f)/window);
@@ -188,7 +199,7 @@ public class Sam {
 		logger.debug(startTime);
 		
 		try {
-			iter = inputSam.query(sequence, start, end, false);
+			iter = file.query(sequence, start, end, false);
 			while (iter.hasNext()) {
 				
 				SAMRecord record = iter.next();
