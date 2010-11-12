@@ -9,10 +9,6 @@
                     http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd"
     >
     
-    <!--
-        - The controllers are autodetected POJOs labeled with the @Controller annotation.
-    -->
-    
      
    <context:property-placeholder location="classpath:project.properties" />
     
@@ -20,73 +16,30 @@
    
    <context:component-scan base-package="org.genedb.crawl.controller" />
    
-   
-   <bean id="samHeirarchyIndex" class="org.genedb.crawl.business.FileStoreHeirarchyIndex" >
-        <property name="fileStorePath" ><value>${fileStorePath}</value></property>
-    </bean>
-    
     <bean class="org.genedb.crawl.view.CrawlMappingExceptionResolver">
 		<property name="defaultErrorView" value="suffix"/>
 	</bean>
     
-    <bean id="xmlView" class="org.springframework.web.servlet.view.xml.MarshallingView">
-      <property name="contentType" value="application/xml" />
-      <property name="modelKey" value="model" />
-      <property name="marshaller">
-        <bean class="org.springframework.oxm.xstream.XStreamMarshaller">
-          <property name="autodetectAnnotations" value="true" />
-          <property name="converters">
-                <bean class="org.genedb.crawl.model.HashConverter" ></bean>
-          </property>
-         </bean>
-      </property>
-      
+    <bean id="gsonView" class="org.genedb.crawl.view.GsonView"></bean>
+    <bean id="xView" class="org.genedb.crawl.view.XMLView"></bean>
+    
+    <bean id="alignmentStore" class="org.genedb.crawl.business.AlignmentStore">
+        <property name="alignmentFiles" ><value>${alignments}</value></property>
     </bean>
     
-    <bean id="jsonView" class="org.springframework.web.servlet.view.xml.MarshallingView">
-     <property name="contentType" value="application/json" />
-     <property name="modelKey" value="model" />
-     <property name="marshaller">
-       <bean class="org.springframework.oxm.xstream.XStreamMarshaller">
-         <property name="autodetectAnnotations" value="true" />
-         <property name="streamDriver">
-            <!-- <bean class="com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver" />  -->
-            <bean class="com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver" />
-         </property>
-         <property name="converters">
-                <bean class="org.genedb.crawl.model.HashConverter" ></bean>
-          </property>
-       </bean>
-     </property>
-   </bean>
-    
-    <bean class="org.genedb.crawl.view.SuffixViewResolver"  >
+    <bean class="org.genedb.crawl.view.CrawlViewResolver"  >
 	    <property name="order" value="2" />
-	     
-	     <!-- 
-	    <property name="viewResolverMap">
-            <map>
-               <entry key="jsp" value-ref="internalResourceViewResolver" />
-            </map>
-        </property>  -->
-        
+	    
 	    <property name="viewMap">
 	      <map>
-	        <entry key="xml" value-ref="xmlView" />
-	        <entry key="json" value-ref="jsonView" />
+	        <entry key="xml" value-ref="xView" />
+	        <!-- <entry key="json" value-ref="jsonView" />  -->
+	        <entry key="json" value-ref="gsonView" />
 	      </map>
 	    </property>
   </bean>
   
-   <!--<bean id="jspCheckingViewResolver" class="org.genedb.web.mvc.view.FileCheckingInternalResourceViewResolver"
-    init-method="postConstruction">
-    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
-    <property name="prefix" value="/WEB-INF/jsp/" />
-    <property name="suffix" value=".jsp" />
-    <property name="order" value="2" />
-  </bean>
-    
-    -->
+  
     
     <bean id="internalResourceViewResolver" 
         class="org.springframework.web.servlet.view.InternalResourceViewResolver" 
@@ -95,13 +48,6 @@
         p:order="3" />
     
     
-    
-    
-    <!-- 
-    <bean id="organisms" class="org.genedb.crawl.Organisms" >
-        <property name="sqlResource" value="classpath:sql/get_all_organisms_and_taxon_ids.sql" /> 
-        <property name="queryMap" ref="queryMap" />
-    </bean>
-    -->     
+     
     
 </beans>

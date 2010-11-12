@@ -30,6 +30,8 @@
         <property name="sqlPath"><value>${sqlPath}</value></property>
     </bean>
     
+    
+    
     <!-- 
     <bean id="querySource" class="org.genedb.crawl.business.postgres.PostgresQuerySource" >
         <property name="dataSource" ref="dataSource" ></property>

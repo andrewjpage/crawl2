@@ -145,7 +145,7 @@ public class GenerateLuceneOrganism {
 			
 			logger.info("Writing: " + writer.getDirectory());
 			
-			addOrReplaceFieldValue(doc,  "genus", options.genus);
+			addOrReplaceFieldValue(doc, "genus", options.genus);
 			addOrReplaceFieldValue(doc, "species", options.species);
 			addOrReplaceFieldValue(doc, "taxon_id", options.taxon_id);
 			addOrReplaceFieldValue(doc, "translation_table", options.translation_table);

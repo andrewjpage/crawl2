@@ -1,5 +1,7 @@
 package org.genedb.crawl.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.model.MappedOrganismList;
@@ -21,10 +23,10 @@ public class OrganismsController extends BaseQueryController {
 	Organisms organisms;
 	
 	@RequestMapping(method=RequestMethod.GET, value={"/list", "/list.*"})
-	public ModelAndView list() throws CrawlException {
+	public ModelAndView list(HttpServletRequest request) throws CrawlException {
 		ModelAndView mav = new ModelAndView("service:"); 
 		MappedOrganismList organismsList = organisms.list();
-		mav.addObject("model", organismsList);
+		mav.addObject("model", this.generateResponseWrapper(request, organismsList));
 		return mav;
 	}
 	

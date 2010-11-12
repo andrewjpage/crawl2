@@ -1,5 +1,7 @@
 package org.genedb.crawl.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.model.Locations;
 import org.genedb.crawl.model.interfaces.Regions;
@@ -18,10 +20,10 @@ public class RegionsController extends BaseQueryController {
 	Regions regions;
 	
 	@RequestMapping(method=RequestMethod.GET, value={"/locations", "/locations.*"})
-	public ModelAndView locations( @RequestParam("region") String region, @RequestParam("start") int start, @RequestParam("end") int end) throws CrawlException {
+	public ModelAndView locations(HttpServletRequest request, @RequestParam("region") String region, @RequestParam("start") int start, @RequestParam("end") int end) throws CrawlException {
 		ModelAndView mav = new ModelAndView("service:"); 
 		Locations locations = regions.locations(region, start, end);
-		mav.addObject("model", locations);
+		mav.addObject("model", this.generateResponseWrapper(request,locations));
 		return mav;
 	}
 	

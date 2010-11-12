@@ -29,13 +29,13 @@ public class OrganismsQueries extends Base implements Organisms {
 				o.genus = rs.getString("genus");
 				o.species = rs.getString("species");
 				o.common_name = rs.getString("common_name");
-				o.ID = rs.getInt("ID");
+				o.ID = rs.getString("ID");
 				o.taxonID = rs.getString("taxonID");
 				return o;
 			}
 		});
 		
-		organisms.list = new ArrayList<MappedOrganism>(results);
+		organisms.organisms = new ArrayList<MappedOrganism>(results);
 		return organisms;
 	}
 

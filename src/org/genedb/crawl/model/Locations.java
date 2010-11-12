@@ -7,7 +7,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("response")
-public class Locations  {
+public class Locations extends BaseResult  {
 	
 	@XStreamAsAttribute()
 	public String name;

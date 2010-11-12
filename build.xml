@@ -7,7 +7,7 @@
 <property file="${config}.properties" />
 
 <property name="build.war.home" value="${basedir}/dist" />
-<property name="build.war.name" value="${config}"  />
+<property name="build.war.name" value="${deploy.name}"  />
 <property name="build.classes.home" value="${basedir}/ant-build" />
 
 <property name="log4j.config" value="${basedir}/war/WEB-INF/log4j.properties"/> 	
@@ -87,6 +87,8 @@
 <target name="package-war" depends="compile,resolve-war" >
     
 	<fail message="The 'config' property must be set" unless="config"/>
+	<fail message="The 'deploy.name' property must be set" unless="deploy.name" />
+	
 	<fail message="The 'resource.type' property must be set" unless="resource.type"/>
 	
 	<copy file="etc/config/crawl-${resource.type}.xml" tofile="war/WEB-INF/crawl-repository.xml" overwrite="true" />
@@ -134,7 +136,7 @@
 	
 </target>
 	
-<target name="run-jetty">
+<target name="run-jetty" depends="package-war" >
 	
 	<fail message="The 'config' property must be set" unless="config"/>
 	

@@ -10,5 +10,5 @@ public class MappedOrganism {
 	public String taxonID;
 	public String translation_table;
 	public String name;
-	public int ID;
+	public String ID;
 }

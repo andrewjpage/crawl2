@@ -14,9 +14,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class SuffixViewResolver implements ViewResolver, Ordered {
+public class CrawlViewResolver implements ViewResolver, Ordered {
 
-    private Logger logger = Logger.getLogger(SuffixViewResolver.class);
+    private Logger logger = Logger.getLogger(CrawlViewResolver.class);
 
     private Map<String, View> viewMap;
 
@@ -35,8 +35,7 @@ public class SuffixViewResolver implements ViewResolver, Ordered {
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {
     	
-    	logger.info(viewName);
-    	System.out.println(viewName);
+    	logger.debug(viewName);
     	
     	String[] viewSplit = viewName.split(":");
     	
@@ -45,7 +44,7 @@ public class SuffixViewResolver implements ViewResolver, Ordered {
     	}
     	
     	String prefix = viewSplit[0];
-    	logger.info(String.format("prefix: '%s'", prefix) );
+    	logger.debug(String.format("prefix: '%s'", prefix) );
     	
 		if (prefix.equals("service")) {
 			
@@ -56,9 +55,8 @@ public class SuffixViewResolver implements ViewResolver, Ordered {
 				extensionViewName = getExtension();
 			}
 			
-			logger.debug("service resolver");
 			View view = viewMap.get(extensionViewName);
-            logger.debug(String.format("Returning view of type '%s'", view.getClass()));
+            logger.info(String.format("Returning view of type '%s'", view.getClass()));
             return view;
 		}
 //		

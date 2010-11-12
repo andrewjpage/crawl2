@@ -18,6 +18,8 @@ import net.sf.samtools.SAMSequenceRecord;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.model.BaseResult;
+import org.genedb.crawl.model.FileInfo;
+import org.genedb.crawl.model.FileInfoList;
 import org.genedb.crawl.model.MappedCoverage;
 import org.genedb.crawl.model.MappedQuery;
 import org.genedb.crawl.model.MappedSAMHeader;
@@ -27,13 +29,14 @@ import org.genedb.crawl.model.MappedSAMSequence;
 public class Sam {
 	
 	private Logger logger = Logger.getLogger(Sam.class);
-	public HeirarchyIndex heirarchyIndex;
+	
+	public AlignmentStore alignmentStore;
 	
 	private final String[] defaultProperties = {"alignmentStart", "alignmentEnd", "flags", "readName"};
 	private final Method[] methods = SAMRecord.class.getDeclaredMethods();
 	
 	private SAMFileReader getSamOrBam(int fileID) throws Exception {
-		final SAMFileReader inputSam = heirarchyIndex.getSamOrBam(fileID);
+		final SAMFileReader inputSam = alignmentStore.getReader(fileID); 
 		if (inputSam == null) {
 			throw new Exception ("Could not find the file " + fileID);
 		}
@@ -70,6 +73,37 @@ public class Sam {
 		return model;
 	}
 	
+	private FileInfoList list(List<Alignment> alignments) {
+		
+		FileInfoList files = new FileInfoList();
+		
+		for (Alignment alignment : alignments) {
+			FileInfo file = new FileInfo(alignment.fileID, alignment.file.getName(), alignment.meta);
+			logger.info(alignment.file.getName());
+			logger.info(alignment.meta);
+			files.files.add(file);
+			
+		}
+		return files;
+	}
+	
+	public FileInfoList list() {
+		return list(alignmentStore.getAlignments());
+	}
+	
+	public FileInfoList listfororganism(String organism) {
+		
+		List<Alignment> alignments = new ArrayList<Alignment>();
+		
+		for (Alignment alignment : alignmentStore.getAlignments()) {
+			if (alignment.organism.equals(organism) || alignment.organism.equals("com:" + organism)) {
+				alignments.add(alignment);
+			}
+		}
+		
+		return list(alignments);
+	}
+	
 	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, int filter) throws Exception {
 		return query(fileID, sequence, start, end, contained, defaultProperties, filter);		
 	}
@@ -81,7 +115,8 @@ public class Sam {
 	}
 	
 	public synchronized MappedQuery query(SAMFileReader file, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
-
+		
+		long startTime = System.currentTimeMillis();
 		
 		MappedQuery model = new MappedQuery();
 		
@@ -94,10 +129,10 @@ public class Sam {
 			if (methodName.startsWith("get")) {
 				String propertyName = methodName.substring(3);
 				propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
-				logger.info(methodName + " " + propertyName);
+				// logger.info(methodName + " " + propertyName);
 				
 				if (propertySet.contains(propertyName)) {
-					logger.info("added!");
+					//logger.info("added!");
 					model.records.put(propertyName, new ArrayList<Object>());
 					methods2properties.put(method, propertyName);
 				}
@@ -105,7 +140,7 @@ public class Sam {
 			}
 		}
 		
-		
+		model.count = 0;
 		
 		SAMRecordIterator i = null;
 		try {
@@ -152,6 +187,8 @@ public class Sam {
 					list.add(result);
 				}
 				
+				model.count++;
+				
 			}
 		
 		} catch (Exception e) {
@@ -164,10 +201,14 @@ public class Sam {
 			}
 		}
 		
+		long endTime = System.currentTimeMillis() ;
+		float time = (endTime - startTime) / (float) 1000 ;
+		
 		model.contained = contained;
 		model.start = start;
 		model.end = end;
 		model.sequence = sequence;
+		model.time = Float.toString(time);
 		
 		return model;
 	}
@@ -179,7 +220,7 @@ public class Sam {
 	
 	public synchronized MappedCoverage coverage(SAMFileReader file, String sequence, int start, int end, int window) throws Exception {
 		
-		
+		long startTime = System.currentTimeMillis();
 		
 		int max = 0;
 		final int nBins = Math.round((end-start+1.f)/window);
@@ -195,7 +236,7 @@ public class Sam {
 		
 		SAMRecordIterator iter = null;
 		
-		long startTime = System.currentTimeMillis();
+		
 		logger.debug(startTime);
 		
 		try {
@@ -237,7 +278,9 @@ public class Sam {
 		}
 		
 		long endTime = System.currentTimeMillis() ;
-		logger.debug(endTime);
+		float time = (endTime - startTime) / (float) 1000 ;
+		
+		
 		
 		logger.debug("ending iterations");
 		
@@ -247,7 +290,7 @@ public class Sam {
 		mc.end = end;
 		mc.window = window;
 		mc.max = max;
-		mc.time = endTime - startTime;
+		mc.time = Float.toString(time);
 		mc.bins = nBins;
 		
 		return mc;

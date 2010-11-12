@@ -38,15 +38,16 @@ public class OrganismsQueries extends Base implements Organisms {
 				Document d = reader.document(sd.doc);
 				
 				MappedOrganism o = new MappedOrganism ();
-				o.common_name = d.getField("organism.common_name").stringValue();
-				o.genus = d.getField("organism.common_name").stringValue();
-				o.species = d.getField("organism.common_name").stringValue();
-				o.taxonID = d.getField("organism.common_name").stringValue();
-				o.translation_table = d.getField("organism.common_name").stringValue();
+				o.common_name = getFieldIfPresent(d, "organism.common_name");
+				o.genus = getFieldIfPresent(d, "organism.genus");
+				o.species = getFieldIfPresent(d, "organism.species");
+				o.taxonID = getFieldIfPresent(d, "organism.taxon_id");
+				o.translation_table = getFieldIfPresent(d, "organism.tranlation_table");
+				o.ID = getFieldIfPresent(d, "organism.id");
 				
 				o.name = o.genus + " " + o.species;
 				
-				organisms.list.add(o);
+				organisms.organisms.add(o);
 			}
 			
 			
@@ -57,6 +58,17 @@ public class OrganismsQueries extends Base implements Organisms {
 		
 		// TODO Auto-generated method stub
 		return organisms;
+	}
+	
+	private String getFieldIfPresent(Document d, String fieldName) {
+		
+		try {
+			return d.getField(fieldName).stringValue();
+		} catch (NullPointerException npe) {
+			logger.warn(npe);
+			return null;
+		} 
+		
 	}
 
 }
