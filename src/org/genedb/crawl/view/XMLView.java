@@ -24,6 +24,8 @@ public class XMLView implements View{
 	public void render(Map<String, ?> map, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		
+		response.setContentType(contentType);
+		
 		XmlFriendlyReplacer replacer = new XmlFriendlyReplacer("_", "_");
 		XStream xstream = new XStream(new DomDriver("UTF-8", replacer));
 		xstream.autodetectAnnotations(true);

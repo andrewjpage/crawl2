@@ -26,8 +26,17 @@ public class GsonView implements View {
 	public void render(Map<String, ?> map, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		
+		response.setContentType(contentType);
+		
 		Gson gson = new Gson();
 		String json = gson.toJson(map.get("model"));
+		
+		String callback = request.getParameter("callback");
+		
+		if (callback!=null) {
+			json = callback + "( " + json + " )";
+		}
+		
 		response.getWriter().append(json);
 		
 	}
