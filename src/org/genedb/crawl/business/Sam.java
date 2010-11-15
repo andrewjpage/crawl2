@@ -17,13 +17,13 @@ import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.SAMSequenceRecord;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.model.BaseResult;
 import org.genedb.crawl.model.FileInfo;
 import org.genedb.crawl.model.FileInfoList;
 import org.genedb.crawl.model.MappedCoverage;
 import org.genedb.crawl.model.MappedQuery;
 import org.genedb.crawl.model.MappedSAMHeader;
 import org.genedb.crawl.model.MappedSAMSequence;
+import org.genedb.crawl.model.MappedSAMSequenceList;
 
 
 public class Sam {
@@ -57,18 +57,21 @@ public class Sam {
 		return model;
 	}
 	
-	public BaseResult sequence(int fileID) throws Exception {
+	public MappedSAMSequenceList sequence(int fileID) throws Exception {
 		return this.sequence(getSamOrBam(fileID));
 	}
 	
-	public BaseResult sequence(SAMFileReader file) throws Exception {
-		BaseResult model = new BaseResult();
+	public MappedSAMSequenceList sequence(SAMFileReader file) throws Exception {
+		MappedSAMSequenceList model = new MappedSAMSequenceList();
 		for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
 			MappedSAMSequence mss = new MappedSAMSequence();
 			mss.length = ssr.getSequenceLength();
 			mss.name = ssr.getSequenceName();
 			mss.index = ssr.getSequenceIndex();
-			model.addResult(mss);
+			
+			model.sequences.add(mss);
+			
+			
 		}
 		return model;
 	}
