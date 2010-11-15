@@ -48,6 +48,7 @@ public class SamController extends BaseQueryController {
 		return mav;
 	}
 	
+	
 	@RequestMapping(method=RequestMethod.GET, value={"/query", "/query.*"})
 	public ModelAndView query(
 			HttpServletRequest request,
@@ -56,12 +57,16 @@ public class SamController extends BaseQueryController {
 			@RequestParam("sequence") String sequence,
 			@RequestParam("start") int start,
 			@RequestParam("end") int end,
-			@RequestParam("contained") boolean contained,
+			@RequestParam(value="contained", required=false) Boolean contained,
 			@RequestParam(value="filter", required=false) Integer filter) throws Exception {
 		ModelAndView mav = new ModelAndView("service:");
 		
 		if (filter == null) {
 			filter = 0;
+		}
+		
+		if (contained == null) {
+			contained = true;
 		}
 		
 		mav.addObject("model", sam.query(fileID, sequence, start, end, contained, filter));
