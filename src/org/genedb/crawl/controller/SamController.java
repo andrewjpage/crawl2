@@ -34,7 +34,7 @@ public class SamController extends BaseQueryController {
 			@RequestParam("fileID") int fileID) 
 	throws Exception {
 		ModelAndView mav = new ModelAndView("service:");
-		mav.addObject("model", generateResponseWrapper(request, sam.header(fileID)));
+		mav.addObject("model", sam.header(fileID));
 		return mav;
 	}
 	
@@ -44,7 +44,7 @@ public class SamController extends BaseQueryController {
 			@RequestParam(value="callback", required=false) String callback,
 			@RequestParam("fileID") int fileID) throws Exception {
 		ModelAndView mav = new ModelAndView("service:");
-		mav.addObject("model", generateResponseWrapper(request, sam.sequence(fileID)));
+		mav.addObject("model", sam.sequence(fileID));
 		return mav;
 	}
 	
@@ -57,9 +57,14 @@ public class SamController extends BaseQueryController {
 			@RequestParam("start") int start,
 			@RequestParam("end") int end,
 			@RequestParam("contained") boolean contained,
-			@RequestParam("filter") int filter) throws Exception {
+			@RequestParam(value="filter", required=false) Integer filter) throws Exception {
 		ModelAndView mav = new ModelAndView("service:");
-		mav.addObject("model", generateResponseWrapper(request, sam.query(fileID, sequence, start, end, contained, filter)));
+		
+		if (filter == null) {
+			filter = 0;
+		}
+		
+		mav.addObject("model", sam.query(fileID, sequence, start, end, contained, filter));
 		return mav;
 	}
 	
@@ -75,7 +80,7 @@ public class SamController extends BaseQueryController {
 			@RequestParam("window") int window) throws Exception {
 		
 		ModelAndView mav = new ModelAndView("service:");
-		mav.addObject("model", generateResponseWrapper(request, sam.coverage(fileID, sequence, start, end, window)));
+		mav.addObject("model", sam.coverage(fileID, sequence, start, end, window));
 		return mav;
 	}
 	
@@ -85,7 +90,7 @@ public class SamController extends BaseQueryController {
 			HttpServletRequest request,
 			@RequestParam(value="callback", required=false) String callback) {
 		ModelAndView mav = new ModelAndView("service:");
-		mav.addObject("model", generateResponseWrapper(request, sam.list()));
+		mav.addObject("model", sam.list());
 		return mav;
 	}
 	
@@ -95,7 +100,7 @@ public class SamController extends BaseQueryController {
 			@RequestParam(value="callback", required=false) String callback,
 			@RequestParam("organism") String organism) {
 		ModelAndView mav = new ModelAndView("service:");
-		mav.addObject("model", generateResponseWrapper(request, sam.list()));
+		mav.addObject("model", sam.list());
 		return mav;
 	}
 	

@@ -15,6 +15,7 @@ public class MappedQuery {
 	public String sequence;
 	public int count;
 	public String time;
+	public int filter;
 	
 	@XStreamConverter(value = HashConverter.class)
 	public Hashtable<String, List<Object>> records = new Hashtable<String, List<Object>>();

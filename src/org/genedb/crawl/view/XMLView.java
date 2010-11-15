@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.genedb.crawl.model.ResponseWrapper;
 import org.springframework.web.servlet.View;
 
 import com.thoughtworks.xstream.XStream;
@@ -30,7 +31,9 @@ public class XMLView implements View{
 		XStream xstream = new XStream(new DomDriver("UTF-8", replacer));
 		xstream.autodetectAnnotations(true);
 		
-		String xml = xstream.toXML(map.get("model"));
+		ResponseWrapper wrapper = new ResponseWrapper(request, map.get("model"));
+		
+		String xml = xstream.toXML(wrapper);
 		response.getWriter().append(xml);
 		
 	}

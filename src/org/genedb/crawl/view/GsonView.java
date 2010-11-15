@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.genedb.crawl.model.ResponseWrapper;
 import org.springframework.web.servlet.View;
 
 import com.google.gson.Gson;
@@ -29,7 +30,10 @@ public class GsonView implements View {
 		response.setContentType(contentType);
 		
 		Gson gson = new Gson();
-		String json = gson.toJson(map.get("model"));
+		
+		ResponseWrapper wrapper = new ResponseWrapper(request, map.get("model"));
+		
+		String json = gson.toJson(wrapper);
 		
 		String callback = request.getParameter("callback");
 		

@@ -23,7 +23,7 @@ public class RegionsController extends BaseQueryController {
 	public ModelAndView locations(HttpServletRequest request, @RequestParam("region") String region, @RequestParam("start") int start, @RequestParam("end") int end) throws CrawlException {
 		ModelAndView mav = new ModelAndView("service:"); 
 		Locations locations = regions.locations(region, start, end);
-		mav.addObject("model", this.generateResponseWrapper(request,locations));
+		mav.addObject("model", locations);
 		return mav;
 	}
 	

@@ -26,7 +26,7 @@ public class OrganismsController extends BaseQueryController {
 	public ModelAndView list(HttpServletRequest request) throws CrawlException {
 		ModelAndView mav = new ModelAndView("service:"); 
 		MappedOrganismList organismsList = organisms.list();
-		mav.addObject("model", this.generateResponseWrapper(request, organismsList));
+		mav.addObject("model", organismsList);
 		return mav;
 	}
 	
