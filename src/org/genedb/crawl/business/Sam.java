@@ -209,6 +209,7 @@ public class Sam {
 		model.end = end;
 		model.sequence = sequence;
 		model.time = Float.toString(time);
+		model.filter = filter;
 		
 		return model;
 	}
