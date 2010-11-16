@@ -23,7 +23,7 @@ public class AlignmentStore {
 	
 	private static Logger logger = Logger.getLogger(AlignmentStore.class);
 	
-	int fileID = 0;
+	int fileID = 1;
 	
 	List<Alignment> alignments = new ArrayList<Alignment>();
 	
@@ -110,9 +110,7 @@ public class AlignmentStore {
 					final String key = entry.getKey();
 					final JsonElement value = entry.getValue();
 					
-					if (key.equals("name")) {
-						alignment.name = value.getAsString();
-					} else if (key.equals("file")) {
+					if (key.equals("file")) {
 						alignment.file = new File(value.getAsString());
 					} else if (key.equals("organism")) {
 						alignment.organism = value.getAsString();

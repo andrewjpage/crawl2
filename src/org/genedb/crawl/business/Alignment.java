@@ -14,7 +14,6 @@ class Alignment {
 	public int fileID;
 	public File file;
 	public String organism;
-	public String name;
 	public List<String> chromosomes = new ArrayList<String>();
 	public String meta;
 	
