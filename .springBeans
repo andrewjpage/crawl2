@@ -9,7 +9,6 @@
 	<configs>
 		<config>war/WEB-INF/crawl-servlet.xml</config>
 		<config>war/WEB-INF/applicationContext.xml</config>
-		<config>old/applicationContext-security.xml</config>
 	</configs>
 	<configSets>
 	</configSets>
