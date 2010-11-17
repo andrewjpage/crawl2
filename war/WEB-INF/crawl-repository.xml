@@ -16,7 +16,7 @@
     
     <context:property-placeholder location="classpath:project.properties" />
     
-    <context:component-scan base-package="org.genedb.crawl.business.postgres" />
+    <!-- <context:component-scan base-package="org.genedb.crawl.business.postgres" />  -->
     
     <!-- DataSource Property -->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
@@ -24,10 +24,6 @@
         <property name="url"><value>jdbc:postgresql://${dbhost}:${dbport}/${dbname}</value></property>
         <property name="username"><value>${dbuser}</value></property>
         <property name="password"><value>${dbpassword}</value></property>
-    </bean>
-    
-    <bean id="queryMap" class="org.genedb.crawl.business.postgres.QueryMap" >
-        <property name="sqlPath"><value>${sqlPath}</value></property>
     </bean>
     
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"> 
