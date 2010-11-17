@@ -16,7 +16,7 @@
     
     <context:property-placeholder location="classpath:project.properties" />
     
-    <context:component-scan base-package="org.genedb.crawl.business.postgres" />
+    <!-- <context:component-scan base-package="org.genedb.crawl.business.postgres" />  -->
     
     <!-- DataSource Property -->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
