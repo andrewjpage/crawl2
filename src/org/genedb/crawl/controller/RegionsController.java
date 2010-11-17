@@ -16,7 +16,8 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/regions")
 public class RegionsController extends BaseQueryController {
 	
-	@Autowired
+	// TODO add a regions ibatis xml 
+	//@Autowired
 	Regions regions;
 	
 	@RequestMapping(method=RequestMethod.GET, value={"/locations", "/locations.*"})
