@@ -30,7 +30,21 @@
         <property name="sqlPath"><value>${sqlPath}</value></property>
     </bean>
     
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"> 
+        <property name="dataSource" ref="dataSource" /> 
+        <property name="configLocation" value="classpath:sql/ibatis.xml"/>
+    </bean> 
     
+    <bean id="organisms" class="org.mybatis.spring.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.genedb.crawl.model.interfaces.Organisms" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean> 
+    
+    <!-- 
+    <bean id="organismsController" class="org.genedb.crawl.controller.OrganismsController" >
+        <property name="organisms" ref="organismMapper" />
+    </bean>
+     -->
     
     <!-- 
     <bean id="querySource" class="org.genedb.crawl.business.postgres.PostgresQuerySource" >
