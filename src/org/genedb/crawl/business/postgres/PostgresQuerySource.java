@@ -13,12 +13,12 @@ public class PostgresQuerySource extends Base implements QuerySource {
 		return regions;
 	}
 
-	@Override
-	public Organisms getOrganisms() {
-		OrganismsQueries organisms = new OrganismsQueries();
-		initialise(organisms);
-		return organisms;
-	}
+//	@Override
+//	public Organisms getOrganisms() {
+//		OrganismsQueries organisms = new OrganismsQueries();
+//		initialise(organisms);
+//		return organisms;
+//	}
 	
 	private Base initialise(Base query) {
 		query.jdbcTemplate = jdbcTemplate;
