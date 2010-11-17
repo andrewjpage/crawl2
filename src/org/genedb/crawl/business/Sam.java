@@ -81,7 +81,7 @@ public class Sam {
 		FileInfoList files = new FileInfoList();
 		
 		for (Alignment alignment : alignments) {
-			FileInfo file = new FileInfo(alignment.fileID, alignment.file.getAbsolutePath(), alignment.meta);
+			FileInfo file = new FileInfo(alignment.fileID, alignment.file.getAbsolutePath(), alignment.meta, alignment.organism);
 			logger.info(alignment.file.getName());
 			logger.info(alignment.meta);
 			files.files.add(file);

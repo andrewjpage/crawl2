@@ -5,21 +5,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 
+import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.model.MappedOrganism;
-import org.genedb.crawl.model.MappedOrganismList;
 import org.genedb.crawl.model.interfaces.Organisms;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrganismsQueries extends Base implements Organisms {
+public class OrganismsQueries extends Base  {
 
-	@Override
-	public MappedOrganismList list() {
-		
-		MappedOrganismList organisms = new MappedOrganismList();
+	
+	public List<MappedOrganism> list() {
 		
 		String sql = queryMap.getQuery("get_all_organisms_and_taxon_ids");
 		
@@ -35,8 +34,10 @@ public class OrganismsQueries extends Base implements Organisms {
 			}
 		});
 		
-		organisms.organisms = new ArrayList<MappedOrganism>(results);
-		return organisms;
+		return new ArrayList<MappedOrganism>(results);
+		
 	}
+
+	
 
 }
