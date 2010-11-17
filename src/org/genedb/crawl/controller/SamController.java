@@ -2,8 +2,13 @@ package org.genedb.crawl.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
+import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.business.AlignmentStore;
 import org.genedb.crawl.business.Sam;
+import org.genedb.crawl.model.FileInfo;
+import org.genedb.crawl.model.FileInfoList;
+import org.genedb.crawl.model.MappedOrganism;
+import org.genedb.crawl.model.interfaces.Organisms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +25,9 @@ public class SamController extends BaseQueryController {
 	
 	private AlignmentStore alignmentStore;
 	private Sam sam = new Sam();
+	
+	@Autowired
+	private Organisms organisms;
 	
 	@Autowired
 	public void setAlignmentStore(AlignmentStore alignmentStore) {
@@ -103,9 +111,20 @@ public class SamController extends BaseQueryController {
 	public ModelAndView listfororganism(
 			HttpServletRequest request, 
 			@RequestParam(value="callback", required=false) String callback,
-			@RequestParam("organism") String organism) {
+			@RequestParam("organism") String organism) throws CrawlException {
+		
 		ModelAndView mav = new ModelAndView("service:");
-		mav.addObject("model", sam.list());
+		
+		FileInfoList matchedAlignments = new FileInfoList();
+		
+		MappedOrganism mappedOrganism = getOrganism(organisms, organism);
+		
+		if (mappedOrganism != null) {
+			logger.debug(mappedOrganism.common_name);
+			matchedAlignments = sam.listfororganism(mappedOrganism.common_name);
+		}
+		
+		mav.addObject("model", matchedAlignments);
 		return mav;
 	}
 	
