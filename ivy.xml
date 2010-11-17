@@ -34,9 +34,8 @@
         
         <dependency org="args4j" name="args4j" rev="2.0.12"/>
 
-        
-        
-        
+        <dependency org="org.mybatis" name="mybatis" rev="3.0.2"/>
+        <dependency org="org.mybatis" name="mybatis-spring" rev="1.0.0-RC2"/>
         
         <!-- only used in the compile -->
         <dependency org="javax.servlet" name="servlet-api" rev="2.5" conf="compile->default" />

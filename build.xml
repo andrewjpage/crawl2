@@ -93,11 +93,13 @@
 	
 	<copy file="etc/config/crawl-${resource.type}.xml" tofile="war/WEB-INF/crawl-repository.xml" overwrite="true" />
 	
+	
 	<copy file="${config}.properties" tofile="war/WEB-INF/classes/project.properties" overwrite="true" />
 	
 	<copy todir="war/WEB-INF/classes/sql">
         <fileset dir="sql/">
             <include name="**/*.sql"/>
+        	<include name="**/*.xml"/>
         </fileset>
         <mapper type="flatten"/>
     </copy>
