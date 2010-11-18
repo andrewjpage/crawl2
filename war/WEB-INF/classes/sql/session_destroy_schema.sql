@@ -1,2 +1,0 @@
-
- drop schema authentication CASCADE;
