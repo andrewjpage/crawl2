@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="etc"/>
 	<classpathentry kind="src" path="tst"/>
-	<classpathentry kind="src" path="sql"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-ant-ant-1.6.5.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-aopalliance-aopalliance-1.0.jar"/>

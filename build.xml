@@ -4,11 +4,18 @@
     default="compile"
 >
 
+
+	
+<path id="ivy.lib.path">
+    <fileset dir="./lib/local/" includes="*.jar"/>
+</path>	
+<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+
 <property file="${config}.properties" />
 
-<property name="build.war.home" value="${basedir}/dist" />
+<property name="build.war.home" value="${basedir}/out" />
 <property name="build.war.name" value="${deploy.name}"  />
-<property name="build.classes.home" value="${basedir}/ant-build" />
+<property name="build.classes.home" value="${basedir}/ant" />
 
 <property name="log4j.config" value="${basedir}/war/WEB-INF/log4j.properties"/> 	
 	
@@ -41,22 +48,23 @@
     <delete dir="${build.war.home}" includeEmptyDirs="true"/>
     <delete dir="${build.classes.home}" includeEmptyDirs="true"/>
     <delete dir="${ivy.lib.dir}" includeEmptyDirs="true"/>
+	<delete dir="war/WEB-INF/classes/" includeEmptyDirs="true"/>
 </target>
 
 
 <target name="resolve-compile" unless="disable.library.resolution"  >  
-    <ivy:resolve log="quiet" conf="compile"/>
-    <ivy:retrieve log="quiet" validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />  
+    <ivy:resolve  conf="compile"/>
+    <ivy:retrieve  validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />  
 </target>
 
 <target name="resolve-war" unless="disable.library.resolution"  >  
-    <ivy:resolve log="quiet" conf="war"/>
-    <ivy:retrieve log="quiet" validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
+    <ivy:resolve  conf="war"/>
+    <ivy:retrieve  validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
 </target>
 	
 <target name="resolve-jar" unless="disable.library.resolution"  >  
-    <ivy:resolve log="quiet" conf="jar"/>
-    <ivy:retrieve log="quiet" validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
+    <ivy:resolve  conf="jar"/>
+    <ivy:retrieve  validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
 </target>
 
 <!--
@@ -98,10 +106,8 @@
 	
 	<copy todir="war/WEB-INF/classes/sql">
         <fileset dir="sql/">
-            <include name="**/*.sql"/>
         	<include name="**/*.xml"/>
         </fileset>
-        <mapper type="flatten"/>
     </copy>
 	
 	<mkdir dir="${lib.dir}/wartmp" />
@@ -143,7 +149,7 @@
 	<fail message="The 'config' property must be set" unless="config"/>
 	
 	<!--java -jar lib/ivy/compile/jar-jetty-runner-jetty-runner-7.1.6.v20100715.jar dist/crawl.war -->
-	<java fork="true" maxmemory="128m" failonerror="true" jar="${ivy.lib.dir}/compile/jar-jetty-runner-jetty-runner-7.1.6.v20100715.jar"  >
+	<java fork="true" maxmemory="128m" failonerror="true" jar="${ivy.lib.dir}/compile/jar-jetty-runner-jetty-runner-7.2.0.RC0.jar"  >
 		<arg line=" ${build.war.home}/${build.war.name}.war "/>
 	</java>
 	
