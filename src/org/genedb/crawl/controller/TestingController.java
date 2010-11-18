@@ -2,7 +2,7 @@ package org.genedb.crawl.controller;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
-import org.genedb.crawl.model.interfaces.Organisms;
+import org.gmod.cat.Organisms;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

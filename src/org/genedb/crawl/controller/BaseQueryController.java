@@ -2,7 +2,7 @@ package org.genedb.crawl.controller;
 
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.model.MappedOrganism;
-import org.genedb.crawl.model.interfaces.Organisms;
+import org.gmod.cat.Organisms;
 
 
 public abstract class BaseQueryController {

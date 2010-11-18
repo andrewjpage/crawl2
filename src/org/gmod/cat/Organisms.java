@@ -1,4 +1,4 @@
-package org.genedb.crawl.model.interfaces;
+package org.gmod.cat;
 
 
 import java.util.List;

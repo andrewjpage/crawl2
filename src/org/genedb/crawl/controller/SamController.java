@@ -8,7 +8,7 @@ import org.genedb.crawl.business.Sam;
 import org.genedb.crawl.model.FileInfo;
 import org.genedb.crawl.model.FileInfoList;
 import org.genedb.crawl.model.MappedOrganism;
-import org.genedb.crawl.model.interfaces.Organisms;
+import org.gmod.cat.Organisms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

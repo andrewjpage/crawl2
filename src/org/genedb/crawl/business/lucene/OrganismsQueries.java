@@ -14,7 +14,7 @@ import org.apache.lucene.search.TopDocs;
 import org.genedb.crawl.CrawlErrorType;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.model.MappedOrganism;
-import org.genedb.crawl.model.interfaces.Organisms;
+import org.gmod.cat.Organisms;
 import org.springframework.stereotype.Component;
 
 @Component
