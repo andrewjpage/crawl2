@@ -53,16 +53,19 @@
 
 
 <target name="resolve-compile" unless="disable.library.resolution"  >  
+	<!-- log="quiet" -->
     <ivy:resolve  conf="compile"/>
     <ivy:retrieve  validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />  
 </target>
 
-<target name="resolve-war" unless="disable.library.resolution"  >  
+<target name="resolve-war" unless="disable.library.resolution"  >
+	<!-- log="quiet" -->
     <ivy:resolve  conf="war"/>
     <ivy:retrieve  validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
 </target>
 	
-<target name="resolve-jar" unless="disable.library.resolution"  >  
+<target name="resolve-jar" unless="disable.library.resolution"  >
+	<!-- log="quiet" -->
     <ivy:resolve  conf="jar"/>
     <ivy:retrieve  validate="false" pattern="${ivy.lib.dir}/[conf]/[type]-[module]-[artifact]-[revision].[ext]" />
 </target>
@@ -149,7 +152,7 @@
 	<fail message="The 'config' property must be set" unless="config"/>
 	
 	<!--java -jar lib/ivy/compile/jar-jetty-runner-jetty-runner-7.1.6.v20100715.jar dist/crawl.war -->
-	<java fork="true" maxmemory="128m" failonerror="true" jar="${ivy.lib.dir}/compile/jar-jetty-runner-jetty-runner-7.2.0.RC0.jar"  >
+	<java fork="true" maxmemory="128m" failonerror="true" jar="${ivy.lib.dir}/compile/*.jar"  >
 		<arg line=" ${build.war.home}/${build.war.name}.war "/>
 	</java>
 	
