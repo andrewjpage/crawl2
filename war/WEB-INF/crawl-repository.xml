@@ -32,7 +32,7 @@
     </bean> 
     
     <bean id="organisms" class="org.mybatis.spring.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.genedb.crawl.model.interfaces.Organisms" /> 
+        <property name="mapperInterface" value="org.gmod.cat.Organisms" /> 
         <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
     </bean> 
     

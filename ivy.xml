@@ -41,6 +41,7 @@
         <!-- only used in the compile -->
         <dependency org="javax.servlet" name="servlet-api" rev="2.5" conf="compile->default" />
         <dependency org="org.mortbay.jetty" name="jetty-runner" rev="7.2.0.RC0" conf="compile->default" />
+        <dependency org="junit" name="junit" rev="4.8.2" conf="compile->default" />
         
         
         

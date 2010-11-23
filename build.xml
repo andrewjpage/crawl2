@@ -10,6 +10,7 @@
     <fileset dir="./lib/local/" includes="*.jar"/>
 </path>	
 <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+	
 
 <property file="${config}.properties" />
 
@@ -21,8 +22,8 @@
 	
 <property name="lib.dir" value="${basedir}/lib" />
 <property name="ivy.lib.dir" value="${basedir}/lib/ivy" />
-	
-	
+
+<property name="report.home" value="${basedir}/tmp" />
 
 <path id="lib.compile.path">
 	<fileset dir="${ivy.lib.dir}/compile" />
@@ -34,6 +35,14 @@
 	<fileset dir="${lib.dir}/local" />
 </path>
 
+<path id="test">
+    <pathelement location="lib/ivy/compile/jar-junit-junit-4.8.2.jar" />
+	<pathelement location="lib/ivy/compile/jar-com.springsource.org.postgresql.jdbc4-com.springsource.org.postgresql.jdbc4-8.3.604.jar" />
+	<pathelement location="out/jar-mybatis-mybatis-3.0.2.jar" />
+    <pathelement location="${build.classes.home}" />
+	<pathelement location="${basedir}" />
+</path>
+
 
 <!-- <setproxy proxyhost="wwwcache.sanger.ac.uk" proxyport="3128"/> -->
 
@@ -42,12 +51,14 @@
     <mkdir dir="${build.war.home}"/>
     <mkdir dir="${build.classes.home}"/>
     <mkdir dir="${ivy.lib.dir}" />
+	<mkdir dir="${report.home}" />
 </target>
 
 <target name="clean">
     <delete dir="${build.war.home}" includeEmptyDirs="true"/>
     <delete dir="${build.classes.home}" includeEmptyDirs="true"/>
     <delete dir="${ivy.lib.dir}" includeEmptyDirs="true"/>
+	<delete dir="${report.home}" includeEmptyDirs="true"/>
 	<delete dir="war/WEB-INF/classes/" includeEmptyDirs="true"/>
 </target>
 
@@ -95,6 +106,18 @@
         />
 </target>
 
+<target name="compile-test" depends="compile" >
+    <javac fork="true"
+        debug="true"
+        verbose="${verbose}"
+        includes="**"
+        destdir="${build.classes.home}"
+        srcdir="${basedir}/tst" 
+        classpathref="lib.compile.path"
+        />
+</target>
+
+	
 <target name="package-war" depends="compile,resolve-war" >
     
 	<fail message="The 'config' property must be set" unless="config"/>
@@ -157,7 +180,9 @@
 	</java>
 	
 </target>
+
 	
+
 <target name="package-jar" depends="compile,resolve-jar" >
 	
 	<!-- generate a path string for use in the crawl.jar manifest -->
@@ -208,6 +233,30 @@
     <copy file="${build.war.home}/${build.war.name}.war" todir="${deploy.dir}/"/>
 </target>
 
+	
+<target name="test" >
+	<fail message="The 'config' property must be set" unless="config"/>
+	<junit printsummary="yes" fork="yes" haltonfailure="yes">
+		 <classpath>
+		    <path refid="test"/>
+        </classpath>
+		
+ 	    <jvmarg value="-Ddbhost=${dbhost}"/>
+		<jvmarg value="-Ddbpassword=${dbpassword}"/>
+ 	    <jvmarg value="-Ddbuser=${dbuser}"/>
+ 	    <jvmarg value="-Ddbport=${dbport}"/>
+		<jvmarg value="-Ddbname=${dbname}"/>
+		
+        <formatter type="plain"/>
+		        
+        <!-- add tests or comment out as necessary -->
+
+        <test todir="${report.home}" 
+              name="org.gmod.cat.TestSimple" 
+              haltonfailure="yes" />
+	</junit>  
+	
+</target>
 
 	
 <target name="GenerateLuceneIndices" >
