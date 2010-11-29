@@ -1,11 +1,15 @@
 <?xml version="1.1" encoding="UTF-8" ?>
 <!DOCTYPE configuration
-    PUBLIC "-//www.mybatis.org//DTD Config 3.0//EN"
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
     "http://www.mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <!--  note here the www has been removed from the PUBLIC uri in doctype at the top, this is to prevent mybatis scanning the internets. -->
 
   <mappers>
     <mapper resource="sql/org/gmod/cat/Organisms.xml"/>
+    <mapper resource="sql/org/gmod/cat/Regions.xml"/>
+    <mapper resource="sql/org/gmod/cat/Terms.xml"/>
+    <mapper resource="sql/org/gmod/cat/Features.xml"/>
   </mappers>
   
 </configuration>

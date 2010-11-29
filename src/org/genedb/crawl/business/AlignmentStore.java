@@ -23,7 +23,7 @@ public class AlignmentStore {
 	
 	private static Logger logger = Logger.getLogger(AlignmentStore.class);
 	
-	int fileID = 1;
+	int fileID = 0;
 	
 	List<Alignment> alignments = new ArrayList<Alignment>();
 	

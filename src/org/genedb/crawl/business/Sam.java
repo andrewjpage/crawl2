@@ -218,11 +218,11 @@ public class Sam {
 	}
 	
 	
-	public synchronized MappedCoverage coverage(int fileID, String sequence, int start, int end, int window) throws Exception {
-		return this.coverage(getSamOrBam(fileID), sequence, start, end, window);
+	public synchronized MappedCoverage coverage(int fileID, String sequence, int start, int end, int window, int filter) throws Exception {
+		return this.coverage(getSamOrBam(fileID), sequence, start, end, window, filter);
 	}
 	
-	public synchronized MappedCoverage coverage(SAMFileReader file, String sequence, int start, int end, int window) throws Exception {
+	public synchronized MappedCoverage coverage(SAMFileReader file, String sequence, int start, int end, int window, int filter) throws Exception {
 		
 		long startTime = System.currentTimeMillis();
 		
@@ -248,6 +248,12 @@ public class Sam {
 			while (iter.hasNext()) {
 				
 				SAMRecord record = iter.next();
+				
+				if ((record.getFlags() & filter) > 0) {
+					continue;
+				}
+				
+				
 				List<AlignmentBlock> blocks = record.getAlignmentBlocks();
 				
 				for (AlignmentBlock block : blocks) {

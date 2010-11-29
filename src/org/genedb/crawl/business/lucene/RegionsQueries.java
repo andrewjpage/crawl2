@@ -34,7 +34,7 @@ public class RegionsQueries extends Base implements Regions {
 		locations.region = region;
 		locations.request_start = start;
 		locations.request_end = end;
-		locations.name = "regions/locations";
+		//locations.name = "regions/locations";
 		locations.actual_start = start;
 		locations.actual_end = end;
 		

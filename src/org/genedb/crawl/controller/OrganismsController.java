@@ -1,9 +1,7 @@
 package org.genedb.crawl.controller;
 
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.genedb.crawl.CrawlException;
+import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.model.MappedOrganism;
 import org.genedb.crawl.model.MappedOrganismList;
 import org.gmod.cat.Organisms;
@@ -12,11 +10,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
 @RequestMapping("/organisms")
+@ResourceDescription("Organism related queries")
 public class OrganismsController extends BaseQueryController {
 	
 	private Organisms organisms;
@@ -26,48 +24,36 @@ public class OrganismsController extends BaseQueryController {
 		this.organisms = organisms;
 	}
 	
+	@ResourceDescription("List all the organisms in the repository")
 	@RequestMapping(method=RequestMethod.GET, value={"/list", "/list.*"})
-	public ModelAndView list(HttpServletRequest request) throws CrawlException {
-		ModelAndView mav = new ModelAndView("service:"); 
-		
+	public MappedOrganismList list() throws CrawlException {
 		MappedOrganismList mol = new MappedOrganismList();
 		mol.organisms =  organisms.list();
-		
-		mav.addObject("model", mol);
-		return mav;
+		return mol;
 	}
 	
-	
+	@ResourceDescription("Get an organism using the organism id")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByID", "/getByID.*"})
-	public ModelAndView getByID(HttpServletRequest request, @RequestParam("ID") int id) throws CrawlException {
-		ModelAndView mav = new ModelAndView("service:"); 
-		
-		MappedOrganism mo = organisms.getByID(id);
-		
-		mav.addObject("model", mo);
-		return mav;
+	public MappedOrganism getByID(@RequestParam("ID") int id) throws CrawlException {
+		return organisms.getByID(id);		
 	}
 	
-	
-	
+	@ResourceDescription("Get an organism using its taxon ID")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByTaxonID", "/getByTaxonID.*"})
-	public ModelAndView getByTaxonID(HttpServletRequest request, @RequestParam("taxonID") int taxonID) throws CrawlException {
-		ModelAndView mav = new ModelAndView("service:"); 
-		
-		MappedOrganism mo = organisms.getByTaxonID(String.valueOf(taxonID));
-		
-		mav.addObject("model", mo);
-		return mav;
+	public MappedOrganism getByTaxonID(@RequestParam("taxonID") int taxonID) throws CrawlException {
+		return organisms.getByTaxonID(String.valueOf(taxonID));
 	}
 	
+	@ResourceDescription("Get an organism by specifying its common name")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByCommonName", "/getByCommonName.*"})
-	public ModelAndView getByCommonName(HttpServletRequest request, @RequestParam("commonName") String commonName) throws CrawlException {
-		ModelAndView mav = new ModelAndView("service:"); 
-		
-		MappedOrganism mo = organisms.getByCommonName(commonName);
-		
-		mav.addObject("model", mo);
-		return mav;
+	public MappedOrganism getByCommonName(@RequestParam("commonName") String commonName) throws CrawlException {
+		return organisms.getByCommonName(commonName);
+	}
+	
+	@ResourceDescription("Get an organism using a taxon ID, common name, or organism ID")
+	@RequestMapping(method=RequestMethod.GET, value="/get")
+	public MappedOrganism get(String organism) throws CrawlException {
+		return getOrganism(organisms, organism);
 	}
 	
 	

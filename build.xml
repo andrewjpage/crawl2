@@ -175,7 +175,7 @@
 	<fail message="The 'config' property must be set" unless="config"/>
 	
 	<!--java -jar lib/ivy/compile/jar-jetty-runner-jetty-runner-7.1.6.v20100715.jar dist/crawl.war -->
-	<java fork="true" maxmemory="128m" failonerror="true" jar="${ivy.lib.dir}/compile/*.jar"  >
+	<java fork="true" maxmemory="128m" failonerror="true" jar="${ivy.lib.dir}/compile/jar-jetty-runner-jetty-runner-7.2.0.RC0.jar"  >
 		<arg line=" ${build.war.home}/${build.war.name}.war "/>
 	</java>
 	
@@ -225,11 +225,13 @@
 </target>
 
 <target name="undeploy">
+	<fail message="The 'config' property must be set" unless="config"/>
 	<delete dir="${deploy.dir}/${build.war.name}" includeEmptyDirs="true"/>
     <delete file="${deploy.dir}/${build.war.name}.war" />
 </target>
 	
 <target name="deploy" depends="package-war, undeploy" >
+	<fail message="The 'config' property must be set" unless="config"/>
     <copy file="${build.war.home}/${build.war.name}.war" todir="${deploy.dir}/"/>
 </target>
 

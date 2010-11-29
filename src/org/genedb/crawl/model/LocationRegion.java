@@ -11,4 +11,8 @@ public class LocationRegion  {
 	public String phase;
 	public String strand;
 	public String type;
+	
+	public String fmin_partial;
+	public String fmax_partial;
+	public String part_of;
 }

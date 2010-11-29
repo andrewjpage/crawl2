@@ -12,7 +12,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
 
-public class XMLView implements View{
+public class XMLView extends BaseView implements View{
 
 	private String contentType = "application/xml";
 	
@@ -31,7 +31,7 @@ public class XMLView implements View{
 		XStream xstream = new XStream(new DomDriver("UTF-8", replacer));
 		xstream.autodetectAnnotations(true);
 		
-		ResponseWrapper wrapper = new ResponseWrapper(request, map.get("model"));
+		ResponseWrapper wrapper = new ResponseWrapper(request, getFirstValidValue(map));
 		
 		String xml = xstream.toXML(wrapper);
 		response.getWriter().append(xml);

@@ -35,7 +35,7 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {
     	
-    	logger.debug(viewName);
+    	logger.info(viewName);
     	
     	String[] viewSplit = viewName.split(":");
     	
@@ -44,9 +44,9 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
     	}
     	
     	String prefix = viewSplit[0];
-    	logger.debug(String.format("prefix: '%s'", prefix) );
+    	logger.info(String.format("prefix: '%s'", prefix) );
     	
-		if (prefix.equals("service")) {
+		//if (prefix.equals("service")) {
 			
 			String extensionViewName = "";
 			if (viewSplit.length == 2) {
@@ -58,7 +58,7 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
 			View view = viewMap.get(extensionViewName);
             logger.info(String.format("Returning view of type '%s'", view.getClass()));
             return view;
-		}
+		//}
 //		
 //		if (viewSplit.length == 2) {
 //			
@@ -74,7 +74,7 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
 //		}
 //		
     	
-        return null;
+        //return null;
     }
     
     /**

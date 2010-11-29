@@ -12,7 +12,7 @@ import org.springframework.web.servlet.View;
 import com.google.gson.Gson;
 
 
-public class GsonView implements View {
+public class GsonView extends BaseView implements View {
 	
 	private Logger logger = Logger.getLogger(GsonView.class);
 	
@@ -27,11 +27,14 @@ public class GsonView implements View {
 	public void render(Map<String, ?> map, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		
+		logger.info(map);
+		logger.info(map.keySet());
+		
 		response.setContentType(contentType);
 		
 		Gson gson = new Gson();
 		
-		ResponseWrapper wrapper = new ResponseWrapper(request, map.get("model"));
+		ResponseWrapper wrapper = new ResponseWrapper(request, getFirstValidValue(map));
 		
 		String json = gson.toJson(wrapper);
 		
@@ -43,7 +46,11 @@ public class GsonView implements View {
 		
 		response.getWriter().append(json);
 		
+		
+		
 	}
+	
+	
 	
 
 

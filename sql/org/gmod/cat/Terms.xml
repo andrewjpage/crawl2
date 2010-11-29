@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="org.gmod.cat.Regions">  
+
+  
+  <select id="getCvtermIDs" resultType="int">
+    
+        SELECT cvterm_id from cvterm 
+            JOIN cv on cvterm.cv_id = cv.cv_id
+            where cvterm.name in 
+            
+                <foreach item="item" index="index" collection="cvterms" open="(" separator="," close=")"> 
+                    #{item} 
+                </foreach> 
+            
+            and cv.name = #{cv}
+    
+  </select>
+  
+  
+
+</mapper> 
