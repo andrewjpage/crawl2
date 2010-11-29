@@ -30,8 +30,7 @@
   </select>
   
   <select id="locations" resultType="org.genedb.crawl.model.LocationRegion" >
-  
-  
+    
     SELECT
     f.uniqueName as feature, 
     type.name as type, 
