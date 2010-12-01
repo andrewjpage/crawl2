@@ -18,9 +18,14 @@
     <!--  <context:property-placeholder location="classpath:project.properties" />  -->
     
     
-    
-    
-    
-    
-    
+    <util:map id="relationshipTypes" key-type="java.lang.String" value-type="java.lang.String">
+    	<entry key="derives_from" value="sequence" />
+    	<entry key="orthologous_to" value="sequence" />
+    	<entry key="paralogous_to" value="sequence" />
+    	<entry key="part_of" value="relationship" />
+    </util:map>
+
+
+
+
 </beans>

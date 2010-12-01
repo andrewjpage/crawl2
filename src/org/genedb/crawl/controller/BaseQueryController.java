@@ -2,9 +2,14 @@ package org.genedb.crawl.controller;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
@@ -14,6 +19,7 @@ import org.genedb.crawl.model.Resource;
 import org.genedb.crawl.model.Service;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.gmod.cat.Organisms;
+import org.gmod.cat.Terms;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +29,27 @@ import org.springframework.web.bind.annotation.ValueConstants;
 public abstract class BaseQueryController {
 	
 	private Logger logger = Logger.getLogger(BaseQueryController.class);
+	
+	
+	private Map<String, String> relationshipTypes;
+	
+	@javax.annotation.Resource() 
+	public void setRelationshipTypes(Map<String, String> relationshipTypes) {
+		this.relationshipTypes = relationshipTypes;
+	}
+	
+	protected List<Integer> getRelationshipTypeIDs(Terms terms, List<String> types) {
+		List<Integer> type_ids = new ArrayList<Integer>();
+		for (String type : types) {
+			if (relationshipTypes.containsKey(type)) {
+				String cv = relationshipTypes.get(type);
+				int cvTermID = terms.getCvtermID(cv, type);
+				type_ids.add(cvTermID);
+			}
+		}
+		return type_ids;
+	}
+	
 	
 	@RequestMapping(method=RequestMethod.GET, value="/index")
 	@ResourceDescription("lists the resources")
@@ -50,6 +77,10 @@ public abstract class BaseQueryController {
 		Method[] methods = cls.getMethods();
 		
 		for (Method method : methods) {
+			
+			if (! Modifier.isPublic(method.getModifiers())) {
+				continue;
+			}
 			
 			Resource resource = new Resource();
 			boolean addMethod = false;
@@ -130,6 +161,16 @@ public abstract class BaseQueryController {
 		
 		
 		return service;
+	}
+	
+	protected String[] mergeArrays(String[][] tomerge) {
+		Set<String> merged = new HashSet<String>();
+		for (String[] array : tomerge) {
+			if (array != null) {
+				merged.addAll(Arrays.asList(array));
+			}
+		}
+		return merged.toArray(new String[]{});
 	}
 	
 	private Argument getOrCreateArgument(Map<Integer, Argument> arguments, int index) {

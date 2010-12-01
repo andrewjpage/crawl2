@@ -74,5 +74,18 @@
    
   </select>
   
+  <select id="sequence" resultType="String">
+        SELECT residues as dna FROM feature WHERE feature_id = #{regionid}
+  </select>
+  
+  <sql id="topleveltype"> select cvterm_id from cvterm join cv using (cv_id) where cv.name = 'genedb_misc' and cvterm.name = 'top_level_seq' </sql> 
+  
+  <select id="inorganism" resultType="String">
+        select f.uniquename from feature f
+			join featureprop using (feature_id)
+			where f.organism_id = #{organismid}
+			and featureprop.type_id = (<include refid="topleveltype"/>)
+			        
+  </select>
 
 </mapper> 

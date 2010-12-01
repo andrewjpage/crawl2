@@ -19,6 +19,14 @@
     
   </select>
   
+  <select id="getCvtermID" resultType="int">
+    
+        SELECT cvterm_id from cvterm 
+            JOIN cv on cvterm.cv_id = cv.cv_id
+            where cvterm.name = #{cvterm}
+            and cv.name = #{cv}
+    
+  </select>
   
 
 </mapper> 

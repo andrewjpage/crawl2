@@ -1,13 +1,23 @@
 package org.genedb.crawl.controller;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.Locations;
+import org.genedb.crawl.model.MappedOrganism;
+import org.genedb.crawl.model.RegionsInOrganism;
+import org.genedb.crawl.model.Sequence;
 import org.gmod.cat.Features;
+import org.gmod.cat.Organisms;
 import org.gmod.cat.Regions;
 import org.gmod.cat.Terms;
 
@@ -33,15 +43,50 @@ public class RegionsController extends BaseQueryController {
 	@Autowired
 	Features features;
 	
+	@Autowired
+	Organisms organisms;
+	
+	private boolean cacheRegionsOnStartup = false;
+	private Map<String, List<String>> organismRegionMap = new HashMap<String, List<String>>();
+	
 	/**
-	 * FIXME the exclude parameter works in this form:
+	 * Force the controller to cache all organism regions on startup.
+	 * @param cacheRegionsOnStartup
+	 */
+	public void setCacheRegionsOnStartup(boolean cacheRegionsOnStartup) {
+		this.cacheRegionsOnStartup = cacheRegionsOnStartup;
+	}
+	
+	@PostConstruct
+	void setup() throws CrawlException {
+		if (! cacheRegionsOnStartup) {
+			return;
+		}
+		for (MappedOrganism o : organisms.list()) {
+			List<String> r = regions.inorganism( Integer.parseInt(o.ID));
+			Collections.sort(r);
+			organismRegionMap.put(o.ID, r);
+			logger.info(String.format("Cached %s.", o.common_name));
+		}
+	}
+	
+	/**
+	 * The exclude parameter works in this form:
 	 * 	&exclude=repeat_region&exclude=gene
 	 * 
 	 * but not this form :
 	 * 
 	 * 	&exclude[]=repeat_region&exclude[]=gene
 	 * 
-	 * which jqquery would typically send.
+	 * which JQuery would typically send. I think we can resolve this by setting 
+	 * 
+	 * 	jQuery.ajaxSettings.traditional = true;
+	 * 
+	 * or
+	 * 
+	 * 	$.ajaxSetup({ traditional: true }); 
+	 * 
+	 * in Web-Artemis.
 	 * 
 	 * 
 	 * @param region
@@ -57,8 +102,10 @@ public class RegionsController extends BaseQueryController {
 			@RequestParam("region") String region, 
 			@RequestParam("start") int start, 
 			@RequestParam("end") int end, 
-			@RequestParam(value="exclude", required=false) @ResourceDescription("A list of features to exclude.") String[] exclude) throws CrawlException {
+			@RequestParam(value="exclude", required=false) @ResourceDescription("A list of features to exclude.") String[] excludeNormalNotation,
+			@RequestParam(value="exclude[]", required=false) @ResourceDescription("A list of features to exclude.") String[] excludeArrayNotation) throws CrawlException {
 		
+		String[] exclude = mergeArrays(new String[][]{excludeArrayNotation, excludeNormalNotation});
 		
 		int regionID = features.getFeatureID(region);
 		
@@ -69,17 +116,18 @@ public class RegionsController extends BaseQueryController {
         
         logger.info("Gene Types " + geneTypes);
         
-        LocationBoundaries expandedBoundaries = regions.locationsMinAndMaxBoundaries(regionID, start, end, geneTypes);
+        int actualStart = start;
+        int actualEnd = end;
         
-		int actualStart = start;
-		if (expandedBoundaries.start != null && expandedBoundaries.start < start) {
-			actualStart = expandedBoundaries.start;
-		}
-		
-		int actualEnd = end;
-		if (expandedBoundaries.end != null &&expandedBoundaries.end > end) {
-			actualEnd = expandedBoundaries.end;
-		}
+        LocationBoundaries expandedBoundaries = regions.locationsMinAndMaxBoundaries(regionID, start, end, geneTypes);
+        if (expandedBoundaries != null) {
+			if (expandedBoundaries.start != null && expandedBoundaries.start < start) {
+				actualStart = expandedBoundaries.start;
+			}
+			if (expandedBoundaries.end != null &&expandedBoundaries.end > end) {
+				actualEnd = expandedBoundaries.end;
+			}
+        }
 
 		Locations locations = new Locations();
 			
@@ -96,6 +144,72 @@ public class RegionsController extends BaseQueryController {
         
 	}
 	
+	
+	@RequestMapping(method=RequestMethod.GET, value="/sequence")
+	@ResourceDescription("Returns the sequence on a region.")
+	public List<Sequence> sequence(
+			@RequestParam("region") String region, 
+			@RequestParam("start") int start, 
+			@RequestParam("end") int end) {
+		
+		List<Sequence> sequences = new ArrayList<Sequence>();
+		
+		int regionID = features.getFeatureID(region);
+		String sequenceResidues = regions.sequence(regionID);
+		int length = sequenceResidues.length();
+		
+		if (length == 0) {
+			return sequences;
+		}
+		
+		int lastResiduePosition = length -1;
+		
+		int actualStart = start -1;
+		int actualEnd = end -1;
+		
+		if (actualStart > lastResiduePosition || actualStart > actualEnd) {
+			return sequences;
+		}
+		
+		if (actualEnd > lastResiduePosition) {
+			actualEnd = lastResiduePosition;
+		}
+		
+		String dna = sequenceResidues.substring(actualStart, actualEnd);
+		
+		Sequence sequence = new Sequence();
+		sequence.dna = dna;
+		sequence.start = start;
+		sequence.end = end;
+		sequence.length = length;
+		sequence.region = region;
+		
+		sequences.add(sequence);
+		
+		return sequences;
+	}
+	
+	@RequestMapping(method=RequestMethod.GET, value="inorganism")
+	@ResourceDescription("Returns the sequence on a region.")
+	public RegionsInOrganism inorganism(@RequestParam("organism") String organism) throws CrawlException {
+		
+		MappedOrganism o = getOrganism(organisms, organism);
+		
+		List<String> r = null;
+		if (organismRegionMap.containsKey(o.ID)) {
+			r = organismRegionMap.get(o.ID);
+		} else {
+			r = regions.inorganism( Integer.parseInt(o.ID));
+			Collections.sort(r);
+			organismRegionMap.put(o.ID, r);
+		}
+		
+		RegionsInOrganism rio = new RegionsInOrganism();
+		rio.organism = o;
+		rio.regions = r;
+		
+		return rio;
+	}
 	
 	
 }

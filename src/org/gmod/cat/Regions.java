@@ -20,5 +20,6 @@ public interface Regions {
 			@Param("end") int end,
 			@Param("exclude") String[] exclude);
 	
-	
+	public String sequence(@Param("regionid") int regionid);
+	public List<String> inorganism(@Param("organismid") int organismid);
 }

@@ -11,6 +11,101 @@
     ]]>
   </select>
   
+  <select id="getGeneForFeature" resultType="org.genedb.crawl.model.HierarchyGeneFetchResult" >
+        SELECT
+
+			f.uniquename as f,
+			ftype.name as ftype,
+			f2.uniquename as f2,
+			ftype2.name as ftype2,
+			f3.uniquename as f3,
+			ftype3.name as ftype3
+			
+		FROM feature f
+		JOIN cvterm ftype ON f.type_id = ftype.cvterm_id 
+		
+		LEFT JOIN feature_relationship fr ON fr.subject_id = f.feature_id and fr.type_id IN (42, 69)
+		LEFT JOIN feature f2 ON fr.object_id = f2.feature_id
+		LEFT JOIN cvterm ftype2 ON f2.type_id = ftype2.cvterm_id 
+		
+		LEFT JOIN feature_relationship fr2 ON fr2.subject_id = fr.object_id and fr2.type_id IN (42, 69)
+		LEFT JOIN feature f3 ON fr2.object_id = f3.feature_id AND f3.type_id IN ('792', '423')
+		LEFT JOIN cvterm ftype3 ON f3.type_id = ftype3.cvterm_id 
+		
+		WHERE f.uniquename in 
+		        <foreach item="item" index="index" collection="features" open="(" separator="," close=")"> #{item}</foreach> 
+		
+		
+  </select>
+  
+  <select id="getRelationshipsParents" resultType="org.genedb.crawl.model.HierarchyRelation" >
+        SELECT 
+			target.uniquename as feature,
+			parent.uniquename as uniquename,
+			parent.name as name,
+			'parent' as relationship,
+			relationship_type.name as relationship_type,
+			type.name as type
+			
+		FROM feature target
+		
+		JOIN feature_relationship fr ON fr.subject_id = target.feature_id and fr.type_id IN 
+		      <foreach item="item" index="index" collection="relationships" open="(" separator="," close=")">#{item}</foreach>
+		JOIN feature parent ON fr.object_id = parent.feature_id
+		JOIN cvterm relationship_type ON fr.type_id = relationship_type.cvterm_id
+		JOIN cvterm type ON parent.type_id = type.cvterm_id
+		
+		WHERE target.uniquename = #{feature}  
+  </select>
+  
+  <select id="getRelationshipsChildren" resultType="org.genedb.crawl.model.HierarchyRelation" >
+        SELECT
+
+			target.uniquename as feature,
+			child.uniquename as uniquename,
+			child.name as name,
+			'child' as relationship,
+			relationship_type.name as relationship_type,
+			type.name as type
+		
+		FROM feature target
+		
+		JOIN feature_relationship fr2 ON fr2.object_id = target.feature_id and fr2.type_id IN 
+             <foreach item="item" index="index" collection="relationships" open="(" separator="," close=")">#{item}</foreach>
+		JOIN feature child ON fr2.subject_id = child.feature_id
+		JOIN cvterm relationship_type ON fr2.type_id = relationship_type.cvterm_id
+		JOIN cvterm type ON child.type_id = type.cvterm_id
+		
+		WHERE target.uniquename = #{feature} 
+		
+  </select>
+  
+  
+  <select id="coordinates" resultMap="regionCoordinatesList" >
+  
+        SELECT sf.uniquename AS region, f.uniquename AS feature, fl.fmin as fmin, fl.fmax as fmax, fl.phase as phase, fl.strand as strand
+		  FROM feature f
+		  JOIN featureloc fl ON f.feature_id = fl.feature_id 
+		  JOIN feature sf ON fl.srcfeature_id = sf.feature_id
+		WHERE f.uniquename in <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach> 
+	   
+	   <if test="region != null"> 
+		  AND sf.uniquename = #{region}
+	   </if>
+  
+  </select>
+  
+  <resultMap id="regionCoordinatesList" type="org.genedb.crawl.model.RegionCoordinatesList">
+    <collection property="coordinates" ofType="org.genedb.crawl.model.RegionCoordinates">
+        <result property="feature" column="feature"/>  
+        <collection property="regions" ofType="org.genedb.crawl.model.Coordinates"> 
+		    <result property="region" column="region"/> 
+		    <result property="fmin" column="fmin"/> 
+		    <result property="fmax" column="fmax"/> 
+		    <result property="strand" column="strand"/> 
+	   </collection>
+	</collection>
+  </resultMap>
   
 
 </mapper> 

@@ -34,7 +34,7 @@ public class GsonView extends BaseView implements View {
 		
 		Gson gson = new Gson();
 		
-		ResponseWrapper wrapper = new ResponseWrapper(request, getFirstValidValue(map));
+		ResponseWrapper wrapper = new ResponseWrapper(request.getServletPath(), getFirstValidValue(map));
 		
 		String json = gson.toJson(wrapper);
 		
