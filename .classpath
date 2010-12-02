@@ -24,18 +24,6 @@
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-ecj-ecj-3.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-geronimo-jta_1.1_spec-geronimo-jta_1.1_spec-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-gson-gson-1.4.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-continuation-jetty-continuation-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-http-jetty-http-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-io-jetty-io-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-jndi-jetty-jndi-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-plus-jetty-plus-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-runner-jetty-runner-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-security-jetty-security-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-server-jetty-server-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-servlet-jetty-servlet-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-util-jetty-util-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-webapp-jetty-webapp-7.1.6.v20100715.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jetty-xml-jetty-xml-7.1.6.v20100715.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-jsp-2.1-glassfish-jsp-2.1-glassfish-2.1.v20100127.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-jsp-api-2.1-glassfish-jsp-api-2.1-glassfish-2.1.v20100127.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-jta-jta-1.1.jar"/>

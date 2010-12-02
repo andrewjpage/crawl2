@@ -12,6 +12,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
+import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.FeatureCollection;
 import org.genedb.crawl.model.FeatureGenes;
 import org.genedb.crawl.model.FeatureGenesList;
 import org.genedb.crawl.model.HierarchicalFeatureList;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 @RequestMapping("/features")
@@ -107,6 +110,14 @@ public class FeaturesController extends BaseQueryController {
 	@RequestMapping(method=RequestMethod.GET, value="/coordinates")
 	public RegionCoordinatesList coordinates(@RequestParam("features") List<String> featureList, @RequestParam(value="region", required=false) String region ) {
 		return features.coordinates(featureList, region);
+	}
+	
+	@ResourceDescription(" Returns a feature's synonyms.")
+	@RequestMapping(method=RequestMethod.GET, value="/synonyms")
+	public FeatureCollection synonyms(@RequestParam("features") List<String> featureList, @RequestParam(value="types", required=false) List<String> types) {
+		FeatureCollection results = new FeatureCollection();
+		results.results = features.synonyms(featureList, types);
+		return results;
 	}
 	
 	

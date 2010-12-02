@@ -7,7 +7,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("error")
-public class CrawlError extends BaseResult {
+public class CrawlError {
 	
 	@XStreamAsAttribute
 	public String message;

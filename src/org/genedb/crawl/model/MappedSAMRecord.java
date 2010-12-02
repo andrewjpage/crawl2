@@ -13,7 +13,7 @@ import net.sf.samtools.CigarElement;
 import net.sf.samtools.SAMRecord;
 
 @XStreamAlias("record")
-public class MappedSAMRecord extends BaseResult {
+public class MappedSAMRecord {
 	
 	@XStreamOmitField
 	private Logger logger = Logger.getLogger(MappedSAMRecord.class);

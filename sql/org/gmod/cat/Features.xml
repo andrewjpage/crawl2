@@ -95,17 +95,82 @@
   
   </select>
   
-  <resultMap id="regionCoordinatesList" type="org.genedb.crawl.model.RegionCoordinatesList">
-    <collection property="coordinates" ofType="org.genedb.crawl.model.RegionCoordinates">
-        <result property="feature" column="feature"/>  
-        <collection property="regions" ofType="org.genedb.crawl.model.Coordinates"> 
-		    <result property="region" column="region"/> 
-		    <result property="fmin" column="fmin"/> 
-		    <result property="fmax" column="fmax"/> 
-		    <result property="strand" column="strand"/> 
-	   </collection>
-	</collection>
+
+
+    <select id="synonymsLike" resultMap="synonymsList" >
+    SELECT f.uniquename as uniqueName, f.name as name, synonym.name as synonym, cvterm.name as synonymtype, feature_synonym.is_current FROM feature f
+
+		JOIN feature_synonym ON f.feature_id = feature_synonym.feature_id 
+		JOIN synonym ON feature_synonym.synonym_id = synonym.synonym_id 
+		JOIN cvterm ON synonym.type_id = cvterm.cvterm_id 
+		
+		<if test="region != null"> 
+            JOIN featureloc fl ON fl.feature_id = f.feature_id AND srcfeature_id=(SELECT feature_id FROM feature WHERE uniquename= #{region})
+        </if>
+        
+        <choose> 
+           <when test="regex == true"> 
+              WHERE synonym.name ~* #{term}
+           </when>
+           <otherwise> 
+              WHERE synonym.name = #{term} 
+           </otherwise>
+       </choose> 
+            
+    </select>  
+    
+    <select id="synonyms" resultMap="synonymsList"  >
+    
+        SELECT feature.uniquename as uniqueName, feature.name as name, synonym.name as synonym, cvterm.name as type, feature_synonym.is_current as is_current
+            FROM feature_synonym 
+            JOIN feature ON feature.feature_id = feature_synonym.feature_id 
+            JOIN synonym ON feature_synonym.synonym_id = synonym.synonym_id
+            JOIN cvterm ON synonym.type_id = cvterm.cvterm_id
+            WHERE feature.uniquename IN <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach> 
+            <if test="types != null"> 
+                AND cvterm.name IN <foreach item="item" index="index" collection="types" open="(" separator="," close=")">#{item}</foreach> 
+            </if>
+            
+        UNION
+        SELECT feature.uniquename as uniqueName, feature.name as name, synonym.name as synonym, cvterm.name as type, feature_synonym.is_current as is_current
+            FROM feature_synonym 
+            JOIN feature ON feature.feature_id = feature_synonym.feature_id 
+            JOIN synonym ON feature_synonym.synonym_id = synonym.synonym_id
+            JOIN cvterm ON synonym.type_id = cvterm.cvterm_id
+            WHERE synonym.name IN <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach> 
+                 <if test="types != null"> 
+                    AND cvterm.name IN <foreach item="item" index="index" collection="types" open="(" separator="," close=")">#{item}</foreach> 
+                </if>
+                
+                
+            
+    </select>
+    
+    
+    
+      <resultMap id="regionCoordinatesList" type="org.genedb.crawl.model.RegionCoordinatesList">
+	    <collection property="coordinates" ofType="org.genedb.crawl.model.RegionCoordinates">
+	        <result property="feature" column="feature"/>  
+	        <collection property="regions" ofType="org.genedb.crawl.model.Coordinates"> 
+	            <result property="region" column="region"/> 
+	            <result property="fmin" column="fmin"/> 
+	            <result property="fmax" column="fmax"/> 
+	            <result property="strand" column="strand"/> 
+	       </collection>
+	    </collection>
+	  </resultMap>
+	    
+    
+    <resultMap id="synonymsList" type="org.genedb.crawl.model.Feature">
+        <result property="uniqueName" column="uniqueName"/>
+        <result property="name" column="name"/>
+        <collection property="synonyms" ofType="org.genedb.crawl.model.Synonym"> 
+            <result property="synonym" column="synonym"/> 
+            <result property="synonymtype" column="type"/> 
+            <result property="is_current" column="is_current"/>
+        </collection>
   </resultMap>
   
+    
 
 </mapper> 
