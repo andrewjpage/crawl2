@@ -83,7 +83,7 @@
   
   <select id="coordinates" resultMap="regionCoordinatesList" >
   
-        SELECT sf.uniquename AS region, f.uniquename AS feature, fl.fmin as fmin, fl.fmax as fmax, fl.phase as phase, fl.strand as strand
+        SELECT sf.uniquename AS region, f.uniquename AS uniqueName, f.name as name, fl.fmin as fmin, fl.fmax as fmax, fl.phase as phase, fl.strand as strand
 		  FROM feature f
 		  JOIN featureloc fl ON f.feature_id = fl.feature_id 
 		  JOIN feature sf ON fl.srcfeature_id = sf.feature_id
@@ -95,10 +95,42 @@
   
   </select>
   
-
+  <resultMap id="regionCoordinatesList" type="org.genedb.crawl.model.Feature">
+        <result property="uniqueName" column="uniqueName"/>
+        <result property="name" column="name"/>
+        <collection property="coordinates" ofType="org.genedb.crawl.model.Coordinates"> 
+            <result property="region" column="region"/> 
+            <result property="fmin" column="fmin"/> 
+            <result property="fmax" column="fmax"/> 
+            <result property="strand" column="strand"/> 
+       </collection>
+    </resultMap>
+    
+  
+    <select id="featuresLike" resultType="org.genedb.crawl.model.Feature" >
+        
+        SELECT f.uniquename as uniqueName, f.name as name
+        FROM feature f
+        
+        <if test="region != null"> 
+            JOIN featureloc fl ON fl.feature_id = f.feature_id AND srcfeature_id=(SELECT feature_id FROM feature WHERE uniquename= #{region})
+        </if>
+        
+        <choose> 
+           <when test="regex == true"> 
+              WHERE f.uniquename ~* #{term} or f.name ~* #{term} 
+           </when>
+           <otherwise> 
+              WHERE f.uniquename = #{term}  or f.name = #{term}  
+           </otherwise>
+       </choose> 
+        
+    </select>
 
     <select id="synonymsLike" resultMap="synonymsList" >
-    SELECT f.uniquename as uniqueName, f.name as name, synonym.name as synonym, cvterm.name as synonymtype, feature_synonym.is_current FROM feature f
+    SELECT f.uniquename as uniqueName, f.name as name, synonym.name as synonym, cvterm.name as type, feature_synonym.is_current as is_current
+    
+    FROM feature f
 
 		JOIN feature_synonym ON f.feature_id = feature_synonym.feature_id 
 		JOIN synonym ON feature_synonym.synonym_id = synonym.synonym_id 
@@ -142,24 +174,9 @@
                     AND cvterm.name IN <foreach item="item" index="index" collection="types" open="(" separator="," close=")">#{item}</foreach> 
                 </if>
                 
-                
-            
     </select>
     
     
-    
-      <resultMap id="regionCoordinatesList" type="org.genedb.crawl.model.RegionCoordinatesList">
-	    <collection property="coordinates" ofType="org.genedb.crawl.model.RegionCoordinates">
-	        <result property="feature" column="feature"/>  
-	        <collection property="regions" ofType="org.genedb.crawl.model.Coordinates"> 
-	            <result property="region" column="region"/> 
-	            <result property="fmin" column="fmin"/> 
-	            <result property="fmax" column="fmax"/> 
-	            <result property="strand" column="strand"/> 
-	       </collection>
-	    </collection>
-	  </resultMap>
-	    
     
     <resultMap id="synonymsList" type="org.genedb.crawl.model.Feature">
         <result property="uniqueName" column="uniqueName"/>
@@ -169,7 +186,53 @@
             <result property="synonymtype" column="type"/> 
             <result property="is_current" column="is_current"/>
         </collection>
-  </resultMap>
+    </resultMap>
+    
+    
+    
+     <select id="properties"  resultMap="propertiesList" >
+        SELECT feature.uniquename as uniqueName, feature.name as name, cvterm.name as propname, featureprop.value as value, featureprop.rank as rank 
+            FROM featureprop 
+            LEFT JOIN cvterm on cvterm.cvterm_id = featureprop.type_id 
+            LEFT JOIN feature on featureprop.feature_id = feature.feature_id
+            WHERE uniquename in <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+    
+    <resultMap id="propertiesList" type="org.genedb.crawl.model.Feature">
+        <result property="uniqueName" column="uniqueName"/>
+        <result property="name" column="name"/>
+         <collection property="properties" ofType="org.genedb.crawl.model.FeatureProperty"> 
+            <result property="name" column="propname"/> 
+            <result property="value" column="value"/> 
+            <result property="rank" column="rank"/>
+        </collection>
+    </resultMap>
+   
+    
+    <select id="pubs" resultMap="pubsList">
+        SELECT 
+		    feature.uniquename as uniqueName, 
+		    feature.name as name,
+		    split_part(pub.uniquename, ':', 1) as database,
+		    split_part(pub.uniquename, ':', 2) as accession
+		FROM feature
+		JOIN feature_pub ON feature_pub.feature_id = feature.feature_id
+		JOIN pub on pub.pub_id = feature_pub.pub_id
+		WHERE feature.uniquename in <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+    
+    
+    <resultMap id="pubsList" type="org.genedb.crawl.model.Feature">
+        <result property="uniqueName" column="uniqueName"/>
+        <result property="name" column="name"/>
+         <collection property="pubs" ofType="org.genedb.crawl.model.Pub"> 
+            <result property="database" column="database"/> 
+            <result property="accession" column="accession"/> 
+        </collection>
+    </resultMap>
+    
+    
+    
   
     
 

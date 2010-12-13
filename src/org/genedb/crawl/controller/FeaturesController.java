@@ -20,7 +20,6 @@ import org.genedb.crawl.model.HierarchicalFeatureList;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.HierarchicalFeature;
-import org.genedb.crawl.model.RegionCoordinatesList;
 import org.gmod.cat.Features;
 import org.gmod.cat.Terms;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,15 +107,51 @@ public class FeaturesController extends BaseQueryController {
 	
 	@ResourceDescription("Returns coordinages of a feature if located on a region.")
 	@RequestMapping(method=RequestMethod.GET, value="/coordinates")
-	public RegionCoordinatesList coordinates(@RequestParam("features") List<String> featureList, @RequestParam(value="region", required=false) String region ) {
-		return features.coordinates(featureList, region);
+	public FeatureCollection coordinates(@RequestParam("features") List<String> featureList, @RequestParam(value="region", required=false) String region ) {
+		FeatureCollection results = new FeatureCollection();
+		results.results = features.coordinates(featureList, region);
+		return results;
 	}
 	
-	@ResourceDescription(" Returns a feature's synonyms.")
+	@ResourceDescription("Returns a feature's synonyms.")
 	@RequestMapping(method=RequestMethod.GET, value="/synonyms")
 	public FeatureCollection synonyms(@RequestParam("features") List<String> featureList, @RequestParam(value="types", required=false) List<String> types) {
 		FeatureCollection results = new FeatureCollection();
 		results.results = features.synonyms(featureList, types);
+		return results;
+	}
+	
+	@ResourceDescription("Return matching features")
+	@RequestMapping(method=RequestMethod.GET, value="/withnamelike")
+	public FeatureCollection withnamelike(
+			@RequestParam("term") String term,
+			@RequestParam(value="regex", defaultValue="false") boolean regex, 
+			@RequestParam(value="region", required=false) String region) {
+		FeatureCollection results = new FeatureCollection();
+		
+		List<Feature> synonyms = features.synonymsLike(term, regex, region);
+		List<Feature> matchingFeatures = features.featuresLike(term, regex, region);
+		
+		matchingFeatures.addAll(synonyms);
+		
+		results.results = matchingFeatures;
+		
+		return results;
+	}
+	
+	@ResourceDescription("Return feature properties")
+	@RequestMapping(method=RequestMethod.GET, value="/properties")
+	public FeatureCollection properties(@RequestParam(value="features") List<String> featureList) {
+		FeatureCollection results = new FeatureCollection();
+		results.results = features.properties(featureList); 
+		return results;
+	}
+	
+	@ResourceDescription("Return feature pubs")
+	@RequestMapping(method=RequestMethod.GET, value="/pubs")
+	public FeatureCollection pubs(@RequestParam(value="features") List<String> featureList) {
+		FeatureCollection results = new FeatureCollection();
+		results.results = features.pubs(featureList); 
 		return results;
 	}
 	

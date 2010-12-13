@@ -16,5 +16,7 @@ public class Feature {
 	
 	public List<Synonym> synonyms;
 	public List<Coordinates> coordinates;
+	public List<FeatureProperty> properties;
+	public List<Pub> pubs;
 	
 }
