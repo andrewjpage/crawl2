@@ -10,6 +10,8 @@
     <mapper resource="sql/org/gmod/cat/Regions.xml"/>
     <mapper resource="sql/org/gmod/cat/Terms.xml"/>
     <mapper resource="sql/org/gmod/cat/Features.xml"/>
+    
+    <mapper resource="sql/org/gmod/cat/FeatureCvTerm.xml"/>
   </mappers>
   
 </configuration>

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper 
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
-<mapper namespace="org.gmod.cat.Regions">  
+<mapper namespace="org.gmod.cat.Features">  
 
   
   <select id="getFeatureID" resultType="int">
@@ -232,8 +232,91 @@
     </resultMap>
     
     
-    
+    <select id="dbxrefs" resultMap="dbxrefsList" >
+        
+        SELECT 
+		    feature.uniquename as uniqueName,
+		    feature.name as name,
+		    dbxref.accession as accession,
+		    db.name as database
+		FROM feature
+		JOIN feature_dbxref ON feature_dbxref.feature_id = feature.feature_id
+		JOIN dbxref ON dbxref.dbxref_id = feature_dbxref.dbxref_id
+		JOIN db ON db.db_id = dbxref.db_id
+		WHERE feature.uniquename IN <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach>
+		UNION
+		SELECT 
+		    feature.uniquename as uniqueName,
+		    feature.name as name,
+		    dbxref.accession as accession,
+		    db.name as database
+		FROM feature
+		JOIN dbxref ON dbxref.dbxref_id = feature.dbxref_id
+		JOIN db ON db.db_id = dbxref.db_id
+		WHERE feature.uniquename IN <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach>
+        
+    </select>  
   
     
-
+    <resultMap id="dbxrefsList" type="org.genedb.crawl.model.Feature">
+        <result property="uniqueName" column="uniqueName"/>
+        <result property="name" column="name"/>
+         <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref"> 
+            <result property="database" column="database"/> 
+            <result property="accession" column="accession"/> 
+        </collection>
+    </resultMap>
+    
+    <select id="terms" resultMap="cvtermsList" >
+       SELECT 
+           f.uniquename as uniqueName,
+           f.name as name,
+           fc.feature_cvterm_id as feature_cvterm_id, 
+           fc.is_not as is_not, 
+           d.accession, 
+           f.uniquename as feature, 
+           ct.name as cvterm, 
+           c.name as cv, 
+           fcp.value as prop, 
+           fcpct.name as proptype, 
+           fcpc.name as proptypecv
+		FROM feature f
+			JOIN feature_cvterm fc ON f.feature_id = fc.feature_id
+			JOIN cvterm ct ON fc.cvterm_id = ct.cvterm_id
+			JOIN cv c ON c.cv_id = ct.cv_id
+			    <if test="cvs != null"> 
+                    AND c.name IN  <foreach item="item" index="index" collection="cvs" open="(" separator="," close=")">#{item}</foreach> 
+                </if>
+			JOIN dbxref d ON ct.dbxref_id = d.dbxref_id
+			LEFT OUTER JOIN feature_cvtermprop fcp on fc.feature_cvterm_id = fcp.feature_cvterm_id
+			LEFT OUTER JOIN cvterm fcpct on fcp.type_id = fcpct.cvterm_id 
+			LEFT OUTER JOIN cv fcpc ON fcpct.cv_id = fcpc.cv_id
+		
+		WHERE f.uniquename in <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+    
+     <resultMap id="cvtermsList" type="org.genedb.crawl.model.Feature">
+        <result property="uniqueName" column="uniqueName"/>
+        <result property="name" column="name"/>
+         <collection property="terms" ofType="org.genedb.crawl.model.Cvterm"> 
+            <result property="accession" column="accession"/>
+            <result property="is_not" column="is_not"/> 
+            <result property="name" column="cvterm"/>
+            <association property="cv" javaType="org.genedb.crawl.model.Cv" >
+                <result property="name" column="cv"/>
+            </association> 
+            <collection property="props" ofType="org.genedb.crawl.model.CvtermProp">
+                <result property="value" column="prop"/>
+                <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+                    <result property="name" column="proptype"/>
+                    <association property="cv" javaType="org.genedb.crawl.model.Cv" >
+                        <result property="name" column="proptypecv"/>
+                    </association> 
+                </association> 
+            </collection> 
+            <collection property="pubs" ofType="org.genedb.crawl.model.Pub" select="featureCvTermPubs" column="feature_cvterm_id"  />
+            <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" select="featureCvTermDbxrefs" column="feature_cvterm_id"  /> 
+        </collection>
+    </resultMap>
+    
 </mapper> 

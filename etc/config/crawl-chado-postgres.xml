@@ -51,6 +51,11 @@
         <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
     </bean>
     
+    <bean id="featureCvterm" class="org.mybatis.spring.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.gmod.cat.FeatureCvtermMapper" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean>
+    
     <!-- 
     <bean id="organismsController" class="org.genedb.crawl.controller.OrganismsController" >
         <property name="organisms" ref="organismMapper" />
