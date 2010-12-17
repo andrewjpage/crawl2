@@ -36,6 +36,26 @@
         <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
     </bean> 
     
+    <bean id="regions" class="org.mybatis.spring.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.gmod.cat.Regions" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean>
+    
+    <bean id="terms" class="org.mybatis.spring.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.gmod.cat.Terms" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean> 
+    
+    <bean id="features" class="org.mybatis.spring.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.gmod.cat.Features" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean>
+    
+    <bean id="featureCvterm" class="org.mybatis.spring.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.gmod.cat.FeatureCvtermMapper" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean>
+    
     <!-- 
     <bean id="organismsController" class="org.genedb.crawl.controller.OrganismsController" >
         <property name="organisms" ref="organismMapper" />
