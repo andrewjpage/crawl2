@@ -155,6 +155,22 @@ public class FeaturesController extends BaseQueryController {
 		return results;
 	}
 	
+	@ResourceDescription("Return feature dbxrefs")
+	@RequestMapping(method=RequestMethod.GET, value="/dbxrefs")
+	public FeatureCollection dbxrefs(@RequestParam(value="features") List<String> featureList) {
+		FeatureCollection results = new FeatureCollection();
+		results.results = features.dbxrefs(featureList); 
+		return results;
+	}
+	
+	@ResourceDescription("Return feature cvterms")
+	@RequestMapping(method=RequestMethod.GET, value="/terms")
+	public FeatureCollection terms(@RequestParam(value="features") List<String> featureList, @RequestParam(value="cvs", required=false) List<String> cvs) {
+		FeatureCollection results = new FeatureCollection();
+		results.results = features.terms(featureList, cvs); 
+		return results;
+	}
+	
 	
 	private List<FeatureGenes> getGeneFeatures(List<String> featureList) {
 		Map <String, FeatureGenes> map = new HashMap<String, FeatureGenes>();

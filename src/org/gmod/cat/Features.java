@@ -21,4 +21,8 @@ public interface Features {
 	List<Feature> featuresLike(@Param("term") String term, @Param("regex") boolean regex, @Param("region") String region);
 	List<Feature> properties(@Param("features") List<String> features);
 	List<Feature> pubs (@Param("features") List<String> features);
+	List<Feature> dbxrefs (@Param("features") List<String> features);
+	List<Feature> terms (@Param("features") List<String> features, @Param("cvs") List<String> cvs);
+	
+	
 }
