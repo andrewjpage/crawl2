@@ -18,5 +18,6 @@ public class Feature {
 	public List<Coordinates> coordinates;
 	public List<FeatureProperty> properties;
 	public List<Pub> pubs;
-	
+	public List<Dbxref> dbxrefs;
+	public List<Cvterm> terms;
 }
