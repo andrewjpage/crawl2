@@ -11,7 +11,6 @@
 </path>	
 <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
 	
-
 <property file="${config}.properties" />
 
 <property name="build.war.home" value="${basedir}/out" />
@@ -60,6 +59,7 @@
     <delete dir="${ivy.lib.dir}" includeEmptyDirs="true"/>
 	<delete dir="${report.home}" includeEmptyDirs="true"/>
 	<delete dir="war/WEB-INF/classes/" includeEmptyDirs="true"/>
+	<delete file="war/WEB-INF/crawl-repository.xml" />
 </target>
 
 
