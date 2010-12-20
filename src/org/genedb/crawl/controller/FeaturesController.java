@@ -12,6 +12,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
+import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.FeatureCollection;
 import org.genedb.crawl.model.FeatureGenes;
@@ -139,11 +140,24 @@ public class FeaturesController extends BaseQueryController {
 		return results;
 	}
 	
+	
 	@ResourceDescription("Return feature properties")
 	@RequestMapping(method=RequestMethod.GET, value="/properties")
 	public FeatureCollection properties(@RequestParam(value="features") List<String> featureList) {
 		FeatureCollection results = new FeatureCollection();
 		results.results = features.properties(featureList); 
+		return results;
+	}
+	
+	@ResourceDescription("Return feature properties")
+	@RequestMapping(method=RequestMethod.GET, value="/withproperty")
+	public FeatureCollection withproperty(
+			@RequestParam("value") String value,
+			@RequestParam(value="regex", defaultValue="false") boolean regex, 
+			@RequestParam(value="region", required=false) String region,
+			@RequestParam(value="type", required=false) String type) {
+		FeatureCollection results = new FeatureCollection();
+		results.results = features.withproperty(value, regex, region, type); 
 		return results;
 	}
 	
@@ -171,6 +185,46 @@ public class FeaturesController extends BaseQueryController {
 		return results;
 	}
 	
+	@ResourceDescription("Return feature with specified cvterm")
+	@RequestMapping(method=RequestMethod.GET, value="/withterm")
+	public FeatureCollection withterm(
+			@RequestParam(value="term") String term, 
+			@RequestParam(value="cv", required=false) String cv,
+			@RequestParam(value="regex", defaultValue="false") boolean regex, 
+			@RequestParam(value="region", required=false) String region) {
+		FeatureCollection results = new FeatureCollection();
+		
+		logger.info(String.format("%s - %s - %s - %s", term, cv, regex, region));
+		
+		results.results = features.withterm(term, cv, regex, region);
+		return results;
+	}
+	
+	@ResourceDescription("Return feature orthologues")
+	@RequestMapping(method=RequestMethod.GET, value="/orthologues")
+	public FeatureCollection orthologues(@RequestParam(value="features") List<String> featureList) {
+		FeatureCollection results = new FeatureCollection();
+		results.results = features.orthologues(featureList); 
+		return results;
+	}
+	
+	@ResourceDescription("Return feature clusters")
+	@RequestMapping(method=RequestMethod.GET, value="/clusters")
+	public FeatureCollection clusters(@RequestParam(value="features") List<String> featureList) {
+		FeatureCollection results = new FeatureCollection();
+		results.results = features.clusters(featureList); 
+		return results;
+	}
+	
+	@ResourceDescription("Return blast hits between two features")
+	@RequestMapping(method=RequestMethod.GET, value="/blastpair")
+	public List<BlastPair> blastpair(
+			@RequestParam(value="f1") String f1, @RequestParam(value="start1") int start1, @RequestParam(value="end1") int end1,
+			@RequestParam(value="f2") String f2, @RequestParam(value="start1") int start2, @RequestParam(value="end1") int end2,
+			@RequestParam(value="length", required=false) Integer length,
+			@RequestParam(value="score", required=false) Integer score) {
+		return features.blastPairs(f1, start1, end1, f2, start2, end2, length, score);
+	}
 	
 	private List<FeatureGenes> getGeneFeatures(List<String> featureList) {
 		Map <String, FeatureGenes> map = new HashMap<String, FeatureGenes>();

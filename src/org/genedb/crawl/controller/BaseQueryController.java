@@ -14,7 +14,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.model.Argument;
-import org.genedb.crawl.model.MappedOrganism;
+import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Resource;
 import org.genedb.crawl.model.Service;
 import org.genedb.crawl.annotations.ResourceDescription;
@@ -180,8 +180,8 @@ public abstract class BaseQueryController {
 		return arguments.get(index);
 	}
 	
-	protected MappedOrganism getOrganism(Organisms organisms, String organism) throws CrawlException {
-		MappedOrganism mappedOrganism = null;
+	protected Organism getOrganism(Organisms organisms, String organism) throws CrawlException {
+		Organism mappedOrganism = null;
 		
 		if (organism.contains(":")) {
 			String[] split = organism.split(":");

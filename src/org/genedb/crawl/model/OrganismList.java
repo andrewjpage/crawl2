@@ -8,9 +8,9 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.google.gson.annotations.Expose;
 
 @XStreamAlias("organisms")
-public class MappedOrganismList  {
+public class OrganismList  {
 	
 	@XStreamImplicit
 	@Expose
-	public List<MappedOrganism> organisms = new ArrayList<MappedOrganism>(); 
+	public List<Organism> organisms = new ArrayList<Organism>(); 
 }

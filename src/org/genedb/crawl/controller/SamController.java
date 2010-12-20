@@ -8,7 +8,7 @@ import org.genedb.crawl.business.Sam;
 
 import org.genedb.crawl.model.FileInfoList;
 import org.genedb.crawl.model.MappedCoverage;
-import org.genedb.crawl.model.MappedOrganism;
+import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.MappedQuery;
 import org.genedb.crawl.model.MappedSAMHeader;
 
@@ -104,7 +104,7 @@ public class SamController extends BaseQueryController {
 		
 		FileInfoList matchedAlignments = new FileInfoList();
 		
-		MappedOrganism mappedOrganism = getOrganism(organisms, organism);
+		Organism mappedOrganism = getOrganism(organisms, organism);
 		
 		if (mappedOrganism != null) {
 			logger.debug(mappedOrganism.common_name);

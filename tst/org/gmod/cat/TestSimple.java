@@ -9,7 +9,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.genedb.crawl.CrawlException;
-import org.genedb.crawl.model.MappedOrganism;
+import org.genedb.crawl.model.Organism;
 
 import junit.framework.TestCase;
 
@@ -34,9 +34,9 @@ public class TestSimple extends TestCase {
 		
 		try {
 			Organisms mapper = session.getMapper(Organisms.class);
-			List<MappedOrganism> organisms = mapper.list();
+			List<Organism> organisms = mapper.list();
 			
-			for (MappedOrganism organism : organisms) {
+			for (Organism organism : organisms) {
 				System.out.println(organism.common_name);
 			}
 			

@@ -2,8 +2,8 @@ package org.genedb.crawl.controller;
 
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
-import org.genedb.crawl.model.MappedOrganism;
-import org.genedb.crawl.model.MappedOrganismList;
+import org.genedb.crawl.model.Organism;
+import org.genedb.crawl.model.OrganismList;
 import org.gmod.cat.Organisms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,33 +26,33 @@ public class OrganismsController extends BaseQueryController {
 	
 	@ResourceDescription("List all the organisms in the repository")
 	@RequestMapping(method=RequestMethod.GET, value={"/list", "/list.*"})
-	public MappedOrganismList list() throws CrawlException {
-		MappedOrganismList mol = new MappedOrganismList();
+	public OrganismList list() throws CrawlException {
+		OrganismList mol = new OrganismList();
 		mol.organisms =  organisms.list();
 		return mol;
 	}
 	
 	@ResourceDescription("Get an organism using the organism id")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByID", "/getByID.*"})
-	public MappedOrganism getByID(@RequestParam("ID") int id) throws CrawlException {
+	public Organism getByID(@RequestParam("ID") int id) throws CrawlException {
 		return organisms.getByID(id);		
 	}
 	
 	@ResourceDescription("Get an organism using its taxon ID")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByTaxonID", "/getByTaxonID.*"})
-	public MappedOrganism getByTaxonID(@RequestParam("taxonID") int taxonID) throws CrawlException {
+	public Organism getByTaxonID(@RequestParam("taxonID") int taxonID) throws CrawlException {
 		return organisms.getByTaxonID(String.valueOf(taxonID));
 	}
 	
 	@ResourceDescription("Get an organism by specifying its common name")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByCommonName", "/getByCommonName.*"})
-	public MappedOrganism getByCommonName(@RequestParam("commonName") String commonName) throws CrawlException {
+	public Organism getByCommonName(@RequestParam("commonName") String commonName) throws CrawlException {
 		return organisms.getByCommonName(commonName);
 	}
 	
 	@ResourceDescription("Get an organism using a taxon ID, common name, or organism ID")
 	@RequestMapping(method=RequestMethod.GET, value="/get")
-	public MappedOrganism get(String organism) throws CrawlException {
+	public Organism get(String organism) throws CrawlException {
 		return getOrganism(organisms, organism);
 	}
 	

@@ -1,6 +1,6 @@
 package org.genedb.crawl.model;
 
 public class CvtermProp {
-	String value;
-	Cvterm type;
+	public String value;
+	public Cvterm type;
 }

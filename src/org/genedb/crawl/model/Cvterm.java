@@ -4,15 +4,20 @@ import java.util.List;
 
 public class Cvterm {
 	
-	Cv cv;
-	String name;
+	public Cv cv;
+	public String name;
 	
-	String accession;
-	boolean is_not;
+	public String accession;
 	
-	List<Dbxref> dbxrefs;
-	List<CvtermProp> props;
-	List<Pub> pubs;
+	/**
+	 *  This is not a primitive boolean so it can be nullable (or else the GSON sets it to false if unset).
+	 */
+	public Boolean is_not;
+	
+	public List<Dbxref> dbxrefs;
+	public List<CvtermProp> props;
+	public List<Pub> pubs;
+	
 	
 	
 }

@@ -4,7 +4,7 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="org.gmod.cat.Organisms">  
 
-  <select id="list" resultType="org.genedb.crawl.model.MappedOrganism" >
+  <select id="list" resultType="org.genedb.crawl.model.Organism" >
   	select 
   	 o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
   	from 
@@ -15,7 +15,7 @@
   	order by o.common_name
   </select>
   
-  <select id="getByID" resultType="org.genedb.crawl.model.MappedOrganism" >
+  <select id="getByID" resultType="org.genedb.crawl.model.Organism" >
     select 
      o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
     from 
@@ -26,7 +26,7 @@
      and o.organism_id = #{ID}
   </select>
   
-  <select id="getByTaxonID" resultType="org.genedb.crawl.model.MappedOrganism" >
+  <select id="getByTaxonID" resultType="org.genedb.crawl.model.Organism" >
     select 
      o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
     from 
@@ -37,7 +37,7 @@
      and op.value = #{taxonID}
   </select>
   
-  <select id="getByCommonName" resultType="org.genedb.crawl.model.MappedOrganism" >
+  <select id="getByCommonName" resultType="org.genedb.crawl.model.Organism" >
     select 
      o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
     from 

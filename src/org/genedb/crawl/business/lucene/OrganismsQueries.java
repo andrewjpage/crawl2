@@ -13,7 +13,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.genedb.crawl.CrawlErrorType;
 import org.genedb.crawl.CrawlException;
-import org.genedb.crawl.model.MappedOrganism;
+import org.genedb.crawl.model.Organism;
 import org.gmod.cat.Organisms;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class OrganismsQueries extends Base implements Organisms {
 
 	@Override
-	public List<MappedOrganism> list()  throws CrawlException {
+	public List<Organism> list()  throws CrawlException {
 		
 		IndexReader reader = repo.luceneIndexReader();
 		IndexSearcher searcher = new IndexSearcher(reader);
@@ -29,7 +29,7 @@ public class OrganismsQueries extends Base implements Organisms {
 		// prefix query with empty string, returns docs with all non empty values for organism.common_name
 		PrefixQuery pq = new PrefixQuery(new Term("organism.common_name", "")); 
 		
-		List<MappedOrganism> organisms = new ArrayList<MappedOrganism>();
+		List<Organism> organisms = new ArrayList<Organism>();
 		
 		try {
 			
@@ -37,7 +37,7 @@ public class OrganismsQueries extends Base implements Organisms {
 			
 			for (ScoreDoc sd : td.scoreDocs) {
 				Document d = reader.document(sd.doc);
-				MappedOrganism o = generateFromDocument(d); 
+				Organism o = generateFromDocument(d); 
 				organisms.add(o);
 			}
 			
@@ -61,8 +61,8 @@ public class OrganismsQueries extends Base implements Organisms {
 		
 	}
 	
-	private MappedOrganism generateFromDocument(Document d) {
-		MappedOrganism o = new MappedOrganism ();
+	private Organism generateFromDocument(Document d) {
+		Organism o = new Organism ();
 		o.common_name = getFieldIfPresent(d, "organism.common_name");
 		o.genus = getFieldIfPresent(d, "organism.genus");
 		o.species = getFieldIfPresent(d, "organism.species");
@@ -73,7 +73,7 @@ public class OrganismsQueries extends Base implements Organisms {
 		return o;
 	}
 	
-	private MappedOrganism search(String term, String value) throws CrawlException {
+	private Organism search(String term, String value) throws CrawlException {
 		IndexReader reader = repo.luceneIndexReader();
 		IndexSearcher searcher = new IndexSearcher(reader);
 		
@@ -84,7 +84,7 @@ public class OrganismsQueries extends Base implements Organisms {
 			
 			if (td.scoreDocs.length > 0) {
 				Document d = reader.document(td.scoreDocs[0].doc);
-				MappedOrganism o = generateFromDocument(d); 
+				Organism o = generateFromDocument(d); 
 				return o;
 			}
 			
@@ -97,18 +97,18 @@ public class OrganismsQueries extends Base implements Organisms {
 	}
 
 	@Override
-	public MappedOrganism getByID(int ID) throws CrawlException {
+	public Organism getByID(int ID) throws CrawlException {
 		return search("organism.id", String.valueOf(ID));
 	}
 
 	@Override
-	public MappedOrganism getByCommonName(String commonName)
+	public Organism getByCommonName(String commonName)
 			throws CrawlException {
 		return search("organism.common_name", commonName);
 	}
 
 	@Override
-	public MappedOrganism getByTaxonID(String taxonID) throws CrawlException {
+	public Organism getByTaxonID(String taxonID) throws CrawlException {
 		return search("organism.taxon_id", taxonID);
 	}
 	

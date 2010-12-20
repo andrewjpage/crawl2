@@ -8,7 +8,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("results")
 public class RegionsInOrganism {
 	
-	public MappedOrganism organism;
+	public Organism organism;
 	
 	@XStreamAlias("regions")
 	public List<String> regions = new ArrayList<String>();

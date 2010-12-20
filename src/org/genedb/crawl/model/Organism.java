@@ -3,7 +3,7 @@ package org.genedb.crawl.model;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("organism")
-public class MappedOrganism {
+public class Organism {
 	public String genus;
 	public String species;
 	public String common_name;

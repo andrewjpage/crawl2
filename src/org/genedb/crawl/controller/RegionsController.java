@@ -13,7 +13,7 @@ import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.Locations;
-import org.genedb.crawl.model.MappedOrganism;
+import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.RegionsInOrganism;
 import org.genedb.crawl.model.Sequence;
 import org.gmod.cat.Features;
@@ -62,7 +62,7 @@ public class RegionsController extends BaseQueryController {
 		if (! cacheRegionsOnStartup) {
 			return;
 		}
-		for (MappedOrganism o : organisms.list()) {
+		for (Organism o : organisms.list()) {
 			List<String> r = regions.inorganism( Integer.parseInt(o.ID));
 			Collections.sort(r);
 			organismRegionMap.put(o.ID, r);
@@ -193,7 +193,7 @@ public class RegionsController extends BaseQueryController {
 	@ResourceDescription("Returns the sequence on a region.")
 	public RegionsInOrganism inorganism(@RequestParam("organism") String organism) throws CrawlException {
 		
-		MappedOrganism o = getOrganism(organisms, organism);
+		Organism o = getOrganism(organisms, organism);
 		
 		List<String> r = null;
 		if (organismRegionMap.containsKey(o.ID)) {

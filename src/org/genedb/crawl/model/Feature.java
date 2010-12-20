@@ -20,4 +20,18 @@ public class Feature {
 	public List<Pub> pubs;
 	public List<Dbxref> dbxrefs;
 	public List<Cvterm> terms;
+	
+	public Cvterm type;
+	
+	public List<FeatureRelationship> relationships;
+	
+	public Organism organism;
+	
+	public List<Feature> orthologues;
+	public AnalysisFeature analysisFeature;
+	public List<String> products;
+	
+	public String relationship;
+	
+	
 }
