@@ -31,28 +31,33 @@
         <property name="configLocation" value="classpath:sql/ibatis.xml"/>
     </bean> 
     
-    <bean id="organisms" class="org.mybatis.spring.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.gmod.cat.Organisms" /> 
+    <bean id="organismsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.gmod.cat.OrganismsMapper" /> 
         <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
     </bean> 
     
-    <bean id="regions" class="org.mybatis.spring.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.gmod.cat.Regions" /> 
+    <bean id="regionsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.gmod.cat.RegionsMapper" /> 
         <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
     </bean>
     
-    <bean id="terms" class="org.mybatis.spring.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.gmod.cat.Terms" /> 
+    <bean id="termsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.gmod.cat.TermsMapper" /> 
         <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
     </bean> 
     
-    <bean id="features" class="org.mybatis.spring.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.gmod.cat.Features" /> 
+    <bean id="featuresMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.gmod.cat.FeaturesMapper" /> 
         <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
     </bean>
     
-    <bean id="featureCvterm" class="org.mybatis.spring.MapperFactoryBean"> 
+    <bean id="featureCvtermMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
         <property name="mapperInterface" value="org.gmod.cat.FeatureCvtermMapper" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean>
+    
+    <bean id="featureMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.gmod.cat.FeatureMapper" /> 
         <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
     </bean>
     

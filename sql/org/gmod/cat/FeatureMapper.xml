@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="org.gmod.cat.FeatureMapper">  
+    
+    <select id="get" resultType="org.genedb.crawl.model.Feature">
+        SELECT feature_id, organism_id, uniqueName 
+        FROM feature f
+        WHERE <include refid="featureSelector"/>
+    </select>
+    
+    <select id="properties"  resultMap="properties" parameterType="org.genedb.crawl.model.Feature" >
+        SELECT 
+            cvterm.name as propname, 
+            featureprop.value as value, 
+            featureprop.rank as rank 
+       FROM featureprop 
+       LEFT JOIN cvterm on cvterm.cvterm_id = featureprop.type_id 
+       LEFT JOIN feature f on featureprop.feature_id = f.feature_id
+       WHERE <include refid="featureSelector"/>
+       
+    </select>
+    
+    <resultMap id="properties" type="org.genedb.crawl.model.FeatureProperty">
+        <result property="name" column="propname"/> 
+        <result property="value" column="value"/> 
+        <result property="rank" column="rank"/>
+        <association property="type" resultMap="type" />
+    </resultMap>
+    
+    
+    
+    
+    
+     <select id="terms" resultMap="terms"  >
+       SELECT 
+           
+           fc.feature_cvterm_id as feature_cvterm_id, 
+           fc.is_not as is_not, 
+           d.accession, 
+           f.uniquename as feature, 
+           ct.name as cvterm, 
+           c.name as cv, 
+           fcp.value as prop, 
+           fcpct.name as type_name, 
+           fcpc.name as type_cv
+        FROM feature f
+            JOIN feature_cvterm fc ON f.feature_id = fc.feature_id
+            JOIN cvterm ct ON fc.cvterm_id = ct.cvterm_id
+            JOIN cv c ON c.cv_id = ct.cv_id
+                
+            JOIN dbxref d ON ct.dbxref_id = d.dbxref_id
+            LEFT OUTER JOIN feature_cvtermprop fcp on fc.feature_cvterm_id = fcp.feature_cvterm_id
+            LEFT OUTER JOIN cvterm fcpct on fcp.type_id = fcpct.cvterm_id 
+            LEFT OUTER JOIN cv fcpc ON fcpct.cv_id = fcpc.cv_id
+        
+        WHERE <include refid="featureSelector"/>
+        
+    </select>
+    
+    <!-- <if test="cvs != null"> 
+                    AND c.name IN  <foreach item="item" index="index" collection="cvs" open="(" separator="," close=")">#{item}</foreach> 
+                </if> -->
+    
+     <resultMap id="terms" type="org.genedb.crawl.model.Cvterm">
+         <result property="accession" column="accession"/>
+         <result property="is_not" column="is_not"/> 
+         <result property="name" column="cvterm"/>
+         <association property="cv" javaType="org.genedb.crawl.model.Cv" >
+                <result property="name" column="cv"/>
+            </association>
+         <collection property="props" ofType="org.genedb.crawl.model.CvtermProp">
+             <result property="value" column="prop"/>
+             <association property="type" resultMap="type" />
+         </collection> 
+         <!-- <collection property="pubs" ofType="org.genedb.crawl.model.Pub" select="org.gmod.cat.FeatureCvtermMapper.featureCvTermPubs" column="feature_cvterm_id"  />
+         <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" select="org.gmod.cat.FeatureCvtermMapper.featureCvTermDbxrefs" column="feature_cvterm_id"  /> --> 
+    </resultMap>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <sql id="featureSelector">
+        
+        f.uniquename = #{uniqueName} 
+        
+        <if test="organism_id != null"> 
+            AND f.organism_id = #{organism_id} 
+        </if>
+        
+        <if test="name != null"> 
+            AND f.name = #{name}
+        </if>
+        
+    </sql>
+    
+    
+
+</mapper>

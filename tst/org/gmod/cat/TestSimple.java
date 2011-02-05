@@ -33,7 +33,7 @@ public class TestSimple extends TestCase {
 		SqlSession session = sqlMapper.openSession();
 		
 		try {
-			Organisms mapper = session.getMapper(Organisms.class);
+			OrganismsMapper mapper = session.getMapper(OrganismsMapper.class);
 			List<Organism> organisms = mapper.list();
 			
 			for (Organism organism : organisms) {

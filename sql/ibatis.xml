@@ -6,12 +6,16 @@
     <!--  note here the www has been removed from the PUBLIC uri in doctype at the top, this is to prevent mybatis scanning the internets. -->
 
   <mappers>
-    <mapper resource="sql/org/gmod/cat/Organisms.xml"/>
-    <mapper resource="sql/org/gmod/cat/Regions.xml"/>
-    <mapper resource="sql/org/gmod/cat/Terms.xml"/>
-    <mapper resource="sql/org/gmod/cat/Features.xml"/>
+  
+    <mapper resource="sql/org/gmod/cat/FeatureCvTermMapper.xml"/>
+    <mapper resource="sql/org/gmod/cat/OrganismsMapper.xml"/>
+    <mapper resource="sql/org/gmod/cat/RegionsMapper.xml"/>
+    <mapper resource="sql/org/gmod/cat/TermsMapper.xml"/>
+    <mapper resource="sql/org/gmod/cat/FeaturesMapper.xml"/>
     
-    <mapper resource="sql/org/gmod/cat/FeatureCvTerm.xml"/>
+    <mapper resource="sql/org/gmod/cat/FeatureMapper.xml"/>
+    
+    
   </mappers>
   
 </configuration>

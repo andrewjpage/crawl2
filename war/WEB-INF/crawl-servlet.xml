@@ -20,8 +20,16 @@
 		<property name="defaultErrorView" value="suffix"/>
 	</bean>
     
-    <bean id="gsonView" class="org.genedb.crawl.view.GsonView"></bean>
-    <bean id="xView" class="org.genedb.crawl.view.XMLView"></bean>
+    <bean id="jacksonView" class="org.genedb.crawl.view.JacksonView">
+        <property name="showParameters"><value>${showParameters}</value></property>
+    </bean>
+    
+    <!--<bean id="gsonView" class="org.genedb.crawl.view.GsonView">
+        <property name="showParameters"><value>${showParameters}</value></property>
+    </bean>
+    --><bean id="xView" class="org.genedb.crawl.view.XMLView">
+        <property name="showParameters"><value>${showParameters}</value></property>
+    </bean>
     
     <bean id="alignmentStore" class="org.genedb.crawl.business.AlignmentStore">
         <property name="alignmentFiles" ><value>${alignments}</value></property>
@@ -34,7 +42,8 @@
 	      <map>
 	        <entry key="xml" value-ref="xView" />
 	        <!-- <entry key="json" value-ref="jsonView" />  -->
-	        <entry key="json" value-ref="gsonView" />
+	        <!-- <entry key="json" value-ref="gsonView" /> -->
+	        <entry key="json" value-ref="jacksonView" />
 	      </map>
 	    </property>
   </bean>

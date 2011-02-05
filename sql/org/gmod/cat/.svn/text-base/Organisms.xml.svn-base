@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="org.gmod.cat.Organisms">  
+
+  <select id="list" resultType="org.genedb.crawl.model.Organism" >
+  	select 
+  	 o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
+  	from 
+  	 organism o, organismprop op, cvterm c
+  	where 
+  	 op.type_id = c.cvterm_id and c.name = 'taxonId' 
+  	 and o.organism_id = op.organism_id 
+  	order by o.common_name
+  </select>
+  
+  <select id="getByID" resultType="org.genedb.crawl.model.Organism" >
+    select 
+     o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
+    from 
+     organism o, organismprop op, cvterm c
+    where 
+     op.type_id = c.cvterm_id and c.name = 'taxonId' 
+     and o.organism_id = op.organism_id 
+     and o.organism_id = #{ID}
+  </select>
+  
+  <select id="getByTaxonID" resultType="org.genedb.crawl.model.Organism" >
+    select 
+     o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
+    from 
+     organism o, organismprop op, cvterm c
+    where 
+     op.type_id = c.cvterm_id and c.name = 'taxonId' 
+     and o.organism_id = op.organism_id 
+     and op.value = #{taxonID}
+  </select>
+  
+  <select id="getByCommonName" resultType="org.genedb.crawl.model.Organism" >
+    select 
+     o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
+    from 
+     organism o, organismprop op, cvterm c
+    where 
+     op.type_id = c.cvterm_id and c.name = 'taxonId' 
+     and o.organism_id = op.organism_id 
+     and o.common_name = #{commonName}
+  </select>
+
+</mapper> 

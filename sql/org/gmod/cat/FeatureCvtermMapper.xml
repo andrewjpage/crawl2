@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="org.gmod.cat.FeatureCvtermMapper">
+    
+    <select id="featureCvTermPubs" resultMap="featureCvTermPubsResults">
+    
+        SELECT pub.uniquename as uniqueName
+            FROM feature_cvterm 
+            JOIN pub on feature_cvterm.pub_id = pub.pub_id
+            WHERE feature_cvterm.feature_cvterm_id = #{feature_cvterm_id}
+        UNION
+        SELECT pub.uniquename as uniqueName
+            FROM feature_cvterm_pub
+            JOIN pub on feature_cvterm_pub.pub_id = pub.pub_id
+            WHERE feature_cvterm_pub.feature_cvterm_id = #{feature_cvterm_id}
+    
+    
+    </select>
+    
+    <resultMap id="featureCvTermPubsResults" type="org.genedb.crawl.model.Pub">
+        <result property="uniqueName" column="uniqueName"/> 
+    </resultMap>
+    
+    
+    
+    
+    <select id="featureCvTermDbxrefs" resultMap="featureCvTermDbxrefsResults" >
+        
+        SELECT dbxref.accession as accession, db.name as database
+            FROM feature_cvterm
+            JOIN feature_cvterm_dbxref ON feature_cvterm.feature_cvterm_id = feature_cvterm_dbxref.feature_cvterm_id
+            JOIN dbxref ON feature_cvterm_dbxref.dbxref_id = dbxref.dbxref_id
+            JOIN db ON dbxref.db_id = db.db_id
+            WHERE feature_cvterm.feature_cvterm_id = #{feature_cvterm_id}
+        
+    </select>
+    
+    <resultMap id="featureCvTermDbxrefsResults" type="org.genedb.crawl.model.Dbxref">
+       <result property="database" column="database"/> 
+       <result property="accession" column="accession"/> 
+    </resultMap>
+    
+    
+    
+    
+</mapper>
+ 

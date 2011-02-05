@@ -13,9 +13,11 @@
 	
 <property file="${config}.properties" />
 
-<property name="build.war.home" value="${basedir}/out" />
+<property name="build" value="${basedir}/ant" />
+<property name="build.packages.home" value="${build}/packages" />
+<property name="build.classes.home" value="${build}/classes" />
+
 <property name="build.war.name" value="${deploy.name}"  />
-<property name="build.classes.home" value="${basedir}/ant" />
 
 <property name="log4j.config" value="${basedir}/war/WEB-INF/log4j.properties"/> 	
 	
@@ -37,7 +39,7 @@
 <path id="test">
     <pathelement location="lib/ivy/compile/jar-junit-junit-4.8.2.jar" />
 	<pathelement location="lib/ivy/compile/jar-com.springsource.org.postgresql.jdbc4-com.springsource.org.postgresql.jdbc4-8.3.604.jar" />
-	<pathelement location="out/jar-mybatis-mybatis-3.0.2.jar" />
+	<pathelement location="${build.packages.home}/jar-mybatis-mybatis-3.0.2.jar" />
     <pathelement location="${build.classes.home}" />
 	<pathelement location="${basedir}" />
 </path>
@@ -47,15 +49,14 @@
 
 
 <target name="setup">
-    <mkdir dir="${build.war.home}"/>
-    <mkdir dir="${build.classes.home}"/>
+    <mkdir dir="${build.packages.home}"/>
+	<mkdir dir="${build.classes.home}"/>
     <mkdir dir="${ivy.lib.dir}" />
 	<mkdir dir="${report.home}" />
 </target>
 
 <target name="clean">
-    <delete dir="${build.war.home}" includeEmptyDirs="true"/>
-    <delete dir="${build.classes.home}" includeEmptyDirs="true"/>
+    <delete dir="${build}" includeEmptyDirs="true"/>
     <delete dir="${ivy.lib.dir}" includeEmptyDirs="true"/>
 	<delete dir="${report.home}" includeEmptyDirs="true"/>
 	<delete dir="war/WEB-INF/classes/" includeEmptyDirs="true"/>
@@ -104,6 +105,11 @@
         srcdir="${basedir}/src" 
         classpathref="lib.compile.path"
         />
+	
+	<copy file="${basedir}/src/org/genedb/crawl/model/jaxb.index" 
+		tofile="${build.classes.home}/org/genedb/crawl/model/jaxb.index" 
+		overwrite="true" />
+	
 </target>
 	
 
@@ -156,7 +162,7 @@
         <mapper type="flatten"/>
     </copy>
 	
-    <war warfile="${build.war.home}/${build.war.name}.war" webxml="${basedir}/war/WEB-INF/web.xml" >
+    <war warfile="${build.packages.home}/${build.war.name}.war" webxml="${basedir}/war/WEB-INF/web.xml" >
     	
     	<lib dir="${lib.dir}/wartmp" >
     		<include name="**/*.jar"/>
@@ -178,7 +184,7 @@
 	
 	<!--java -jar lib/ivy/compile/jar-jetty-runner-jetty-runner-7.1.6.v20100715.jar dist/crawl.war -->
 	<java fork="true" maxmemory="128m" failonerror="true" jar="${ivy.lib.dir}/compile/jar-jetty-runner-jetty-runner-7.2.0.RC0.jar"  >
-		<arg line=" ${build.war.home}/${build.war.name}.war "/>
+		<arg line=" ${build.packages.home}/${build.war.name}.war "/>
 	</java>
 	
 </target>
@@ -192,7 +198,7 @@
 	    <flattenmapper />
 	</pathconvert>
     
-	<jar destfile="${build.war.home}/crawl.jar"  >
+	<jar destfile="${build.packages.home}/crawl.jar"  >
 		
 		<fileset dir=".">
 			  <include name="sql/**.sql" />
@@ -210,12 +216,12 @@
 	</jar>
 	
 	<!-- copy all the dependencies into the dist folder, so that the craw.jar can access them-->
-	<copy todir="${build.war.home}">
+	<copy todir="${build.packages.home}">
 		<path refid="lib.jar.path" />
 		<mapper type="flatten"/>
 	</copy>
 	
-	<copy todir="${build.war.home}" >
+	<copy todir="${build.packages.home}" >
 		<path>
 		    <fileset dir="${basedir}/etc/" />
 		</path>
@@ -233,7 +239,7 @@
 	
 <target name="deploy" depends="package-war, undeploy" >
 	<fail message="The 'config' property must be set" unless="config"/>
-    <copy file="${build.war.home}/${build.war.name}.war" todir="${deploy.dir}/"/>
+    <copy file="${build.packages.home}/${build.war.name}.war" todir="${deploy.dir}/"/>
 </target>
 
 	
@@ -278,7 +284,7 @@
     <java fork="true" maxmemory="1024m" failonerror="true" classname="org.genedb.crawl.business.GenerateLuceneIndex"  >
         <classpath>
             <path >
-            	<fileset dir="${build.war.home}" >
+            	<fileset dir="${build.packages.home}" >
             		<include name="**/*.jar"/>
             	 </fileset>
             </path>
