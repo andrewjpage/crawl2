@@ -58,5 +58,6 @@
 	<classpathentry kind="lib" path="lib/local/jewelcli-0.6.jar"/>
 	<classpathentry kind="lib" path="lib/local/picard-1.27.jar"/>
 	<classpathentry kind="lib" path="lib/local/sam-1.27.jar"/>
+	<classpathentry kind="lib" path="lib/ivy/compile/jar-elasticsearch-elasticsearch-0.14.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
