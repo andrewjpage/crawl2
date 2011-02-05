@@ -7,27 +7,30 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 import org.apache.log4j.Logger;
+import org.genedb.crawl.CrawlErrorType;
 import org.genedb.crawl.CrawlException;
 
 import org.genedb.crawl.model.CrawlError;
 
 public class CrawlMappingExceptionResolver extends SimpleMappingExceptionResolver {
+	
 	private Logger logger = Logger.getLogger(CrawlMappingExceptionResolver.class);
+	
 	@Override
-	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-		ModelAndView mav = new ModelAndView("service:");
+	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, 
+			Object handler, Exception ex) {
 		
-		//BaseResult result = new BaseResult();
+		ModelAndView mav = new ModelAndView("service:");
 		
 		CrawlError error = new CrawlError();
 		
 		if (ex instanceof CrawlException) {
 			error.setException((CrawlException)ex);
 		} else {
-			error.message = ex.getMessage();
+			error.setException(new CrawlException(ex.getMessage(), CrawlErrorType.MISC_ERROR));
 		}
 		
-		//result.addResult(error);
+		logger.error(ex.getStackTrace());
 		
 		ex.printStackTrace();
 		

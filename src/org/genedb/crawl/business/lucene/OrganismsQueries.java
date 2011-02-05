@@ -14,11 +14,12 @@ import org.apache.lucene.search.TopDocs;
 import org.genedb.crawl.CrawlErrorType;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.model.Organism;
-import org.gmod.cat.Organisms;
+import org.genedb.crawl.model.OrganismProp;
+import org.gmod.cat.OrganismsMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrganismsQueries extends Base implements Organisms {
+public class OrganismsQueries extends Base implements OrganismsMapper {
 
 	@Override
 	public List<Organism> list()  throws CrawlException {
@@ -68,7 +69,7 @@ public class OrganismsQueries extends Base implements Organisms {
 		o.species = getFieldIfPresent(d, "organism.species");
 		o.taxonID = getFieldIfPresent(d, "organism.taxon_id");
 		o.translation_table = getFieldIfPresent(d, "organism.tranlation_table");
-		o.ID = getFieldIfPresent(d, "organism.id");
+		o.ID = Integer.parseInt(getFieldIfPresent(d, "organism.id"));
 		o.name = o.genus + " " + o.species;
 		return o;
 	}
@@ -110,6 +111,12 @@ public class OrganismsQueries extends Base implements Organisms {
 	@Override
 	public Organism getByTaxonID(String taxonID) throws CrawlException {
 		return search("organism.taxon_id", taxonID);
+	}
+
+	@Override
+	public OrganismProp getOrganismProp(int ID, String cv, String cvterm) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 

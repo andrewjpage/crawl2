@@ -1,10 +1,15 @@
 package org.genedb.crawl.controller;
 
+import java.util.List;
+
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
+import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.OrganismList;
-import org.gmod.cat.Organisms;
+import org.genedb.crawl.model.OrganismProp;
+import org.genedb.crawl.model.Results;
+import org.gmod.cat.OrganismsMapper;
+import org.gmod.cat.TermsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,43 +22,54 @@ import org.springframework.web.bind.annotation.RequestParam;
 @ResourceDescription("Organism related queries")
 public class OrganismsController extends BaseQueryController {
 	
-	private Organisms organisms;
-	
 	@Autowired
-	public void setOrganisms(Organisms organisms) {
-		this.organisms = organisms;
-	}
+	private OrganismsMapper organismsMapper;
 	
-	@ResourceDescription("List all the organisms in the repository")
+	
+	@ResourceDescription(value="List all the organisms in the repository", type="Organism")
 	@RequestMapping(method=RequestMethod.GET, value={"/list", "/list.*"})
-	public OrganismList list() throws CrawlException {
-		OrganismList mol = new OrganismList();
-		mol.organisms =  organisms.list();
-		return mol;
+	public Results list(Results results) throws CrawlException {
+		List<Organism> list = organismsMapper.list();
+		
+		for (Organism organism : list) {
+			OrganismProp prop = organismsMapper.getOrganismProp(organism.ID, "genedb_misc", "translationTable");
+			
+			if (prop != null) {
+				organism.translation_table = prop.value;
+			}
+			
+		}
+		
+		results.organisms = list;
+		return results;		
 	}
 	
-	@ResourceDescription("Get an organism using the organism id")
+	@ResourceDescription(value="Get an organism using the organism id", type="Organism")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByID", "/getByID.*"})
-	public Organism getByID(@RequestParam("ID") int id) throws CrawlException {
-		return organisms.getByID(id);		
+	public Results getByID(Results results, @RequestParam("ID") int id) throws CrawlException {
+		results.addOrganism(organismsMapper.getByID(id));
+		return results;
 	}
 	
-	@ResourceDescription("Get an organism using its taxon ID")
+	@ResourceDescription(value="Get an organism using its taxon ID", type="Organism")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByTaxonID", "/getByTaxonID.*"})
-	public Organism getByTaxonID(@RequestParam("taxonID") int taxonID) throws CrawlException {
-		return organisms.getByTaxonID(String.valueOf(taxonID));
+	public Results getByTaxonID(Results results, @RequestParam("taxonID") int taxonID) throws CrawlException {
+		results.addOrganism(organismsMapper.getByTaxonID(String.valueOf(taxonID)));
+		return results;
 	}
 	
-	@ResourceDescription("Get an organism by specifying its common name")
+	@ResourceDescription(value="Get an organism by specifying its common name", type="Organism")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByCommonName", "/getByCommonName.*"})
-	public Organism getByCommonName(@RequestParam("commonName") String commonName) throws CrawlException {
-		return organisms.getByCommonName(commonName);
+	public Results getByCommonName(Results results, @RequestParam("commonName") String commonName) throws CrawlException {
+		results.addOrganism(organismsMapper.getByCommonName(commonName));
+		return results;
 	}
 	
-	@ResourceDescription("Get an organism using a taxon ID, common name, or organism ID")
+	@ResourceDescription(value="Get an organism using a taxon ID, common name, or organism ID", type="Organism")
 	@RequestMapping(method=RequestMethod.GET, value="/get")
-	public Organism get(String organism) throws CrawlException {
-		return getOrganism(organisms, organism);
+	public Results get(Results results, String organism) throws CrawlException {
+		results.addOrganism(getOrganism(organismsMapper, organism));
+		return results;
 	}
 	
 	

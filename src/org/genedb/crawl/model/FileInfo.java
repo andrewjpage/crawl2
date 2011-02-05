@@ -1,14 +1,19 @@
 package org.genedb.crawl.model;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import javax.xml.bind.annotation.XmlAttribute;
 
-@XStreamAlias("file")
 public class FileInfo  {
 	
+	@XmlAttribute
 	public int fileID;
+	@XmlAttribute
 	public String file;
+	@XmlAttribute
 	public String meta;
+	@XmlAttribute
 	public String organism;
+	
+	public FileInfo() {}
 	
 	public FileInfo(int fileID, String file, String meta, String organism) {
 		this.fileID = fileID;

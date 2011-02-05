@@ -1,19 +1,19 @@
 package org.genedb.crawl.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.business.AlignmentStore;
 import org.genedb.crawl.business.Sam;
 
-import org.genedb.crawl.model.FileInfoList;
-import org.genedb.crawl.model.MappedCoverage;
+import org.genedb.crawl.model.FileInfo;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.MappedQuery;
-import org.genedb.crawl.model.MappedSAMHeader;
+import org.genedb.crawl.model.ResultsSAM;
 
-import org.genedb.crawl.model.MappedSAMSequenceList;
-import org.gmod.cat.Organisms;
+import org.gmod.cat.OrganismsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +34,7 @@ public class SamController extends BaseQueryController {
 	private Sam sam = new Sam();
 	
 	@Autowired
-	private Organisms organisms;
+	private OrganismsMapper organismsMapper;
 	
 	@Autowired
 	public void setAlignmentStore(AlignmentStore alignmentStore) {
@@ -44,25 +44,30 @@ public class SamController extends BaseQueryController {
 	
 	@RequestMapping(method=RequestMethod.GET, value={"/header", "/header.*"})
 	@ResourceDescription("Returns the header attributes for a SAM or BAM in the repository.")
-	public MappedSAMHeader header(
+	public ResultsSAM header(
+			ResultsSAM results,
 			@RequestParam(value="callback", required=false) String callback, 
 			@RequestParam("fileID") int fileID) 
 	throws Exception {
-		return sam.header(fileID);
+		results.header = sam.header(fileID);
+		return results;
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value={"/sequences", "/sequences.*"})
 	@ResourceDescription("Returns the sequences for a SAM or BAM in the repository.")
-	public MappedSAMSequenceList sequences(
+	public ResultsSAM sequences(
+			ResultsSAM results,
 			@RequestParam(value="callback", required=false) String callback,
 			@RequestParam("fileID") int fileID) throws Exception {
-		return sam.sequence(fileID);
+		results.sequences = sam.sequence(fileID); 
+		return results;
 	}
 	
 	
 	@RequestMapping(method=RequestMethod.GET, value={"/query", "/query.*"})
 	@ResourceDescription("Returns the reads between a start and end position for a SAM or BAM in the repository.")
-	public MappedQuery query(
+	public ResultsSAM query(
+			ResultsSAM results,
 			@RequestParam(value="callback", required=false) String callback,
 			@RequestParam("fileID") int fileID, 
 			@RequestParam("sequence") @ResourceDescription("The FASTA sequence name, as returned by the sequences query") String sequence,
@@ -70,14 +75,15 @@ public class SamController extends BaseQueryController {
 			@RequestParam("end") int end,
 			@RequestParam(value="contained", defaultValue="true", required=false) Boolean contained,
 			@RequestParam(value="filter", defaultValue="0", required=false) Integer filter) throws Exception {
-		
-		return sam.query(fileID, sequence, start, end, contained, filter);
+		results.query = sam.query(fileID, sequence, start, end, contained, filter);
+		return results;
 	}
 	
 	
 	@RequestMapping(method=RequestMethod.GET, value={"/coverage", "/coverage.*"})
 	@ResourceDescription("Computes the coverage count for a range, windowed in steps for a SAM or BAM in the repository.")
-	public synchronized MappedCoverage coverage(
+	public synchronized ResultsSAM coverage(
+			ResultsSAM results, 
 			@RequestParam(value="callback", required=false) String callback,
 			@RequestParam("fileID") int fileID, 
 			@RequestParam("sequence") String sequence,
@@ -85,34 +91,36 @@ public class SamController extends BaseQueryController {
 			@RequestParam("end") int end,
 			@RequestParam("window") int window,
 			@RequestParam(value="filter", defaultValue="0", required=false) Integer filter) throws Exception {
-		
-		return sam.coverage(fileID, sequence, start, end, window, filter);
+		results.coverage = sam.coverage(fileID, sequence, start, end, window, filter);
+		return results;
 	}
 	
 	
 	@ResourceDescription("Returns a list of SAM / BAM files in the repository.")
 	@RequestMapping(method=RequestMethod.GET, value={"/list", "/list.*"})
-	public FileInfoList list(@RequestParam(value="callback", required=false) String callback) {
-		return sam.list();
+	public ResultsSAM list(ResultsSAM results, @RequestParam(value="callback", required=false) String callback) {
+		results.files = sam.list();
+		return results;
 	}
 	
 	@ResourceDescription("Returns a list of SAM / BAM files for a particular organism.")
 	@RequestMapping(method=RequestMethod.GET, value={"/listfororganism", "/listfororganism.*"})
-	public FileInfoList listfororganism( 
+	public ResultsSAM listfororganism( 
+			ResultsSAM results,
 			@RequestParam(value="callback", required=false) String callback,
 			@RequestParam("organism") String organism) throws CrawlException {
 		
-		FileInfoList matchedAlignments = new FileInfoList();
+		List<FileInfo> matchedAlignments = new ArrayList<FileInfo>();
 		
-		Organism mappedOrganism = getOrganism(organisms, organism);
+		Organism mappedOrganism = getOrganism(organismsMapper, organism);
 		
 		if (mappedOrganism != null) {
 			logger.debug(mappedOrganism.common_name);
 			matchedAlignments = sam.listfororganism(mappedOrganism.common_name);
 		}
 		
-		return matchedAlignments;
-		
+		results.files = matchedAlignments;
+		return results;
 	}
 	
 	

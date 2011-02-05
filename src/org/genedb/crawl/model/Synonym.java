@@ -1,17 +1,15 @@
 package org.genedb.crawl.model;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import javax.xml.bind.annotation.XmlAttribute;
 
-@XStreamAlias("synonym")
 public class Synonym {
 	
-	@XStreamAsAttribute
+	@XmlAttribute
 	public String synonym;
 	
-	@XStreamAsAttribute
+	@XmlAttribute
 	public String synonymtype;
 	
-	@XStreamAsAttribute
+	@XmlAttribute
 	public boolean is_current;
 }

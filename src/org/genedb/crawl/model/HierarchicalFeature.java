@@ -3,24 +3,21 @@ package org.genedb.crawl.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
-@XStreamAlias("feature")
-public class HierarchicalFeature {
+public class HierarchicalFeature extends Feature {
 	
+	@XmlElement(name="child")
 	public List<HierarchicalFeature> children = new ArrayList<HierarchicalFeature>();
-	public List<HierarchicalFeature> parents = new ArrayList<HierarchicalFeature>();
 	
-	@XStreamAsAttribute
+	@XmlElement(name="parent")
+	public List<HierarchicalFeature> parents = new ArrayList<HierarchicalFeature>();	
+	
+	@XmlAttribute
 	public String relationship;
 	
-	@XStreamAsAttribute
-	public String type;
+	@XmlAttribute
+	public String relationshipType;
 	
-	@XStreamAsAttribute
-	public String uniqueName;
-	
-	@XStreamAsAttribute
-	public String name;
 }

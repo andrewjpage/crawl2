@@ -12,7 +12,16 @@ import net.sf.samtools.AlignmentBlock;
 import net.sf.samtools.CigarElement;
 import net.sf.samtools.SAMRecord;
 
+/**
+ * 
+ * This class has been deprecated for now, in favour of the MappedQueryRecordElementList approach,
+ * however it has not been deleted because it may yet be used as the basis for some other queries.
+ * 
+ * @author gv1
+ *
+ */
 @XStreamAlias("record")
+@Deprecated
 public class MappedSAMRecord {
 	
 	@XStreamOmitField
@@ -32,6 +41,8 @@ public class MappedSAMRecord {
 	
 	public List<MappedCigarElement> cigars = new ArrayList<MappedCigarElement>();
 	public List<MappedAlignmentBlock> alignmentBlocks = new ArrayList<MappedAlignmentBlock>();
+	
+	public MappedSAMRecord() {};
 	
 	public MappedSAMRecord(SAMRecord record) {
 		
@@ -92,6 +103,7 @@ class MappedFlags {
 	public boolean readFailsVendorQualityCheckFlag;
 	public boolean duplicateReadFlag;
 	
+	public MappedFlags() {}
 	
 	public MappedFlags(SAMRecord record) {
 		

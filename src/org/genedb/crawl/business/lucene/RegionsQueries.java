@@ -72,13 +72,13 @@ public class RegionsQueries extends Base implements Regions {
 				
 				LocationRegion lr = new LocationRegion();
 				
-				lr.start = d.getField("start").stringValue();
-				lr.end = d.getField("end").stringValue();
+				lr.start = Integer.parseInt(d.getField("start").stringValue());
+				lr.end = Integer.parseInt(d.getField("end").stringValue());
 				
-				lr.phase = d.getField("phase").stringValue();
-				lr.is_obsolete = d.getField("isObsolete").stringValue();
+				lr.phase = Integer.parseInt(d.getField("phase").stringValue());
+				lr.is_obsolete = Boolean.valueOf(d.getField("isObsolete").stringValue());
 				lr.feature = d.getField("ID").stringValue();
-				lr.strand = d.getField("strand").stringValue();
+				lr.strand = Integer.parseInt(d.getField("strand").stringValue());
 				lr.type = d.getField("type").stringValue();
 				
 				locations.features.add(lr);

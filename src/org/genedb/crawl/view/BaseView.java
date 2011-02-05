@@ -1,29 +1,28 @@
 package org.genedb.crawl.view;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.springframework.validation.BeanPropertyBindingResult;
+import org.genedb.crawl.model.XMLResponseWrapper;
 
 public class BaseView {
-
-	public BaseView() {
-		super();
+	
+	boolean showParameters = false;
+	
+	public void setShowParameters(boolean showParameters) {
+		this.showParameters = showParameters;
 	}
-
-	protected Object getFirstValidValue(Map<String, ?>map) {
+	
+	protected XMLResponseWrapper wrap(String name, Map<String, ?>map, Map<String, ?>parameters) {
 		
-		for (Entry<String, ?> e : map.entrySet()) {
-			Object value = e.getValue();
-			
-			if (value instanceof BeanPropertyBindingResult)	 
-	    		continue;
-			
-			return value;
+		XMLResponseWrapper wrapper = null;
+		if (showParameters) {
+			wrapper = new XMLResponseWrapper(name, map, parameters);
+		} else {
+			wrapper = new XMLResponseWrapper(name, map, null);
 		}
 		
-		return null;
+		return wrapper;
 		
 	}
-
+	
 }

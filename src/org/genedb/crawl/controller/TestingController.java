@@ -2,7 +2,7 @@ package org.genedb.crawl.controller;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
-import org.gmod.cat.Organisms;
+import org.gmod.cat.OrganismsMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,9 +14,9 @@ public class TestingController {
 	
 	private Logger logger = Logger.getLogger(TestingController.class);
 	
-	private Organisms organisms;
+	private OrganismsMapper organisms;
 	
-	public void setOrganisms(Organisms organisms) {
+	public void setOrganisms(OrganismsMapper organisms) {
 		this.organisms = organisms;
 	}
 	

@@ -1,21 +1,22 @@
 package org.genedb.crawl.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
+
+import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlErrorType;
 import org.genedb.crawl.CrawlException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
-@XStreamAlias("error")
 public class CrawlError {
 	
-	@XStreamAsAttribute
+	private Logger logger = Logger.getLogger(CrawlError.class);
+	
+	@XmlAttribute
 	public String message;
 	
-	@XStreamAsAttribute
-	public int code = typeCode(CrawlErrorType.MISC_ERROR);
+	@XmlAttribute
+	public Integer code = typeCode(CrawlErrorType.MISC_ERROR);
 	
-	@XStreamAsAttribute
+	@XmlAttribute
 	public CrawlErrorType type = CrawlErrorType.MISC_ERROR;
 	
 	public void setErrorType(CrawlErrorType type) {
@@ -24,9 +25,10 @@ public class CrawlError {
 	}
 	
 	public void setException(CrawlException e) {
-		this.type = e.type;
-		this.code = typeCode(e.type);
-		this.message = e.getMessage();
+		type = e.type;
+		code = typeCode(e.type);
+		message = e.getMessage();
+		logger.error(String .format("Error, type: %s, code: %s, message: %s", type, code, message));
 	}
 	
 	private int typeCode(CrawlErrorType t) {

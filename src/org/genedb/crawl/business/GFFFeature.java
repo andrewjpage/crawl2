@@ -24,9 +24,11 @@ public class GFFFeature {
 	public int end;
 	public String score;
 	public Strand strand;
-	public String phase;
-	//public Map<String, String> attributes = new LinkedHashMap<String,String>();
-	public GFFAttributeMap attributes = new GFFAttributeMap();
+	public Integer phase;
+	
+	public GFFAttributeMap attributes = new GFFAttributeMap(this);
+	
+	public String id;
 	
 	public enum Strand {
 		POSITIVE ("+"),
@@ -42,6 +44,15 @@ public class GFFFeature {
 		
 		public String getStrand() {
 			return text;
+		}
+		
+		public int getStrandInt() {
+			if (text.equals("+")) {
+				return 1;
+			} else if (text.equals("-")) {
+				return 2;
+			}
+			return 0;
 		}
 		
 		public static Strand fromText(String text) {
@@ -63,6 +74,9 @@ public class GFFFeature {
 	
 	
 	public GFFFeature(String line, boolean parseAttributes) {
+		
+		logger.trace(line);
+		
 		String[] columns = line.split("\t");
 		
 		seqid = columns[0];
@@ -72,8 +86,17 @@ public class GFFFeature {
 		end = new Integer (columns[4]);
 		score = columns[5];
 		
-		strand = Strand.fromText(columns[6]); 
-		phase = columns[7];
+		strand = Strand.fromText(columns[6]);
+		
+		//logger.info(columns[7]);
+		
+		try {
+			phase = Integer.parseInt( columns[7] );
+		} catch (NumberFormatException nfe) {
+			if (type.equals("exon") || type.equals("CDS")) {
+				logger.warn(String.format("%s features should have phase : \n\t %s", type, line));
+			}
+		}
 		
 		//logger.info(seqid);
 		
@@ -162,9 +185,19 @@ public class GFFFeature {
 	}
 	
 	
-	class GFFAttributeMap {
+	public class GFFAttributeMap {
 		public Map<String,Object> map = new LinkedHashMap<String, Object>();
 		public boolean decode = true;
+		
+		public GFFFeature feature;
+		
+		public GFFAttributeMap() {
+			// deliberately empty
+		}
+		
+		public GFFAttributeMap(GFFFeature feature) {
+			this.feature = feature;
+		}
 		
 		public void put (String key, String obj) {
 			
@@ -178,6 +211,13 @@ public class GFFFeature {
 				
 			} else {
 				map.put(key, obj);
+				
+				// attempt to store an ID for this feature.
+				if (key.equals("ID")) {
+					if (this.feature != null) {
+						this.feature.id = obj;
+					}
+				}
 				
 			}
 		}
@@ -234,7 +274,7 @@ public class GFFFeature {
 		
 	}
 	
-	class GFFAttributeMapList {
+	public class GFFAttributeMapList {
 		public List<GFFAttributeMap> list = new ArrayList<GFFAttributeMap>();
 		
 		public void parseAttributes(String attrs) {

@@ -12,14 +12,13 @@ import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.model.LocationBoundaries;
-import org.genedb.crawl.model.Locations;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.RegionsInOrganism;
+import org.genedb.crawl.model.ResultsRegions;
 import org.genedb.crawl.model.Sequence;
-import org.gmod.cat.Features;
-import org.gmod.cat.Organisms;
-import org.gmod.cat.Regions;
-import org.gmod.cat.Terms;
+import org.gmod.cat.FeaturesMapper;
+import org.gmod.cat.OrganismsMapper;
+import org.gmod.cat.RegionsMapper;
+import org.gmod.cat.TermsMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,16 +34,16 @@ public class RegionsController extends BaseQueryController {
 	private Logger logger = Logger.getLogger(RegionsController.class);
 	
 	@Autowired
-	Regions regions;
+	RegionsMapper regionsMapper;
 	
 	@Autowired
-	Terms terms;
+	TermsMapper termsMapper;
 	
 	@Autowired
-	Features features;
+	FeaturesMapper featuresMapper;
 	
 	@Autowired
-	Organisms organisms;
+	OrganismsMapper organismsMapper;
 	
 	private boolean cacheRegionsOnStartup = false;
 	private Map<String, List<String>> organismRegionMap = new HashMap<String, List<String>>();
@@ -62,10 +61,10 @@ public class RegionsController extends BaseQueryController {
 		if (! cacheRegionsOnStartup) {
 			return;
 		}
-		for (Organism o : organisms.list()) {
-			List<String> r = regions.inorganism( Integer.parseInt(o.ID));
+		for (Organism o : organismsMapper.list()) {
+			List<String> r = regionsMapper.inorganism( o.ID );
 			Collections.sort(r);
-			organismRegionMap.put(o.ID, r);
+			organismRegionMap.put(String.valueOf(o.ID), r);
 			logger.info(String.format("Cached %s.", o.common_name));
 		}
 	}
@@ -98,28 +97,27 @@ public class RegionsController extends BaseQueryController {
 	 */
 	@RequestMapping(method=RequestMethod.GET, value={"/locations", "/locations.*"})
 	@ResourceDescription("Returns features and their locations on a region of interest")
-	public Locations locations(
+	public ResultsRegions locations(
+			ResultsRegions results,
 			@RequestParam("region") String region, 
 			@RequestParam("start") int start, 
 			@RequestParam("end") int end, 
-			@RequestParam(value="exclude", required=false) @ResourceDescription("A list of features to exclude.") String[] excludeNormalNotation,
-			@RequestParam(value="exclude[]", required=false) @ResourceDescription("A list of features to exclude.") String[] excludeArrayNotation) throws CrawlException {
+			@RequestParam(value="exclude", required=false) @ResourceDescription("A list of features to exclude.") List<String> exclude
+			) throws CrawlException {
 		
-		String[] exclude = mergeArrays(new String[][]{excludeArrayNotation, excludeNormalNotation});
-		
-		int regionID = features.getFeatureID(region);
+		int regionID = featuresMapper.getFeatureID(region);
 		
 		logger.info(String.format("Getting locations for %s (%d).", region, regionID));
 				
 		// trying to speed up the boundary query by determining the types in advance
-        List<Integer> geneTypes = terms.getCvtermIDs("sequence", new String[] {"gene", "pseudogene"});
+        List<Integer> geneTypes = termsMapper.getCvtermIDs("sequence", new String[] {"gene", "pseudogene"});
         
         logger.info("Gene Types " + geneTypes);
         
         int actualStart = start;
         int actualEnd = end;
         
-        LocationBoundaries expandedBoundaries = regions.locationsMinAndMaxBoundaries(regionID, start, end, geneTypes);
+        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(regionID, start, end, geneTypes);
         if (expandedBoundaries != null) {
 			if (expandedBoundaries.start != null && expandedBoundaries.start < start) {
 				actualStart = expandedBoundaries.start;
@@ -128,38 +126,32 @@ public class RegionsController extends BaseQueryController {
 				actualEnd = expandedBoundaries.end;
 			}
         }
-
-		Locations locations = new Locations();
-			
-		locations.features = regions.locations(regionID, actualStart, actualEnd, exclude);
-		
-		locations.actual_start = actualStart;
-		locations.actual_end = actualEnd;
-		locations.exclude = exclude;
-		locations.region = region;
-		locations.request_start = start;
-		locations.request_end = end;
-		
-		return locations;
         
+		logger.info( String.format("Locating on %s : %s-%s (%s)", regionID, actualStart, actualEnd, exclude));
+		
+		results.locations = regionsMapper.locations(regionID, actualStart, actualEnd, exclude);
+		return results;
+
 	}
 	
 	
 	@RequestMapping(method=RequestMethod.GET, value="/sequence")
 	@ResourceDescription("Returns the sequence on a region.")
-	public List<Sequence> sequence(
+	public ResultsRegions sequence(
+			ResultsRegions results,
 			@RequestParam("region") String region, 
 			@RequestParam("start") int start, 
 			@RequestParam("end") int end) {
 		
 		List<Sequence> sequences = new ArrayList<Sequence>();
+		results.sequences = sequences;
 		
-		int regionID = features.getFeatureID(region);
-		String sequenceResidues = regions.sequence(regionID);
+		int regionID = featuresMapper.getFeatureID(region);
+		String sequenceResidues = regionsMapper.sequence(regionID);
 		int length = sequenceResidues.length();
 		
 		if (length == 0) {
-			return sequences;
+			return results;
 		}
 		
 		int lastResiduePosition = length -1;
@@ -168,7 +160,7 @@ public class RegionsController extends BaseQueryController {
 		int actualEnd = end -1;
 		
 		if (actualStart > lastResiduePosition || actualStart > actualEnd) {
-			return sequences;
+			return results;
 		}
 		
 		if (actualEnd > lastResiduePosition) {
@@ -186,29 +178,27 @@ public class RegionsController extends BaseQueryController {
 		
 		sequences.add(sequence);
 		
-		return sequences;
+		return results;
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="inorganism")
 	@ResourceDescription("Returns the sequence on a region.")
-	public RegionsInOrganism inorganism(@RequestParam("organism") String organism) throws CrawlException {
+	public ResultsRegions inorganism(ResultsRegions results, @RequestParam("organism") String organism) throws CrawlException {
 		
-		Organism o = getOrganism(organisms, organism);
+		Organism o = getOrganism(organismsMapper, organism);
 		
 		List<String> r = null;
 		if (organismRegionMap.containsKey(o.ID)) {
 			r = organismRegionMap.get(o.ID);
 		} else {
-			r = regions.inorganism( Integer.parseInt(o.ID));
+			r = regionsMapper.inorganism( o.ID);
 			Collections.sort(r);
-			organismRegionMap.put(o.ID, r);
+			organismRegionMap.put(String.valueOf(o.ID), r);
 		}
 		
-		RegionsInOrganism rio = new RegionsInOrganism();
-		rio.organism = o;
-		rio.regions = r;
+		results.regions = r;
 		
-		return rio;
+		return results;
 	}
 	
 	

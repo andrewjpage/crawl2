@@ -4,15 +4,17 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("features")
 public class LocationRegion  {
-	public String start;
-	public String end;
+	
+	public Integer start;
+	public Integer end;
 	public String feature;
-	public String is_obsolete;
-	public String phase;
-	public String strand;
+	public Boolean is_obsolete;
+	public Integer phase;
+	public int strand;
 	public String type;
 	
-	public String fmin_partial;
-	public String fmax_partial;
+	public Boolean fmin_partial;
+	public Boolean fmax_partial;
 	public String part_of;
+	
 }

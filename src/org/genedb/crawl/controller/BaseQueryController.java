@@ -18,8 +18,8 @@ import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Resource;
 import org.genedb.crawl.model.Service;
 import org.genedb.crawl.annotations.ResourceDescription;
-import org.gmod.cat.Organisms;
-import org.gmod.cat.Terms;
+import org.gmod.cat.OrganismsMapper;
+import org.gmod.cat.TermsMapper;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,7 +38,7 @@ public abstract class BaseQueryController {
 		this.relationshipTypes = relationshipTypes;
 	}
 	
-	protected List<Integer> getRelationshipTypeIDs(Terms terms, List<String> types) {
+	protected List<Integer> getRelationshipTypeIDs(TermsMapper terms, List<String> types) {
 		List<Integer> type_ids = new ArrayList<Integer>();
 		for (String type : types) {
 			if (relationshipTypes.containsKey(type)) {
@@ -85,12 +85,13 @@ public abstract class BaseQueryController {
 			Resource resource = new Resource();
 			boolean addMethod = false;
 			
-			resource.returnType = method.getReturnType().getSimpleName();
+			// resource.returnType = method.getReturnType().getSimpleName();
 			
 			ResourceDescription methodDescription = method.getAnnotation(ResourceDescription.class);
 			if (methodDescription != null) {
 				addMethod = true;
 				resource.description = methodDescription.value();
+				resource.returnType =methodDescription.type();
 			}
 			
 			for (Annotation annotation : method.getAnnotations()) {
@@ -180,7 +181,7 @@ public abstract class BaseQueryController {
 		return arguments.get(index);
 	}
 	
-	protected Organism getOrganism(Organisms organisms, String organism) throws CrawlException {
+	protected Organism getOrganism(OrganismsMapper organisms, String organism) throws CrawlException {
 		Organism mappedOrganism = null;
 		
 		if (organism.contains(":")) {

@@ -1,14 +1,21 @@
 package org.genedb.crawl.model;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import javax.xml.bind.annotation.XmlAttribute;
 
-@XStreamAlias("organism")
 public class Organism {
+	
+	@XmlAttribute
 	public String genus;
+	@XmlAttribute
 	public String species;
+	@XmlAttribute
 	public String common_name;
+	@XmlAttribute
 	public String taxonID;
+	@XmlAttribute
 	public String translation_table;
+	@XmlAttribute
 	public String name;
-	public String ID;
+	@XmlAttribute
+	public Integer ID;
 }

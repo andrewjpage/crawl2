@@ -1,22 +1,28 @@
 package org.genedb.crawl.view;
 
+import java.io.Writer;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-import org.genedb.crawl.model.ResponseWrapper;
+import org.genedb.crawl.model.XMLResponseWrapper;
 import org.springframework.web.servlet.View;
 
 import com.google.gson.Gson;
 
-
 public class GsonView extends BaseView implements View {
 	
-	private Logger logger = Logger.getLogger(GsonView.class);
-	
 	private String contentType = "application/json";
+	
+	private Gson gson;
+	
+	
+	
+	public GsonView() {
+		super();
+		gson = new Gson();
+	}
 	
 	@Override
 	public String getContentType() {
@@ -27,24 +33,25 @@ public class GsonView extends BaseView implements View {
 	public void render(Map<String, ?> map, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		
-		logger.info(map);
-		logger.info(map.keySet());
-		
 		response.setContentType(contentType);
 		
-		Gson gson = new Gson();
-		
-		ResponseWrapper wrapper = new ResponseWrapper(request.getServletPath(), getFirstValidValue(map));
-		
-		String json = gson.toJson(wrapper);
+		XMLResponseWrapper wrapper = wrap(request.getServletPath(), map, request.getParameterMap());
 		
 		String callback = request.getParameter("callback");
 		
+		Writer writer = response.getWriter();
+		
 		if (callback!=null) {
-			json = callback + "( " + json + " )";
+			writer.append(callback + "( ");
 		}
 		
-		response.getWriter().append(json);
+		String json = gson.toJson(wrapper);
+		writer.append(json);
+		
+		
+		if (callback!=null) {
+			writer.append(" )");
+		}
 		
 		
 		

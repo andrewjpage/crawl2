@@ -1,17 +1,32 @@
 package org.genedb.crawl.model;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
-@XStreamAlias("coverage")
+
 public class MappedCoverage {
 	
-	public int[] coverage;
+	@XmlElementWrapper(name="data")
+	@XmlElement(name="d")
+	public int[] data;
+	
+	@XmlAttribute
 	public int start;
+	
+	@XmlAttribute
 	public int end;
+	
+	@XmlAttribute
 	public int window;
+	
+	@XmlAttribute
 	public int max;
 	
+	@XmlAttribute
 	public int bins;
+	
+	@XmlAttribute
 	public String time;
 	
 }

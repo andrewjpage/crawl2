@@ -18,12 +18,23 @@ public class GFFAnnotatationAndFastaExtractor {
 	private File file;
 	private File destinationFolder;
 	
-	public GFFAnnotatationAndFastaExtractor(File file, File destinationFolder) {
-		this.file = file;
-		this.destinationFolder = destinationFolder;
+	String fastaFileName;
+	String annotationFileName;
+	
+	
+	public File getAnnotationFile() {
+		logger.info(String.format("Return annoation file %s", annotationFileName));
+		return new File(annotationFileName);
 	}
 	
-	public void extract() throws IOException {
+	public File getFastaFile() {
+		return new File(fastaFileName);
+	}
+	
+	public GFFAnnotatationAndFastaExtractor(File file, File destinationFolder) throws IOException {
+		this.file = file;
+		this.destinationFolder = destinationFolder;
+	
 		
 		if (! file.exists()) {
 			throw new FileNotFoundException("Could not find file " + file);
@@ -37,12 +48,21 @@ public class GFFAnnotatationAndFastaExtractor {
 		if (! file.isDirectory() && file.getName().endsWith(".gff")) {
 			extractAnnotationsAndSequence(file, destinationFolder);
 		} else {
-			GFFFileFilter filter = new GFFFileFilter();
-			filter.filter_set = GFFFileExtensionSet.UNZIPPED_ONLY;
-			for (File child : file.listFiles(filter)) {
-				extractAnnotationsAndSequence(child, destinationFolder);
-			}
+			throw new IOException("GFFAnnotatationAndFastaExtractor can't process a directory.");
 		}
+		
+//		} else if (! file.isDirectory() && file.getName().endsWith(".gz")) {
+//			
+//			
+//			
+//			
+//		} else { 
+//			GFFFileFilter filter = new GFFFileFilter();
+//			filter.filter_set = GFFFileExtensionSet.UNZIPPED_ONLY;
+//			for (File child : file.listFiles(filter)) {
+//				extractAnnotationsAndSequence(child, destinationFolder);
+//			}
+//		}
 		
 	}
 	
@@ -52,8 +72,8 @@ public class GFFAnnotatationAndFastaExtractor {
 		BufferedWriter annotationWriter = null;
 		BufferedReader buf = null;
 		
-		String fastaFileName = destinationFolder.getAbsolutePath() + "/" + file.getName().substring(0, file.getName().length() - 4) + ".fasta";
-		String annotationFileName = destinationFolder.getAbsolutePath() + "/" + file.getName().substring(0, file.getName().length() - 4) + ".gff";
+		fastaFileName = destinationFolder.getAbsolutePath() + "/" + file.getName().substring(0, file.getName().length() - 4) + ".fasta";
+		annotationFileName = destinationFolder.getAbsolutePath() + "/" + file.getName().substring(0, file.getName().length() - 4) + ".gff";
 		
 		try {
 			
@@ -112,6 +132,8 @@ public class GFFAnnotatationAndFastaExtractor {
 		
 	}
 	
+	
+	
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -126,10 +148,10 @@ public class GFFAnnotatationAndFastaExtractor {
 		File file = new File (args[0]);
 		File destinationFolder = new File (args[1]);
 		
-		GFFAnnotatationAndFastaExtractor extractor = new GFFAnnotatationAndFastaExtractor(file, destinationFolder);
 		
 		try {
-			extractor.extract();
+			GFFAnnotatationAndFastaExtractor extractor = new GFFAnnotatationAndFastaExtractor(file, destinationFolder);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());

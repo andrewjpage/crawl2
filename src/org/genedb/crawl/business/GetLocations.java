@@ -162,13 +162,13 @@ public class GetLocations {
 			
 			LocationRegion lr = new LocationRegion();
 			
-			lr.start = d.getField("start").stringValue();
-			lr.end = d.getField("end").stringValue();
+			lr.start = Integer.parseInt(d.getField("start") .stringValue());
+			lr.end = Integer.parseInt(d.getField("end").stringValue());
 			
-			lr.phase = d.getField("phase").stringValue();
-			lr.is_obsolete = d.getField("isObsolete").stringValue();
+			lr.phase = Integer.parseInt(d.getField("phase").stringValue());
+			lr.is_obsolete = Boolean.valueOf(d.getField("isObsolete").stringValue());
 			lr.feature = d.getField("ID").stringValue();
-			lr.strand = d.getField("strand").stringValue();
+			lr.strand = Integer.parseInt(d.getField("strand").stringValue());
 			lr.type = d.getField("type").stringValue();
 			
 			locations.features.add(lr);
@@ -213,11 +213,11 @@ public class GetLocations {
 			GFFFeature feature = new GFFFeature(line);
 			
 			LocationRegion lr = new LocationRegion();
-			lr.start = Integer.toString(feature.start);
-			lr.end = Integer.toString(feature.end);
+			lr.start = feature.start;
+			lr.end = feature.end;
 			lr.phase = feature.phase;
-			lr.is_obsolete = (String) feature.attributes.map.get("isObsolete");
-			lr.strand = feature.strand.getStrand();
+			lr.is_obsolete = Boolean.valueOf( feature.attributes.map.get("isObsolete").toString() );
+			lr.strand = feature.strand.getStrandInt();
 			lr.type = feature.type;
 			
 			lr.feature = (String) feature.attributes.map.get("ID");

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,12 +19,11 @@ import net.sf.samtools.SAMSequenceRecord;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.model.FileInfo;
-import org.genedb.crawl.model.FileInfoList;
 import org.genedb.crawl.model.MappedCoverage;
 import org.genedb.crawl.model.MappedQuery;
+import org.genedb.crawl.model.MappedQueryRecordElementList;
 import org.genedb.crawl.model.MappedSAMHeader;
 import org.genedb.crawl.model.MappedSAMSequence;
-import org.genedb.crawl.model.MappedSAMSequenceList;
 
 
 public class Sam {
@@ -57,44 +57,44 @@ public class Sam {
 		return model;
 	}
 	
-	public MappedSAMSequenceList sequence(int fileID) throws Exception {
+	public List<MappedSAMSequence> sequence(int fileID) throws Exception {
 		return this.sequence(getSamOrBam(fileID));
 	}
 	
-	public MappedSAMSequenceList sequence(SAMFileReader file) throws Exception {
-		MappedSAMSequenceList model = new MappedSAMSequenceList();
+	public List<MappedSAMSequence> sequence(SAMFileReader file) throws Exception {
+		List<MappedSAMSequence> model = new ArrayList<MappedSAMSequence>();
 		for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
 			MappedSAMSequence mss = new MappedSAMSequence();
 			mss.length = ssr.getSequenceLength();
 			mss.name = ssr.getSequenceName();
 			mss.index = ssr.getSequenceIndex();
 			
-			model.sequences.add(mss);
+			model.add(mss);
 			
 			
 		}
 		return model;
 	}
 	
-	private FileInfoList list(List<Alignment> alignments) {
+	private List<FileInfo> list(List<Alignment> alignments) {
 		
-		FileInfoList files = new FileInfoList();
+		List<FileInfo> files = new ArrayList<FileInfo>();
 		
 		for (Alignment alignment : alignments) {
 			FileInfo file = new FileInfo(alignment.fileID, alignment.file.getAbsolutePath(), alignment.meta, alignment.organism);
 			logger.info(alignment.file.getName());
 			logger.info(alignment.meta);
-			files.files.add(file);
+			files.add(file);
 			
 		}
 		return files;
 	}
 	
-	public FileInfoList list() {
+	public List<FileInfo> list() {
 		return list(alignmentStore.getAlignments());
 	}
 	
-	public FileInfoList listfororganism(String organism) {
+	public List<FileInfo> listfororganism(String organism) {
 		
 		List<Alignment> alignments = new ArrayList<Alignment>();
 		
@@ -127,6 +127,8 @@ public class Sam {
 		Map<Method,String> methods2properties = new HashMap<Method,String>();
 		
 		
+		Map<String, MappedQueryRecordElementList> map = new Hashtable<String, MappedQueryRecordElementList>();
+		
 		for (Method method : methods) {
 			String methodName = method.getName();
 			if (methodName.startsWith("get")) {
@@ -136,7 +138,12 @@ public class Sam {
 				
 				if (propertySet.contains(propertyName)) {
 					//logger.info("added!");
-					model.records.put(propertyName, new ArrayList<Object>());
+					
+					MappedQueryRecordElementList mqrle = new MappedQueryRecordElementList();
+					mqrle.name = propertyName;
+					mqrle.fields = new ArrayList();
+					
+					map.put(propertyName, mqrle);
 					methods2properties.put(method, propertyName);
 				}
 				
@@ -186,7 +193,7 @@ public class Sam {
 					Method method = entry.getKey();
 					String propertyName = entry.getValue();
 					Object result = method.invoke(record, new Object[]{});
-					List<Object> list = model.records.get(propertyName);
+					List list = map.get(propertyName).fields;
 					list.add(result);
 				}
 				
@@ -213,6 +220,8 @@ public class Sam {
 		model.sequence = sequence;
 		model.time = Float.toString(time);
 		model.filter = filter;
+		
+		model.records = new ArrayList(map.values());
 		
 		return model;
 	}
@@ -295,7 +304,7 @@ public class Sam {
 		logger.debug("ending iterations");
 		
 		MappedCoverage mc = new MappedCoverage();
-		mc.coverage = coverage;
+		mc.data = coverage;
 		mc.start = start;
 		mc.end = end;
 		mc.window = window;
