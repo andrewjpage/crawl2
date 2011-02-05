@@ -8,8 +8,6 @@
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-ant-ant-1.6.5.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-aopalliance-aopalliance-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-args4j-args4j-2.0.12.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-asm-asm-1.5.3.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-cglib-cglib-2.1_3.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.net.sf.cglib-com.springsource.net.sf.cglib-2.2.0.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.org.aopalliance-com.springsource.org.aopalliance-1.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.org.apache.commons.dbcp-com.springsource.org.apache.commons.dbcp-1.2.2.osgi.jar"/>
@@ -29,10 +27,7 @@
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-jta-jta-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-jyaml-jyaml-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-log4j-log4j-1.2.13.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-lucene-core-lucene-core-3.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-mail-mail-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-mybatis-mybatis-3.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-mybatis-spring-mybatis-spring-1.0.0-RC2.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.aop-org.springframework.aop-3.0.2.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.asm-org.springframework.asm-3.0.2.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.beans-org.springframework.beans-3.0.2.RELEASE.jar"/>
