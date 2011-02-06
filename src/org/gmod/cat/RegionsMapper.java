@@ -9,17 +9,17 @@ import org.genedb.crawl.model.LocationRegion;
 public interface RegionsMapper {
 	
 	public LocationBoundaries locationsMinAndMaxBoundaries(
-			@Param("regionid") int regionid, 
+			@Param("region") String region, 
 			@Param("start") int start, 
 			@Param("end") int end, 
 			@Param("types") List<Integer> types);
 	
 	public List<LocationRegion> locations(
-			@Param("regionid") int regionid, 
+			@Param("region") String region, 
 			@Param("start") int start, 
 			@Param("end") int end,
 			@Param("exclude") List<String> exclude);
 	
-	public String sequence(@Param("regionid") int regionid);
+	public String sequence(@Param("region") String region);
 	public List<String> inorganism(@Param("organismid") int organismid);
 }

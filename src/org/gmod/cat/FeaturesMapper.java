@@ -12,7 +12,7 @@ import org.genedb.crawl.model.HierarchyRelation;
 
 public interface FeaturesMapper {
 	
-	int getFeatureID(String uniquename);
+	//int getFeatureID(String uniquename);
 	
 	List<HierarchyGeneFetchResult> getGeneForFeature(@Param("features") List<String> features );
 	List<HierarchyRelation> getRelationshipsParents(@Param("feature") String feature, @Param("relationships") List<Integer> relationships );
