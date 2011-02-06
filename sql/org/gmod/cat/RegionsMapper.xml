@@ -13,7 +13,8 @@
 	    
 	FROM feature f
 	
-	JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = #{regionid} )
+	JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = 
+	   (select feature_id from feature where uniqueName = #{region} )  )
 	
 	WHERE f.type_id in 
 	    <foreach item="item" index="index" collection="types" open="(" separator="," close=")"> 
@@ -46,7 +47,8 @@
 	FROM feature f
 	
 	JOIN cvterm type ON f.type_id = type.cvterm_id 
-	JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = #{regionid} )
+	JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = 
+        (select feature_id from feature where uniqueName = #{region} ) )
 	
 	LEFT OUTER JOIN feature_relationship fr ON f.feature_id = fr.subject_id AND fr.type_id = (select cvterm_id from cvterm where name = 'part_of')
 	LEFT OUTER JOIN feature f2 ON fr.object_id = f2.feature_id
@@ -75,7 +77,7 @@
   </select>
   
   <select id="sequence" resultType="String">
-        SELECT residues as dna FROM feature WHERE feature_id = #{regionid}
+        SELECT residues as dna FROM feature WHERE feature_id = (select feature_id from feature where uniqueName = #{region} )
   </select>
   
   <sql id="topleveltype"> select cvterm_id from cvterm join cv using (cv_id) where cv.name = 'genedb_misc' and cvterm.name = 'top_level_seq' </sql> 
