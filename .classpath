@@ -63,5 +63,9 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/crawl/lib/ivy/compile/javadoc-elasticsearch-elasticsearch-0.14.4.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/ivy/compile/jar-jackson-core-asl-jackson-core-asl-1.6.2.jar"/>
+	<classpathentry kind="lib" path="lib/ivy/compile/jar-jackson-mapper-asl-jackson-mapper-asl-1.6.2.jar"/>
+	<classpathentry kind="lib" path="lib/ivy/compile/jar-jackson-xc-jackson-xc-1.6.2.jar"/>
+	<classpathentry kind="lib" path="lib/ivy/compile/jar-mybatis-mybatis-3.0.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
