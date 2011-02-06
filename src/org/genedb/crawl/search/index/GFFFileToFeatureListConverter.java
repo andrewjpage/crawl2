@@ -100,7 +100,7 @@ public class GFFFileToFeatureListConverter {
 						Orthologue orthologue = null;
 						
 						if (feature.orthologues == null) {
-							feature.orthologues = new ArrayList<Feature>();
+							feature.orthologues = new ArrayList<Orthologue>();
 						}
 						
 						
