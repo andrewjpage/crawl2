@@ -105,9 +105,9 @@ public class RegionsController extends BaseQueryController {
 			@RequestParam(value="exclude", required=false) @ResourceDescription("A list of features to exclude.") List<String> exclude
 			) throws CrawlException {
 		
-		int regionID = featuresMapper.getFeatureID(region);
+		//int regionID = featuresMapper.getFeatureID(region);
 		
-		logger.info(String.format("Getting locations for %s (%d).", region, regionID));
+		logger.info(String.format("Getting locations for %s.", region));
 				
 		// trying to speed up the boundary query by determining the types in advance
         List<Integer> geneTypes = termsMapper.getCvtermIDs("sequence", new String[] {"gene", "pseudogene"});
@@ -117,7 +117,7 @@ public class RegionsController extends BaseQueryController {
         int actualStart = start;
         int actualEnd = end;
         
-        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(regionID, start, end, geneTypes);
+        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(region, start, end, geneTypes);
         if (expandedBoundaries != null) {
 			if (expandedBoundaries.start != null && expandedBoundaries.start < start) {
 				actualStart = expandedBoundaries.start;
@@ -127,9 +127,9 @@ public class RegionsController extends BaseQueryController {
 			}
         }
         
-		logger.info( String.format("Locating on %s : %s-%s (%s)", regionID, actualStart, actualEnd, exclude));
+		logger.info( String.format("Locating on %s : %s-%s (%s)", region, actualStart, actualEnd, exclude));
 		
-		results.locations = regionsMapper.locations(regionID, actualStart, actualEnd, exclude);
+		results.locations = regionsMapper.locations(region, actualStart, actualEnd, exclude);
 		return results;
 
 	}
@@ -146,8 +146,8 @@ public class RegionsController extends BaseQueryController {
 		List<Sequence> sequences = new ArrayList<Sequence>();
 		results.sequences = sequences;
 		
-		int regionID = featuresMapper.getFeatureID(region);
-		String sequenceResidues = regionsMapper.sequence(regionID);
+		//int regionID = featuresMapper.getFeatureID(region);
+		String sequenceResidues = regionsMapper.sequence(region);
 		int length = sequenceResidues.length();
 		
 		if (length == 0) {

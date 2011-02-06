@@ -82,7 +82,7 @@ public class Feature {
 	
 	@XmlElement(name="orthologue", required=false)
 	@XmlElementWrapper(name="orthologues")
-	public List<Feature> orthologues;
+	public List<Orthologue> orthologues;
 	
 	@XmlElement(name="analysisFeature", required=false)
 	public AnalysisFeature analysisFeature;

@@ -7,8 +7,12 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
+import org.elasticsearch.client.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.index.query.xcontent.BoolQueryBuilder;
+import org.elasticsearch.index.query.xcontent.QueryBuilders;
+import org.elasticsearch.index.query.xcontent.XContentQueryBuilder;
 import org.genedb.crawl.model.Feature;
 import org.kohsuke.args4j.Option;
 
@@ -52,7 +56,25 @@ public abstract class IndexBuilder {
 			
 			logger.trace(response.sourceAsString());
 			
+			
+			
+			
 		}
+		
+		
+		
+		
+		SearchRequestBuilder srb = client.prepareSearch("feature");
+		
+		XContentQueryBuilder query1 = QueryBuilders.fieldQuery("uniqueName", features.get(0).uniqueName);
+		XContentQueryBuilder query2 = QueryBuilders.fieldQuery("uniqueName", features.get(0).uniqueName);
+		
+		BoolQueryBuilder query3 = QueryBuilders.boolQuery();
+		query3.must(query1);
+		query3.must(query2);
+		
+		srb.setQuery(query3);
+		
 	}
 
 }

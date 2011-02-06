@@ -24,6 +24,18 @@
         <property name="tabixDirectory"><value>${tabixDirectory}</value></property>
     </bean>
     
+    <bean id="elasticSearchFeaturesMapper" class="org.genedb.crawl.search.mappers.ElasticSearchFeaturesMapper">
+    </bean>
+    <bean id="elasticSearchFeatureMapper" class="org.genedb.crawl.search.mappers.ElasticSearchFeatureMapper">
+    </bean>
+    <bean id="elasticSearchFeatureCvtermMapper" class="org.genedb.crawl.search.mappers.ElasticSearchFeatureCvtermMapper">
+    </bean>
+    <bean id="elasticSearchOrganismsMapper" class="org.genedb.crawl.search.mappers.ElasticSearchOrganismsMapper">
+    </bean>
+    <bean id="elasticSearchRegionsMapper" class="org.genedb.crawl.search.mappers.ElasticSearchRegionsMapper">
+    </bean>
+     <bean id="elasticSearchTermsMapper" class="org.genedb.crawl.search.mappers.ElasticSearchTermsMapper">
+    </bean>
      
     
 
