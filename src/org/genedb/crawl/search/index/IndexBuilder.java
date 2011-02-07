@@ -14,6 +14,7 @@ import org.elasticsearch.index.query.xcontent.BoolQueryBuilder;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.elasticsearch.index.query.xcontent.XContentQueryBuilder;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.LocatedFeature;
 import org.kohsuke.args4j.Option;
 
 public abstract class IndexBuilder {
@@ -50,8 +51,19 @@ public abstract class IndexBuilder {
 			String json = jsonIzer.toJson(feature);
 			
 			logger.debug(json);
+			builder.setSource(json);
 			
-			builder.setSource(json).execute().actionGet();
+			if (feature instanceof LocatedFeature) {
+				LocatedFeature lFeature = (LocatedFeature) feature;
+				if (lFeature.parent != null) {
+					logger.debug(String.format("Setting %s as parent of %s!", lFeature.parent, feature.uniqueName));
+					builder.setParent(lFeature.parent);
+				}
+			}
+			
+			
+			
+			builder.execute().actionGet();
 			GetResponse response = client.prepareGet("features", "Feature", feature.uniqueName).execute().actionGet();
 			
 			logger.trace(response.sourceAsString());
