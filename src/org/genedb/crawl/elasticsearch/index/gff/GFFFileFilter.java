@@ -1,4 +1,4 @@
-package org.genedb.crawl.business;
+package org.genedb.crawl.elasticsearch.index.gff;
 
 import java.io.File;
 import java.io.FileFilter;

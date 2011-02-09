@@ -1,4 +1,6 @@
-package org.genedb.crawl.search.mappers;
+package org.genedb.crawl.elasticsearch.mappers;
+
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -13,29 +15,40 @@ import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.action.get.GetRequestBuilder;
+import org.elasticsearch.client.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.elasticsearch.index.query.xcontent.XContentQueryBuilder;
+import org.elasticsearch.node.Node;
+import org.elasticsearch.search.SearchHit;
+import org.genedb.crawl.CrawlErrorType;
+import org.genedb.crawl.CrawlException;
+import org.genedb.crawl.elasticsearch.Connection;
+import org.genedb.crawl.elasticsearch.index.JsonIzer;
 import org.genedb.crawl.model.BlastPair;
+import org.genedb.crawl.model.CrawlError;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.LocatedFeature;
-import org.genedb.crawl.search.index.JsonIzer;
 import org.gmod.cat.FeaturesMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public class ElasticSearchFeaturesMapper implements FeaturesMapper {
+@Component
+public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper implements FeaturesMapper {
 	
 	private Logger logger = Logger.getLogger(ElasticSearchFeaturesMapper.class);
 	
-	Client client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("127.0.0.1", 9300));
 	String index = "features";
 	String type = "Feature";
 	
 	JsonIzer jsonIzer = new JsonIzer();
+
 	
 	@Override
 	public List<HierarchyGeneFetchResult> getGeneForFeature(
@@ -55,7 +68,7 @@ public class ElasticSearchFeaturesMapper implements FeaturesMapper {
 		//XContentQueryBuilder getFeatureQuery = QueryBuilders.termQuery("uniqueName", feature);
 		//XContentQueryBuilder builder = QueryBuilders.hasChildQuery(type, getFeatureQuery);
 		
-		client.prepareSearch("features");
+		connection.getClient().prepareSearch("features");
 		
 		
 		return null;
@@ -128,6 +141,10 @@ public class ElasticSearchFeaturesMapper implements FeaturesMapper {
 	@Override
 	public List<Feature> withproperty(String value, Boolean regex,
 			String region, String type) {
+		
+		//SearchRequestBuilder srb = connection.getClient().prepareSearch(index)
+		//.setQuery( QueryBuilders.fieldQuery("uniqueName", uniqueName));
+		
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -204,13 +221,54 @@ public class ElasticSearchFeaturesMapper implements FeaturesMapper {
 	private List<Feature> fetchAndCopy(List<String> features, String[] fields) {
 		List<Feature> featureResults = new ArrayList<Feature>();
 		for (String uniqueName : features) {
-			Feature feature = getFeatureFromJson(client.prepareGet(index, type, uniqueName).execute().actionGet().sourceAsString());
+			String json = getFromElastic(uniqueName, fields);
+			Feature feature = getFeatureFromJson(json);
 			Feature featureToAdd = copy(feature, fields);
 			if (featureToAdd != null) {
 				featureResults.add(featureToAdd);
 			}
 		}
 		return featureResults;
+	}
+	
+	private String getFromElastic(String uniqueName, String[] fields) {
+		//return client.prepareGet(index, type, uniqueName).execute().actionGet().sourceAsString();
+		
+		logger.debug("Searching for uniqueName " + uniqueName);
+		
+		SearchRequestBuilder srb = connection.getClient().prepareSearch(index)
+			.setQuery( QueryBuilders.fieldQuery("uniqueName", uniqueName));
+		//	.setQuery( QueryBuilders.termQuery("uniqueName", uniqueName));
+//			.setFrom(0)
+//			.setSize(1);
+		
+//		for (String field : fields) {
+//			String fieldName = "_source." + field;
+//			logger.debug("Field " + fieldName);
+//			srb.addField(fieldName);
+//		}
+		
+		// srb.addField("_source.coordinates");
+		
+		SearchResponse response = srb.execute().actionGet();
+		
+		logger.debug(response.getHits().totalHits());
+		
+		if (response.getHits().totalHits() == 1) {
+			logger.debug("returning ");
+			
+			SearchHit hit = response.hits().getAt(0);
+			
+			logger.debug(hit.sourceAsString());
+			
+			logger.debug(hit.fields());
+			
+			return response.hits().getAt(0).sourceAsString();
+		}
+		
+		return null;
+		
+		
 	}
 	
 	

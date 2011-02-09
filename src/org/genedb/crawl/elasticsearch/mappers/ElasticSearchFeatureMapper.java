@@ -1,4 +1,4 @@
-package org.genedb.crawl.search.mappers;
+package org.genedb.crawl.elasticsearch.mappers;
 
 import java.util.List;
 
@@ -6,8 +6,10 @@ import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.FeatureProperty;
 import org.gmod.cat.FeatureMapper;
+import org.springframework.stereotype.Component;
 
-public class ElasticSearchFeatureMapper implements FeatureMapper {
+@Component
+public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implements FeatureMapper {
 
 	@Override
 	public Feature get(String uniqueName, String organism_id, String name) {

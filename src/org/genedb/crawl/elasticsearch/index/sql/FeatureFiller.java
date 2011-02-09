@@ -1,4 +1,4 @@
-package org.genedb.crawl.search.index;
+package org.genedb.crawl.elasticsearch.index.sql;
 
 import java.util.List;
 

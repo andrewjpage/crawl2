@@ -1,4 +1,4 @@
-package org.genedb.crawl.search.index;
+package org.genedb.crawl.elasticsearch.index.gff;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.business.GFFAnnotatationAndFastaExtractor;
-import org.genedb.crawl.business.GFFFeature;
-import org.genedb.crawl.business.GFFFeature.GFFAttributeMap;
-import org.genedb.crawl.business.GFFFeature.GFFAttributeMapList;
+import org.genedb.crawl.elasticsearch.index.gff.GFFFeature.GFFAttributeMap;
+import org.genedb.crawl.elasticsearch.index.gff.GFFFeature.GFFAttributeMapList;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cv;
 import org.genedb.crawl.model.Cvterm;
@@ -27,13 +25,11 @@ public class GFFFileToFeatureListConverter {
 	
 	private Logger logger = Logger.getLogger(GFFFileToFeatureListConverter.class);
 	
-	GoGetter goGetter;
-	
 	public List<Feature> features = new ArrayList<Feature>();
 	
-	public GFFFileToFeatureListConverter(File gffFile, File tmpFolder, GoGetter goGetter) throws IOException {
+	public GFFFileToFeatureListConverter(File gffFile, File tmpFolder) throws IOException {
 		
-		this.goGetter = goGetter;
+		
 		
 		GFFAnnotatationAndFastaExtractor extractor = new GFFAnnotatationAndFastaExtractor(gffFile, tmpFolder);
 		

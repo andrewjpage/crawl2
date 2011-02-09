@@ -33,7 +33,9 @@
             
             -->
             
-            <ibiblio name="sonata" root="http://oss.sonatype.org/content/repositories/releases/" m2compatible="true" />
+            <!-- <ibiblio name="sonata" root="http://oss.sonatype.org/content/repositories/releases/" m2compatible="true" /> -->
+            <ibiblio name="sonata" root="https://oss.sonatype.org/content/repositories/snapshots/" m2compatible="true" />
+            
             
             <ibiblio name="public" m2compatible="true"/>
             

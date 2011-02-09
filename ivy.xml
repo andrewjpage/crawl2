@@ -68,7 +68,7 @@
         <dependency org="terrastore" name="terrastore" rev="0.8.0"  />
         
     -->
-        <dependency org="org.elasticsearch" name="elasticsearch" rev="0.14.4" />
+        <dependency org="org.elasticsearch" name="elasticsearch" rev="0.15.0-SNAPSHOT" />
     
         </dependencies>
 </ivy-module>

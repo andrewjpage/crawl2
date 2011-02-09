@@ -1,4 +1,4 @@
-package org.genedb.crawl.search.index;
+package org.genedb.crawl.elasticsearch.index;
 
 import java.io.IOException;
 import java.io.StringWriter;

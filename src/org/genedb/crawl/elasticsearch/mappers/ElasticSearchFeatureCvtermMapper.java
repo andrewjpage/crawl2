@@ -1,12 +1,14 @@
-package org.genedb.crawl.search.mappers;
+package org.genedb.crawl.elasticsearch.mappers;
 
 import java.util.List;
 
 import org.genedb.crawl.model.Dbxref;
 import org.genedb.crawl.model.Pub;
 import org.gmod.cat.FeatureCvtermMapper;
+import org.springframework.stereotype.Component;
 
-public class ElasticSearchFeatureCvtermMapper implements FeatureCvtermMapper {
+@Component
+public class ElasticSearchFeatureCvtermMapper extends ElasticSearchBaseMapper implements FeatureCvtermMapper {
 
 	@Override
 	public List<Pub> featureCvTermPubs(int feature_cvterm_id) {

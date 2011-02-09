@@ -1,4 +1,4 @@
-package org.genedb.crawl.search.index;
+package org.genedb.crawl.elasticsearch.index.sql;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -13,6 +13,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.genedb.crawl.CrawlException;
+import org.genedb.crawl.elasticsearch.index.IndexBuilder;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.Organism;
 import org.gmod.cat.FeatureMapper;

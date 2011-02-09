@@ -1,4 +1,4 @@
-package org.genedb.crawl.business;
+package org.genedb.crawl.elasticsearch.index.gff;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -9,7 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.business.GFFFileFilter.GFFFileExtensionSet;
+import org.genedb.crawl.elasticsearch.index.gff.GFFFileFilter.GFFFileExtensionSet;
 
 public class GFFAnnotatationAndFastaExtractor {
 	

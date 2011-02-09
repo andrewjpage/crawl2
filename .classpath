@@ -4,68 +4,10 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="etc"/>
 	<classpathentry kind="src" path="tst"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-ant-ant-1.6.5.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-aopalliance-aopalliance-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-args4j-args4j-2.0.12.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.net.sf.cglib-com.springsource.net.sf.cglib-2.2.0.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.org.aopalliance-com.springsource.org.aopalliance-1.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.org.apache.commons.dbcp-com.springsource.org.apache.commons.dbcp-1.2.2.osgi.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.org.apache.commons.logging-com.springsource.org.apache.commons.logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.org.apache.commons.pool-com.springsource.org.apache.commons.pool-1.3.0.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.org.apache.log4j-com.springsource.org.apache.log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.org.apache.tools.ant-com.springsource.org.apache.tools.ant-1.7.0.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.org.codehaus.jettison-com.springsource.org.codehaus.jettison-1.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-com.springsource.org.postgresql.jdbc4-com.springsource.org.postgresql.jdbc4-8.3.604.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-commons-lang-commons-lang-2.5.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-commons-logging-commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-ecj-ecj-3.5.1.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-geronimo-jta_1.1_spec-geronimo-jta_1.1_spec-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-gson-gson-1.4.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jsp-2.1-glassfish-jsp-2.1-glassfish-2.1.v20100127.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jsp-api-2.1-glassfish-jsp-api-2.1-glassfish-2.1.v20100127.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jta-jta-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jyaml-jyaml-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-log4j-log4j-1.2.13.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-mail-mail-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.aop-org.springframework.aop-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.asm-org.springframework.asm-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.beans-org.springframework.beans-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.context-org.springframework.context-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.context.support-org.springframework.context.support-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.core-org.springframework.core-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.expression-org.springframework.expression-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.jdbc-org.springframework.jdbc-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.oxm-org.springframework.oxm-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.transaction-org.springframework.transaction-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.web-org.springframework.web-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-org.springframework.web.servlet-org.springframework.web.servlet-3.0.2.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-servlet-api-servlet-api-2.5.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-slf4j-api-slf4j-api-1.5.8.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-slf4j-log4j12-slf4j-log4j12-1.5.8.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-spring-aop-spring-aop-3.0.5.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-spring-asm-spring-asm-3.0.5.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-spring-beans-spring-beans-3.0.5.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-spring-context-spring-context-3.0.5.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-spring-core-spring-core-3.0.5.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-spring-expression-spring-expression-3.0.5.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-spring-jdbc-spring-jdbc-3.0.5.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-spring-tx-spring-tx-3.0.5.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-xpp3_min-xpp3_min-1.1.4c.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-xstream-benchmark-xstream-benchmark-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-xstream-xstream-1.3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/local/artemis.jar"/>
-	<classpathentry kind="lib" path="lib/local/jewelcli-0.6.jar"/>
 	<classpathentry kind="lib" path="lib/local/picard-1.27.jar"/>
 	<classpathentry kind="lib" path="lib/local/sam-1.27.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-elasticsearch-elasticsearch-0.14.4.jar" sourcepath="lib/ivy/compile/source-elasticsearch-elasticsearch-0.14.4.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/crawl/lib/ivy/compile/javadoc-elasticsearch-elasticsearch-0.14.4.jar!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jackson-core-asl-jackson-core-asl-1.6.2.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jackson-mapper-asl-jackson-mapper-asl-1.6.2.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-jackson-xc-jackson-xc-1.6.2.jar"/>
-	<classpathentry kind="lib" path="lib/ivy/compile/jar-mybatis-mybatis-3.0.4.jar"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?ivyXmlPath=ivy.xml&amp;confs=*"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

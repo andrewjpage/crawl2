@@ -1,4 +1,4 @@
-package org.genedb.crawl.search.index;
+package org.genedb.crawl.elasticsearch.index.gff;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.business.FileUtil;
+import org.genedb.crawl.elasticsearch.index.IndexBuilder;
 import org.genedb.crawl.model.Feature;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -23,11 +24,10 @@ public class GFFIndexBuilder extends IndexBuilder {
 	@Option(name = "-t", aliases = {"--tmp"}, usage = "The path to a tmp folder folder")
 	public String tmp = "/tmp/crawl";
 	
-	GoGetter goGetter;
 	
 	public GFFIndexBuilder() {
 		super();
-		goGetter = new GoGetter();
+		
 	}
 	
 	public void run() throws IOException {
@@ -70,7 +70,7 @@ public class GFFIndexBuilder extends IndexBuilder {
 			gffFile = new File(gunzippedFileName);
 		}
 		
-		GFFFileToFeatureListConverter converter = new GFFFileToFeatureListConverter(gffFile, tmpFolder, goGetter);
+		GFFFileToFeatureListConverter converter = new GFFFileToFeatureListConverter(gffFile, tmpFolder);
 		return converter.features;
 	}
 	

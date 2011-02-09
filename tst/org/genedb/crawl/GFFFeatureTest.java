@@ -2,8 +2,8 @@ package org.genedb.crawl;
 
 import java.io.IOException;
 
-import org.genedb.crawl.business.GFFFeature;
 import org.genedb.crawl.business.TabixReader;
+import org.genedb.crawl.elasticsearch.index.gff.GFFFeature;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

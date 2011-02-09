@@ -1,10 +1,12 @@
-package org.genedb.crawl.search.mappers;
+package org.genedb.crawl.elasticsearch.mappers;
 
 import java.util.List;
 
 import org.gmod.cat.TermsMapper;
+import org.springframework.stereotype.Component;
 
-public class ElasticSearchTermsMapper implements TermsMapper {
+@Component
+public class ElasticSearchTermsMapper extends ElasticSearchBaseMapper implements TermsMapper {
 
 	@Override
 	public List<Integer> getCvtermIDs(String cv, String[] cvterms) {

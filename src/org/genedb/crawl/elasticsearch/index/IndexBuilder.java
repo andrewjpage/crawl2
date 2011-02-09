@@ -1,4 +1,4 @@
-package org.genedb.crawl.search.index;
+package org.genedb.crawl.elasticsearch.index;
 
 import java.io.IOException;
 import java.util.List;
@@ -8,11 +8,11 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.action.search.SearchRequestBuilder;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.xcontent.BoolQueryBuilder;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.elasticsearch.index.query.xcontent.XContentQueryBuilder;
+import org.genedb.crawl.elasticsearch.Connection;
+import org.genedb.crawl.elasticsearch.LocalConnection;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.kohsuke.args4j.Option;
@@ -27,21 +27,23 @@ public abstract class IndexBuilder {
 	JsonIzer jsonIzer = new JsonIzer();
 	Client client;
 	
+	Connection connection = new LocalConnection();
+	
 	public IndexBuilder() {
 		super();
 	}
 	
-	void setupIndex() throws IOException {
-		client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("127.0.0.1", 9300));
+	protected void setupIndex() throws IOException {
+		client = connection.getClient();
 	}
 	
-	void closeIndex() {
+	protected void closeIndex() {
 		if (client != null) {
 			client.close();
 		}
 	}
 	
-	void sendFeaturesToIndex(List<Feature> features) throws IOException {
+	protected void sendFeaturesToIndex(List<Feature> features) throws IOException {
 		
 		for (Feature feature : features) {
 			
@@ -50,7 +52,10 @@ public abstract class IndexBuilder {
 			IndexRequestBuilder builder = client.prepareIndex("features", "Feature", feature.uniqueName);
 			String json = jsonIzer.toJson(feature);
 			
+			
+			logger.debug("Source:");
 			logger.debug(json);
+			
 			builder.setSource(json);
 			
 			if (feature instanceof LocatedFeature) {
@@ -66,7 +71,8 @@ public abstract class IndexBuilder {
 			builder.execute().actionGet();
 			GetResponse response = client.prepareGet("features", "Feature", feature.uniqueName).execute().actionGet();
 			
-			logger.trace(response.sourceAsString());
+			logger.debug("Response:");
+			logger.debug(response.sourceAsString());
 			
 			
 			
