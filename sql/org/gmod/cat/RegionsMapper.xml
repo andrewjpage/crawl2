@@ -30,19 +30,19 @@
     ]]>
   </select>
   
-  <select id="locations" resultType="org.genedb.crawl.model.LocationRegion" >
+  <select id="locations" resultMap="locations" >
     
     SELECT
-    f.uniqueName as feature, 
+    f.uniqueName as uniqueName, 
     type.name as type, 
-    fl.fmin as start, 
-    fl.fmax as end,
-    fl.strand as strand,
-    fl.phase as phase,
+    fl.fmin, 
+    fl.fmax,
+    fl.strand,
+    fl.phase,
     f.is_obsolete,
     f2.uniquename as part_of,
-    fl.is_fmin_partial as fmin_partial,
-    fl.is_fmax_partial as fmax_partial
+    fl.is_fmin_partial,
+    fl.is_fmax_partial
 
 	FROM feature f
 	
@@ -73,8 +73,22 @@
 	    
 	ORDER BY fl.fmin, fl.fmax
 	
-   
   </select>
+  
+  <resultMap type="org.genedb.crawl.model.LocatedFeature" id="locations">
+    <result property="uniqueName" column="uniqueName"/>
+    <result property="isObsolete" column="is_obsolete"/>
+    <result property="strand" column="strand"/>
+    <result property="fmin" column="fmin"/>
+    <result property="fmax" column="fmax"/>
+    <result property="fmin_partial" column="is_fmin_partial"/>
+    <result property="fmax_partial" column="is_fmax_partial"/>
+    
+    <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+        <result property="name" column="type"/>
+    </association>
+    
+  </resultMap>
   
   <select id="sequence" resultType="String">
         SELECT residues as dna FROM feature WHERE feature_id = (select feature_id from feature where uniqueName = #{region} )
