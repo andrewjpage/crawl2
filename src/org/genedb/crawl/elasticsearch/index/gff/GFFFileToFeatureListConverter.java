@@ -8,7 +8,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -23,6 +25,7 @@ import org.genedb.crawl.model.FeatureProperty;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Orthologue;
 import org.genedb.crawl.model.Pub;
+import org.genedb.crawl.model.gff.Sequence;
 
 public class GFFFileToFeatureListConverter {
 	
@@ -30,20 +33,26 @@ public class GFFFileToFeatureListConverter {
 	
 	public List<Feature> features = new ArrayList<Feature>();
 	
+	GFFAnnotatationAndFastaExtractor extractor;
+	List<Sequence> sequences;
+	
 	public GFFFileToFeatureListConverter(File gffFile, File tmpFolder) throws IOException, ParseException {
 		
-		
-		
-		GFFAnnotatationAndFastaExtractor extractor = new GFFAnnotatationAndFastaExtractor(gffFile, tmpFolder);
+		extractor = new GFFAnnotatationAndFastaExtractor(gffFile, tmpFolder);
 		
 		File annotationFile = extractor.getAnnotationFile();
+		
+		sequences = extractor.getSequences();
+		
 		// File fastaFile = extractor.getFastaFile();
 		
 		parseFile(annotationFile);
 		
 	}
 	
-	
+	public List<Sequence> getSequences() {
+		return sequences;
+	}
 	
 	public void parseFile(File file) throws IOException, ParseException {
 		

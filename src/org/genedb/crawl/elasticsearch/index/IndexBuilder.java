@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.action.search.SearchRequestBuilder;
@@ -15,6 +16,7 @@ import org.genedb.crawl.elasticsearch.Connection;
 import org.genedb.crawl.elasticsearch.LocalConnection;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
+import org.genedb.crawl.model.gff.Sequence;
 import org.kohsuke.args4j.Option;
 
 public abstract class IndexBuilder {
@@ -41,6 +43,24 @@ public abstract class IndexBuilder {
 		if (client != null) {
 			client.close();
 		}
+	}
+	
+	protected void sendSequencesToIndex(List<Sequence> sequences) throws IOException {
+		
+		for (Sequence sequence : sequences) {
+			
+			String json = jsonIzer.toJson(sequence);
+			
+			IndexResponse response = 
+				client.prepareIndex("sequences", "Sequence", sequence.name)
+					.setSource(json)
+					.execute()
+					.actionGet();
+			
+			logger.debug("Response: version..." + response.getVersion());
+			
+		}
+		
 	}
 	
 	protected void sendFeaturesToIndex(List<Feature> features) throws IOException {

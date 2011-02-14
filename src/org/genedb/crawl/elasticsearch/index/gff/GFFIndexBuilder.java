@@ -34,14 +34,13 @@ public class GFFIndexBuilder extends IndexBuilder {
 	public void run() throws IOException, ParseException {
 		
 		setupIndex();
+		convert();
 		
-		List<Feature> features = convert();
-		sendFeaturesToIndex(features);
 		logger.debug("Complete");
 		
 	}
 	
-	List<Feature> convert() throws IOException, ParseException {
+	void convert() throws IOException, ParseException {
 		File gffFile = new File(gffs);
 		
 		File tmpFolder = new File(tmp);
@@ -51,15 +50,15 @@ public class GFFIndexBuilder extends IndexBuilder {
 		
 		if (gffFile.isDirectory()) {
 			for (File f : gffFile.listFiles()) {
-				features.addAll(convert(f, tmpFolder));
+				convert(f, tmpFolder);
 			}
 		} else {
-			features.addAll(convert(gffFile, tmpFolder));
+			convert(gffFile, tmpFolder);
 		}
-		return features;
+		//return features;
 	}
 	
-	List<Feature> convert(File gffFile, File tmpFolder) throws IOException, ParseException {
+	void convert(File gffFile, File tmpFolder) throws IOException, ParseException {
 		System.out.println(String.format("Converting %s using tmp folder %s", gffFile.getName(), tmpFolder.getPath()));
 		
 		String newFilePath = tmpFolder + File.pathSeparator + gffFile.getName();
@@ -72,7 +71,9 @@ public class GFFIndexBuilder extends IndexBuilder {
 		}
 		
 		GFFFileToFeatureListConverter converter = new GFFFileToFeatureListConverter(gffFile, tmpFolder);
-		return converter.features;
+		
+		sendFeaturesToIndex(converter.features);
+		sendSequencesToIndex(converter.sequences);
 	}
 	
 	

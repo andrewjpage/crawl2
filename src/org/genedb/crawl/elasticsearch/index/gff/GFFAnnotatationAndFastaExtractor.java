@@ -7,9 +7,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.elasticsearch.index.gff.GFFFileFilter.GFFFileExtensionSet;
+import org.genedb.crawl.model.gff.Sequence;
+import org.genedb.crawl.model.gff.SequenceType;
 
 public class GFFAnnotatationAndFastaExtractor {
 	
@@ -21,6 +27,11 @@ public class GFFAnnotatationAndFastaExtractor {
 	String fastaFileName;
 	String annotationFileName;
 	
+	List<Sequence> sequences = new ArrayList<Sequence>();
+	
+	public List<Sequence> getSequences() {
+		return sequences;
+	}
 	
 	public File getAnnotationFile() {
 		logger.info(String.format("Return annoation file %s", annotationFileName));
@@ -88,6 +99,8 @@ public class GFFAnnotatationAndFastaExtractor {
 			
 			boolean parsingAnnotations = true;
 			
+			Sequence sequence = null;
+			
 			while ((line=buf.readLine())!=null) {
 				// logger.debug(line);
 				
@@ -102,6 +115,18 @@ public class GFFAnnotatationAndFastaExtractor {
 				if (parsingAnnotations) {
 					annotationWriter.write(line + "\n");
 				} else {
+					
+					if (line.startsWith(">")) {
+						String sequenceName = line.substring(1);
+						
+						sequence = new Sequence(sequenceName, SequenceType.AMINO_ACID);
+						
+						sequences.add(sequence);
+						
+					} else if (sequence != null) {
+						sequence.sequence += line;
+					}
+					
 					fastaWriter.write(line + "\n");
 				}
 				
