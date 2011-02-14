@@ -25,6 +25,8 @@
 <property name="ivy.lib.dir" value="${basedir}/lib/ivy" />
 
 <property name="report.home" value="${basedir}/tmp" />
+	
+<property name="elasticsearch.data.home" value="${basedir}/data" />
 
 <path id="lib.compile.path">
 	<fileset dir="${ivy.lib.dir}/compile" />
@@ -61,6 +63,12 @@
 	<delete dir="${report.home}" includeEmptyDirs="true"/>
 	<delete dir="war/WEB-INF/classes/" includeEmptyDirs="true"/>
 	<delete file="war/WEB-INF/crawl-repository.xml" />
+	<delete dir="${build}" includeEmptyDirs="true"/>
+</target>
+	
+<target name="clean-es">
+	<!-- this is kept separate from the clean target to stop us from deleting data accidentally -->
+	<delete dir="${elasticsearch.data.home}" includeEmptyDirs="true" />
 </target>
 
 

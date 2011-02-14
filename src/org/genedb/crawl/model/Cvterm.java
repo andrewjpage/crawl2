@@ -21,20 +21,20 @@ public class Cvterm {
 	/**
 	 *  This is not a primitive boolean so it can be nullable (or else the GSON sets it to false if unset).
 	 */
-	@XmlAttribute(name="is_not")
+	@XmlAttribute(name="is_not", required=false)
 	public Boolean is_not;
 	
 	@XmlElement(name="dbxref")
-	@XmlElementWrapper(name="dbxrefs")
+	@XmlElementWrapper(name="dbxrefs", required=false)
 	public List<Dbxref> dbxrefs;
 	
 	@XmlElement(name="prop")
-	@XmlElementWrapper(name="props")
+	@XmlElementWrapper(name="props", required=false)
 	public List<CvtermProp> props;
 	
 	@XmlElement(name="pub")
-	@XmlElementWrapper(name="pubs")
-	public List<Pub> pubs = new ArrayList<Pub>();
+	@XmlElementWrapper(name="pubs", required=false)
+	public List<Pub> pubs; 
 	
 	public void addPub(Pub pub) {
 		if (pubs == null) {

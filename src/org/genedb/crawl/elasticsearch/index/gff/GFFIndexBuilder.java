@@ -2,6 +2,7 @@ package org.genedb.crawl.elasticsearch.index.gff;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class GFFIndexBuilder extends IndexBuilder {
 		
 	}
 	
-	public void run() throws IOException {
+	public void run() throws IOException, ParseException {
 		
 		setupIndex();
 		
@@ -40,7 +41,7 @@ public class GFFIndexBuilder extends IndexBuilder {
 		
 	}
 	
-	List<Feature> convert() throws IOException {
+	List<Feature> convert() throws IOException, ParseException {
 		File gffFile = new File(gffs);
 		
 		File tmpFolder = new File(tmp);
@@ -58,7 +59,7 @@ public class GFFIndexBuilder extends IndexBuilder {
 		return features;
 	}
 	
-	List<Feature> convert(File gffFile, File tmpFolder) throws IOException {
+	List<Feature> convert(File gffFile, File tmpFolder) throws IOException, ParseException {
 		System.out.println(String.format("Converting %s using tmp folder %s", gffFile.getName(), tmpFolder.getPath()));
 		
 		String newFilePath = tmpFolder + File.pathSeparator + gffFile.getName();
@@ -78,8 +79,9 @@ public class GFFIndexBuilder extends IndexBuilder {
 	/**
 	 * @param args
 	 * @throws IOException 
+	 * @throws ParseException 
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, ParseException {
 		GFFIndexBuilder gffIndexBuilder = new GFFIndexBuilder();
 		CmdLineParser parser = new CmdLineParser(gffIndexBuilder);
 		

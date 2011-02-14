@@ -1,11 +1,14 @@
 package org.genedb.crawl.model;
 
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+
 
 public class Feature {
 	
@@ -44,6 +47,25 @@ public class Feature {
 	@XmlElementWrapper(name="dbxrefs")
 	public List<Dbxref> dbxrefs;
 	
+	@XmlElement(required=false)
+	public Date timelastmodified;
+	
+	public Date timelastaccessioned;
+	
+	@XmlElement(required=false)
+	public boolean isObsolete;
+	
+//	@XmlElement(required=false)
+//	public String getTimelastodified() {
+//		
+//		if (timelastmodified != null) {
+//			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+//			return df.format(timelastmodified);
+//		}
+//		
+//		return null;
+//	}
+	
 	public void addDbxref(Dbxref dbxref) {
 		if (dbxrefs == null) {
 			dbxrefs = new ArrayList<Dbxref>();
@@ -62,16 +84,21 @@ public class Feature {
 		terms.add(term);
 	}
 	
-	@XmlElement(required=false, name="type.cvterm")
+	@XmlElement(required=false)
 	public Cvterm type;
 	
-	@XmlElement(name="type", required=false)
-	public String getTypeName() {
-		if (type != null) {
-			return type.name;
-		}
-		return null;
-	}
+//	@XmlElement(name="type", required=false)
+//	public String getTypeName() {
+//		if (type != null) {
+//			return type.name;
+//		}
+//		return null;
+//	}
+//	
+//	public void setTypeName(String typeName) {
+//		type = new Cvterm();
+//		type.name = typeName;
+//	}
 	
 	@XmlElement(name="relationship", required=false)
 	@XmlElementWrapper(name="relationships")

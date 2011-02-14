@@ -4,7 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -27,7 +30,7 @@ public class GFFFileToFeatureListConverter {
 	
 	public List<Feature> features = new ArrayList<Feature>();
 	
-	public GFFFileToFeatureListConverter(File gffFile, File tmpFolder) throws IOException {
+	public GFFFileToFeatureListConverter(File gffFile, File tmpFolder) throws IOException, ParseException {
 		
 		
 		
@@ -42,7 +45,7 @@ public class GFFFileToFeatureListConverter {
 	
 	
 	
-	public void parseFile(File file) throws IOException {
+	public void parseFile(File file) throws IOException, ParseException {
 		
 		FileReader fr = new FileReader(file);
 		BufferedReader br = new BufferedReader(fr);
@@ -64,7 +67,8 @@ public class GFFFileToFeatureListConverter {
 			feature.fmin = gffFeature.start;
 			feature.fmax = gffFeature.end;
 			feature.region = gffFeature.seqid;
-			
+			feature.phase = gffFeature.phase;
+			feature.strand = gffFeature.strand.getStrandInt();
 			
 			// but for web service display we are also storing a coordinates array
 			Coordinates coordinates = new Coordinates();
@@ -73,11 +77,15 @@ public class GFFFileToFeatureListConverter {
 			coordinates.region = gffFeature.seqid;
 			if (gffFeature.phase != null) {
 				coordinates.phase = gffFeature.phase;
+				coordinates.strand = gffFeature.strand.getStrandInt();
 			}
 			coordinates.fmin = gffFeature.start;
 			coordinates.fmax = gffFeature.end;
 			
-			
+			;
+			Cvterm type = new Cvterm();
+			type.name = gffFeature.type;
+			feature.type = type;
 			
 			feature.properties = new ArrayList<FeatureProperty>();
 			
@@ -226,6 +234,8 @@ public class GFFFileToFeatureListConverter {
 					
 					String stringValue = (String) value; 
 					
+					//logger.debug(key + ":" + value);
+					
 					if ( key.equals("Derives_from") || key.equals("Parent") || key.equals("Part_of") )  {
 						
 						feature.parent = stringValue;
@@ -256,6 +266,19 @@ public class GFFFileToFeatureListConverter {
 							feature.addProduct(stringValue);
 						}
 						
+					} else if (key.equals("timelastmodified")) {
+						
+						
+						
+						SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss z");
+						Date date =  df.parse(stringValue);
+						feature.timelastmodified = date;
+						
+						logger.error("feature.timelastmodified  " + feature.timelastmodified );
+					
+					} else if (key.equals("isObsolete")) {
+						
+						feature.isObsolete = Boolean.parseBoolean(stringValue);
 						
 						
 					} else {

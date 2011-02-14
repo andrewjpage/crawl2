@@ -3,6 +3,7 @@ package org.genedb.crawl.model;
 import javax.xml.bind.annotation.XmlAttribute;
 
 public class LocatedFeature extends Feature {
+	
 	@XmlAttribute(required=false)
 	public Integer fmin;
 	
@@ -17,5 +18,14 @@ public class LocatedFeature extends Feature {
 	
 	@XmlAttribute(required=false)
 	public String parentRelationshipType;
+	
+	@XmlAttribute
+	public Integer phase;
+	
+	@XmlAttribute
+	public int strand;
+	
+	public Boolean fmin_partial;
+	public Boolean fmax_partial;
 	
 }

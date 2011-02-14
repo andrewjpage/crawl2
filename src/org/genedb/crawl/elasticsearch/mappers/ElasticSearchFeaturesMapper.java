@@ -44,10 +44,8 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 	
 	private Logger logger = Logger.getLogger(ElasticSearchFeaturesMapper.class);
 	
-	String index = "features";
-	String type = "Feature";
 	
-	JsonIzer jsonIzer = new JsonIzer();
+	
 
 	
 	@Override
@@ -172,104 +170,9 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 	
 	
 	
-	private static final Field[] featureFields = Feature.class.getDeclaredFields();
 	
-	private LocatedFeature getFeatureFromJson(String json) {
-		
-		if (json == null) {
-			return null;
-		}
-		
-		try {
-			
-			LocatedFeature feature = (LocatedFeature) jsonIzer.fromJson(json, LocatedFeature.class);
-			return feature;
-						
-		} catch (JsonParseException e) {
-			logger.error("Could not parse the JSON!");
-			e.printStackTrace();
-		} catch (IOException e) {
-			logger.error("Could not read the JSON!");
-			e.printStackTrace();
-		} 
-		return null;
-	}
 	
-	private Feature copy(Feature feature, String[] fields)  {
-		Feature copy = new Feature();
-		
-		if (feature == null) {
-			return null;
-		}
-		
-		for (String field : fields) {
-			for (Field featureField : featureFields) {
-				if (featureField.getName().equals(field)) {
-					try {
-						featureField.set(copy, featureField.get(feature));
-					} catch (Exception e) {
-						logger.error(String.format("could not copy field", field));
-						e.printStackTrace();
-					} 
-				}
-			}
-		}
-		
-		return copy;
-	}
 	
-	private List<Feature> fetchAndCopy(List<String> features, String[] fields) {
-		List<Feature> featureResults = new ArrayList<Feature>();
-		for (String uniqueName : features) {
-			String json = getFromElastic(uniqueName, fields);
-			Feature feature = getFeatureFromJson(json);
-			Feature featureToAdd = copy(feature, fields);
-			if (featureToAdd != null) {
-				featureResults.add(featureToAdd);
-			}
-		}
-		return featureResults;
-	}
-	
-	private String getFromElastic(String uniqueName, String[] fields) {
-		//return client.prepareGet(index, type, uniqueName).execute().actionGet().sourceAsString();
-		
-		logger.debug("Searching for uniqueName " + uniqueName);
-		
-		SearchRequestBuilder srb = connection.getClient().prepareSearch(index)
-			.setQuery( QueryBuilders.fieldQuery("uniqueName", uniqueName));
-		//	.setQuery( QueryBuilders.termQuery("uniqueName", uniqueName));
-//			.setFrom(0)
-//			.setSize(1);
-		
-//		for (String field : fields) {
-//			String fieldName = "_source." + field;
-//			logger.debug("Field " + fieldName);
-//			srb.addField(fieldName);
-//		}
-		
-		// srb.addField("_source.coordinates");
-		
-		SearchResponse response = srb.execute().actionGet();
-		
-		logger.debug(response.getHits().totalHits());
-		
-		if (response.getHits().totalHits() == 1) {
-			logger.debug("returning ");
-			
-			SearchHit hit = response.hits().getAt(0);
-			
-			logger.debug(hit.sourceAsString());
-			
-			logger.debug(hit.fields());
-			
-			return response.hits().getAt(0).sourceAsString();
-		}
-		
-		return null;
-		
-		
-	}
 	
 	
 	

@@ -130,6 +130,9 @@ public class RegionsController extends BaseQueryController {
 		logger.info( String.format("Locating on %s : %s-%s (%s)", region, actualStart, actualEnd, exclude));
 		
 		results.locations = regionsMapper.locations(region, actualStart, actualEnd, exclude);
+		results.actual_end = actualEnd;
+		results.actual_start = actualStart;
+		
 		return results;
 
 	}
