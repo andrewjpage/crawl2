@@ -3,6 +3,8 @@ package org.genedb.crawl.elasticsearch.mappers;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.SortOrder;
+
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.search.SearchResponse;
@@ -15,6 +17,7 @@ import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.elasticsearch.index.query.xcontent.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
@@ -176,8 +179,10 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		
 		BoolQueryBuilder isOverlap = isOverlap(region, start, end);
 		
-		SearchRequestBuilder builder = connection.getClient().prepareSearch(index);
-		
+		SearchRequestBuilder builder = connection.getClient()
+			.prepareSearch(index)
+			.addSort(SortBuilders.fieldSort("fmin"))
+			.addSort(SortBuilders.fieldSort("fmax"));
 		
 		SearchResponse response = builder
 			.setQuery(isOverlap)
@@ -187,6 +192,7 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			.actionGet();
 		
 		logger.info(toString(builder.internalBuilder()));
+		
 		
 		List<LocatedFeature> features = new ArrayList<LocatedFeature>();
 		
