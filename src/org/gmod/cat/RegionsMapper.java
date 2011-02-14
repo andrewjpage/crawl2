@@ -3,8 +3,8 @@ package org.gmod.cat;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
-import org.genedb.crawl.model.LocationRegion;
 
 public interface RegionsMapper {
 	
@@ -14,7 +14,7 @@ public interface RegionsMapper {
 			@Param("end") int end, 
 			@Param("types") List<Integer> types);
 	
-	public List<LocationRegion> locations(
+	public List<LocatedFeature> locations(
 			@Param("region") String region, 
 			@Param("start") int start, 
 			@Param("end") int end,
