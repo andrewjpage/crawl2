@@ -29,7 +29,8 @@ public class FeatureFiller {
 			
 			feature.terms = featureMapper.terms(feature);
 			feature.properties = featureMapper.properties(feature);
-				
+			feature.coordinates = featureMapper.coordinates(feature);
+			
 		}
 		
 		logger.info("Invoking feature converter");

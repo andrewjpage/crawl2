@@ -11,9 +11,9 @@ public class Organism {
 	@XmlAttribute
 	public String common_name;
 	@XmlAttribute
-	public String taxonID;
+	public Integer taxonID;
 	@XmlAttribute
-	public String translation_table;
+	public Integer translation_table;
 	@XmlAttribute
 	public String name;
 	@XmlAttribute

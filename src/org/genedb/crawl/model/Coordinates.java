@@ -4,18 +4,18 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 public class Coordinates {
 	
-	@XmlAttribute
+	@XmlAttribute(required=true)
 	public String region;
 	
-	@XmlAttribute
+	@XmlAttribute(required=true)
 	public int fmin;
 	
-	@XmlAttribute
+	@XmlAttribute(required=true)
 	public int fmax;
 	
-	@XmlAttribute
+	@XmlAttribute(required=true)
 	public Integer phase;
 	
-	@XmlAttribute
+	@XmlAttribute(required=true)
 	public int strand;
 }

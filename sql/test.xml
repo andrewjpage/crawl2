@@ -20,6 +20,7 @@
     <mapper resource="sql/org/gmod/cat/OrganismsMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/FeaturesMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/FeatureMapper.xml"/>
+    <mapper resource="sql/org/gmod/cat/RegionsMapper.xml"/>
   </mappers>
   
 </configuration>

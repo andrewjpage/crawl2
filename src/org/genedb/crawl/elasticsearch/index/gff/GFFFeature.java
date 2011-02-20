@@ -75,7 +75,7 @@ public class GFFFeature {
 	
 	public GFFFeature(String line, boolean parseAttributes) {
 		
-		logger.trace(line);
+		//logger.debug(line);
 		
 		String[] columns = line.split("\t");
 		
@@ -115,50 +115,7 @@ public class GFFFeature {
 		
 	}
 	
-	/*
-	 * Pf3D7_01        chado   polypeptide     39205   40430   .       -       .       ID=PFA0010c:pep;Derives_from=PFA0010c:mRNA;Dbxref=OrthoMCLDB
-	:PFA0010c%2CPlasmoDB:PFA0010c%2CUniProtKB:Q9NFB5;colour=2;private=ed+Skyes+2007;timelastmodified=06.07.2009+01:35:35+BST;blastp_file=/nfs/pa
-	thdata/Plasmodium/falciparum/3D7/workshop/DATABASES/apicomplexans:blastp/MAL1.embl.seq.00149.out%2C%uniprot:blastp/MAL1.embl.seq.00002.out;f
-	eature_id=810;isObsolete=false;literature=PMID:10562315%2CPMID:17719658%2CPMID:2842673%2CPMID:10430943;comment=rif+%28repetitive+intersperse
-	d+family%29+genes+were+originally+identified+by+Weber%3B+they+encode+clonally+variant+RIFIN+proteins%2C+which+are+likely+expressed+on+the+in
-	fected+erythrocyte+surface%2C+in+Maurer's+clefts+and+on+merozoites.+Originally+classed+with+stevors%2C+rifs+are+clearly+a+distinct+family%2C
-	+with+150+or+so+copies+per+haploid+genome.+Surface+expression+indicates+possible+role+in+immune+evasion.;
-	 * */
-//	private void parseAttributes(String attributes) {
-//		
-//		int start = 0;
-//		int end = attributes.indexOf(";");
-//		
-//		while (end > 0) {
-//			
-//			String attribute = attributes.substring(start, end);
-//			
-//			//logger.info(attribute);
-//			
-//			int equals = attribute.indexOf("=");
-//			
-//			if (equals == -1) {
-//				start = end + 1;
-//				end = attributes.indexOf(";", start);
-//				continue;
-//			}
-//			
-//			String key = attribute.substring(0, equals);
-//			String value = GFFStreamFeature.decode(attribute.substring(equals+1));
-//			
-//			if (key.equals("gO")) {
-//				logger.debug(value);
-//			}
-//			
-//			this.attributes.put(key, value);
-//			
-//			start = end + 1;
-//			end = attributes.indexOf(";", start);
-//			
-//		}
-//		
-//	}
-//	
+	
 	
 	public String toString() {
 		StringBuffer s = new StringBuffer();

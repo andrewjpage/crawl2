@@ -80,7 +80,24 @@
     
     
     
-    
+    <select id="coordinates" resultMap="regionCoordinatesList" >
+  
+        SELECT sf.uniquename AS region, f.uniquename AS uniqueName, f.name as name, fl.fmin as fmin, fl.fmax as fmax, fl.phase as phase, fl.strand as strand
+          FROM feature f
+          JOIN featureloc fl ON f.feature_id = fl.feature_id 
+          JOIN feature sf ON fl.srcfeature_id = sf.feature_id
+          
+        WHERE <include refid="featureSelector"/> 
+       
+  
+  </select>
+  
+    <resultMap id="regionCoordinatesList" type="org.genedb.crawl.model.Coordinates">
+       <result property="region" column="region"/> 
+       <result property="fmin" column="fmin"/> 
+       <result property="fmax" column="fmax"/> 
+       <result property="strand" column="strand"/> 
+    </resultMap>
     
     
     

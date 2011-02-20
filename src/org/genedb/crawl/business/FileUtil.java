@@ -27,7 +27,7 @@ public class FileUtil {
 	    gzipInputStream.close();
 	    out.close();
 	 
-	    new File(inFilePath).delete();
+	    //new File(inFilePath).delete();
 	 
 	    return outFilePath;
 	}

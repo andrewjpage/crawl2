@@ -7,6 +7,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
+import org.elasticsearch.index.query.xcontent.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 import org.genedb.crawl.elasticsearch.Connection;
 import org.genedb.crawl.elasticsearch.index.JsonIzer;
 import org.genedb.crawl.model.Feature;
@@ -156,6 +160,81 @@ public class ElasticSearchBaseMapper {
 		}
 		
 		return copy;
+	}
+	
+	
+	protected <T extends Object> T getFirstMatch(String indexName, String fieldName, String value, Class<T> cls) {
+		
+		FieldQueryBuilder regionQuery = 
+		QueryBuilders.fieldQuery(fieldName, value);
+	
+		SearchResponse response = connection.getClient().prepareSearch(indexName)
+			.setQuery(regionQuery)
+			.execute()
+			.actionGet();
+		
+		return getFirstMatch( response, cls);
+		
+	}
+	
+	protected <T extends Object> T getFirstMatch(SearchResponse response, Class<T> cls) {
+		
+			
+		for (SearchHit hit : response.getHits()) {
+		
+			String source = hit.sourceAsString();
+			
+			try {
+				
+				T object = (T) jsonIzer.fromJson(source, cls);
+				return object;
+				
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				e.printStackTrace();
+				return null;
+			}
+			
+		}
+		
+		return null;
+	}
+	
+	protected <T extends Object> List<T> getAllMatches(String indexName, String fieldName, String value, Class<T> cls) {
+		
+		FieldQueryBuilder regionQuery = 
+		QueryBuilders.fieldQuery(fieldName, value);
+		
+		SearchResponse response = connection.getClient().prepareSearch(indexName)
+			.setQuery(regionQuery)
+			.execute()
+			.actionGet();
+		
+		return getAllMatches(response, cls);
+		
+	}
+	
+	protected <T extends Object> List<T> getAllMatches(SearchResponse response, Class<T> cls) {
+		
+		List<T> list = new ArrayList<T>();
+		
+		for (SearchHit hit : response.getHits()) {
+		
+			String source = hit.sourceAsString();
+			
+			try {
+				
+				T object = (T) jsonIzer.fromJson(source, cls);
+				list.add(object);
+				
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return list;
 	}
 	
 }

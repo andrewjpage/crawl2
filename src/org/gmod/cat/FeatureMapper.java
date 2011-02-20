@@ -3,6 +3,7 @@ package org.gmod.cat;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.FeatureProperty;
@@ -17,5 +18,7 @@ public interface FeatureMapper {
 	List<FeatureProperty> properties(Feature feature);
 	
 	List<Cvterm> terms (Feature feature);
+	
+	List<Coordinates> coordinates(Feature feature);
 	
 }

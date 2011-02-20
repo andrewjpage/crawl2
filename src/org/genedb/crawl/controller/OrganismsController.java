@@ -35,7 +35,7 @@ public class OrganismsController extends BaseQueryController {
 			OrganismProp prop = organismsMapper.getOrganismProp(organism.ID, "genedb_misc", "translationTable");
 			
 			if (prop != null) {
-				organism.translation_table = prop.value;
+				organism.translation_table = Integer.parseInt(prop.value);
 			}
 			
 		}

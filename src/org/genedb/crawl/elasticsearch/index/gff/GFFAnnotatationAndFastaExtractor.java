@@ -1,105 +1,48 @@
 package org.genedb.crawl.elasticsearch.index.gff;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.elasticsearch.index.gff.GFFFileFilter.GFFFileExtensionSet;
-import org.genedb.crawl.model.gff.Sequence;
-import org.genedb.crawl.model.gff.SequenceType;
+import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
+import org.genedb.crawl.model.ElasticSequence;
+import org.genedb.crawl.model.LocatedFeature;
+import org.genedb.crawl.model.Organism;
+import org.genedb.crawl.model.SequenceType;
 
 public class GFFAnnotatationAndFastaExtractor {
 	
 	private static Logger logger = Logger.getLogger(GFFAnnotatationAndFastaExtractor.class);
 	
-	private File file;
-	private File destinationFolder;
-	
-	String fastaFileName;
-	String annotationFileName;
-	
-	List<Sequence> sequences = new ArrayList<Sequence>();
-	
-	public List<Sequence> getSequences() {
-		return sequences;
-	}
-	
-	public File getAnnotationFile() {
-		logger.info(String.format("Return annoation file %s", annotationFileName));
-		return new File(annotationFileName);
-	}
-	
-	public File getFastaFile() {
-		return new File(fastaFileName);
-	}
-	
-	public GFFAnnotatationAndFastaExtractor(File file, File destinationFolder) throws IOException {
-		this.file = file;
-		this.destinationFolder = destinationFolder;
-	
+	class SequenceBuilder {
+		private StringBuilder buffer = new StringBuilder();
+		private ElasticSequence sequence = new ElasticSequence();
 		
-		if (! file.exists()) {
-			throw new FileNotFoundException("Could not find file " + file);
+		public SequenceBuilder(String name, SequenceType sequenceType, int organism_id) {
+			sequence = new ElasticSequence(name, sequenceType, organism_id);
 		}
 		
-		if (! destinationFolder.isDirectory()) {
-			throw new IOException(String.format("The destination folder %s is not a directory.", destinationFolder.getAbsolutePath()) );
+		public void addSequence(String line) {
+			buffer.append(line);
 		}
 		
-		
-		if (! file.isDirectory() && file.getName().endsWith(".gff")) {
-			extractAnnotationsAndSequence(file, destinationFolder);
-		} else {
-			throw new IOException("GFFAnnotatationAndFastaExtractor can't process a directory.");
+		public ElasticSequence getSequence() {
+			sequence.sequence = buffer.toString();
+			return sequence;
 		}
-		
-//		} else if (! file.isDirectory() && file.getName().endsWith(".gz")) {
-//			
-//			
-//			
-//			
-//		} else { 
-//			GFFFileFilter filter = new GFFFileFilter();
-//			filter.filter_set = GFFFileExtensionSet.UNZIPPED_ONLY;
-//			for (File child : file.listFiles(filter)) {
-//				extractAnnotationsAndSequence(child, destinationFolder);
-//			}
-//		}
-		
 	}
 	
-	private void extractAnnotationsAndSequence(File file, File destinationFolder) throws IOException  {
+	public GFFAnnotatationAndFastaExtractor(BufferedReader buf, Organism organism, ElasticSearchFeatureMapper mapper) throws IOException {
 		
-		BufferedWriter fastaWriter = null;
-		BufferedWriter annotationWriter = null;
-		BufferedReader buf = null;
-		
-		fastaFileName = destinationFolder.getAbsolutePath() + "/" + file.getName().substring(0, file.getName().length() - 4) + ".fasta";
-		annotationFileName = destinationFolder.getAbsolutePath() + "/" + file.getName().substring(0, file.getName().length() - 4) + ".gff";
+		List<SequenceBuilder> sequences = new ArrayList<SequenceBuilder>();
 		
 		try {
 			
-			// logger.debug(file.getAbsolutePath());
-			
-			buf = new BufferedReader(new FileReader(file.getAbsolutePath()));
-			
 			String line = "";
-			
-			fastaWriter = new BufferedWriter(new FileWriter(fastaFileName));
-			annotationWriter = new BufferedWriter(new FileWriter(annotationFileName));
-			
 			boolean parsingAnnotations = true;
-			
-			Sequence sequence = null;
+			SequenceBuilder sequence = null;
 			
 			while ((line=buf.readLine())!=null) {
 				// logger.debug(line);
@@ -113,76 +56,40 @@ public class GFFAnnotatationAndFastaExtractor {
 				}
 				
 				if (parsingAnnotations) {
-					annotationWriter.write(line + "\n");
+					
+					
+					LocatedFeature feature = new FeatureBeanFactory(organism, line).getFeature();
+					mapper.createOrUpdate(feature);
+					
+					
 				} else {
 					
 					if (line.startsWith(">")) {
 						String sequenceName = line.substring(1);
 						
-						sequence = new Sequence(sequenceName, SequenceType.AMINO_ACID);
-						
+						sequence = new SequenceBuilder(sequenceName, SequenceType.AMINO_ACID, organism.ID);
+						logger.debug("Parsing sequence : " + sequenceName);
 						sequences.add(sequence);
 						
 					} else if (sequence != null) {
-						sequence.sequence += line;
+						sequence.addSequence(line);
 					}
 					
-					fastaWriter.write(line + "\n");
 				}
 				
 			}
 			
+			for (SequenceBuilder seq : sequences) {
+				mapper.createOrUpdate(seq.getSequence());
+			}
 			
-		
 		} finally {
-			
-			if (buf != null) {
-				buf.close();
-			}
-			
-			if (fastaWriter != null) {
-				fastaWriter.close();
-			}
-			
-			if (annotationWriter != null) {
-				annotationWriter.close();
-			}
-			
-			
-			
+			buf.close();
 		}
-		
-		logger.info("Annotation: " + annotationFileName);
-		logger.info("Fasta: " + fastaFileName);
 		
 	}
 	
-	
-	
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) {
-		
-		if (args.length < 2) {
-			logger.error("You must supply a path to a GFF file or folder, followed by a destination folder");
-			System.exit(1);
-		}
-		
-		File file = new File (args[0]);
-		File destinationFolder = new File (args[1]);
-		
-		
-		try {
-			GFFAnnotatationAndFastaExtractor extractor = new GFFAnnotatationAndFastaExtractor(file, destinationFolder);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-			System.exit(1);
-		}
-	}
+
 	
 	
 }

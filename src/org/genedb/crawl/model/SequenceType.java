@@ -1,4 +1,4 @@
-package org.genedb.crawl.model.gff;
+package org.genedb.crawl.model;
 
 public enum SequenceType {
 	DNA,

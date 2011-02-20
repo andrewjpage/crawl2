@@ -1,15 +1,20 @@
 package org.genedb.crawl.elasticsearch.index.gff;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.business.FileUtil;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.genedb.crawl.elasticsearch.index.IndexBuilder;
-import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
+import org.genedb.crawl.elasticsearch.mappers.ElasticSearchOrganismsMapper;
+import org.genedb.crawl.model.Organism;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -17,63 +22,130 @@ import org.kohsuke.args4j.Option;
 
 public class GFFIndexBuilder extends IndexBuilder {
 	
-	private Logger logger = Logger.getLogger(GFFIndexBuilder.class);
+	private static Logger logger = Logger.getLogger(GFFIndexBuilder.class);
 	
 	@Option(name = "-g", aliases = {"--gffs"}, usage = "The path to the GFF folder", required = true)
 	public String gffs;
+		
+	@Option(name = "-oc", aliases = {"--organism_common_name"}, usage = "The organism's common name", required = true)
+	public String commonName;
 	
-	@Option(name = "-t", aliases = {"--tmp"}, usage = "The path to a tmp folder folder")
-	public String tmp = "/tmp/crawl";
+	@Option(name = "-og", aliases = {"--organism_genus"}, usage = "The organism's genus")
+	public String genus;
 	
+	@Option(name = "-os", aliases = {"--organism_species"}, usage = "The organism's species")
+	public String species;
+	
+	@Option(name = "-ot", aliases = {"--organism_taxon_id"}, usage = "The organism's taxonID")
+	public Integer taxonID;
+	
+	@Option(name = "-oid", aliases = {"--organism_id"}, usage = "The organism's common name")
+	public Integer organismID;
+	
+	@Option(name = "-ott", aliases = {"--organism_translation_table"}, usage = "The organism's translation table")
+	public Integer translationTable;
 	
 	public GFFIndexBuilder() {
 		super();
-		
 	}
 	
-	public void run() throws IOException, ParseException {
+	private ElasticSearchFeatureMapper featureMapper;
+	private ElasticSearchOrganismsMapper organismsMapper;
+	
+	public void run() throws IOException, ParseException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
 		
 		setupIndex();
-		convert();
+		
+		featureMapper = new ElasticSearchFeatureMapper();
+		featureMapper.setConnection(connection);
+		
+		organismsMapper = new ElasticSearchOrganismsMapper();
+		organismsMapper.setConnection(connection);
+		
+		Organism organism = storeOrganism();
+		
+		convertPath(gffs, organism);
 		
 		logger.debug("Complete");
 		
 	}
 	
-	void convert() throws IOException, ParseException {
-		File gffFile = new File(gffs);
+	Organism storeOrganism() throws JsonParseException, JsonMappingException, IOException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		
-		File tmpFolder = new File(tmp);
-		tmpFolder.mkdirs();
+		Organism organism = new Organism();
+		organism.common_name = commonName;
 		
-		List<Feature> features = new ArrayList<Feature>();
-		
-		if (gffFile.isDirectory()) {
-			for (File f : gffFile.listFiles()) {
-				convert(f, tmpFolder);
-			}
-		} else {
-			convert(gffFile, tmpFolder);
+		if (genus != null) {
+			organism.genus = genus;
 		}
-		//return features;
+		if (species != null) {
+			organism.species = species;
+		}
+		if (taxonID != null) {
+			organism.taxonID = taxonID;
+		}
+		if (translationTable != null) {
+			organism.translation_table = translationTable;
+		}
+		if (organismID != null) {
+			organism.ID = organismID;
+		}
+		
+		organismsMapper.createOrUpdate(organism);
+		
+		return organism;
 	}
 	
-	void convert(File gffFile, File tmpFolder) throws IOException, ParseException {
-		System.out.println(String.format("Converting %s using tmp folder %s", gffFile.getName(), tmpFolder.getPath()));
+	void convertPath(String path, Organism organism) throws ParseException, IOException {
 		
-		String newFilePath = tmpFolder + File.pathSeparator + gffFile.getName();
-		FileUtil.copy(gffFile.getAbsolutePath(), newFilePath);
-		gffFile = new File(newFilePath);
+		File gffFile = new File(path);
 		
-		if (gffFile.getName().endsWith("gz")) {
-			String gunzippedFileName = FileUtil.unzip(gffFile.getAbsolutePath());
-			gffFile = new File(gunzippedFileName);
+		GFFFileFilter filter = new GFFFileFilter();
+		filter.filter_set = GFFFileFilter.GFFFileExtensionSet.ALL;
+		
+		if (gffFile.isDirectory()) {
+			for (File f : gffFile.listFiles(filter)) {
+				convertFile(f, organism);
+				f = null;
+			}
+		} else {
+			convertFile(gffFile, organism);
+			gffFile = null;
 		}
 		
-		GFFFileToFeatureListConverter converter = new GFFFileToFeatureListConverter(gffFile, tmpFolder);
+	}
+	
+	private void convertFile(File gffFile, Organism organism) throws ParseException, IOException {
+		BufferedReader reader = getReader(gffFile);
+		GFFAnnotatationAndFastaExtractor extractor = new GFFAnnotatationAndFastaExtractor(reader, organism, featureMapper);
 		
-		sendFeaturesToIndex(converter.features);
-		sendSequencesToIndex(converter.sequences);
+//		GFFFileToFeatureListConverter converter = new GFFFileToFeatureListConverter(organism);
+//		converter.parse(extractFile(gffFile));
+//		sendFeaturesToIndex(converter.getFeatures());
+//		sendSequencesToIndex(converter.getSequences());
+//		converter = null;
+	}
+	
+//	GFFAnnotatationAndFastaExtractor extractFile(File file) throws ParseException, IOException {
+//		logger.info("Processing file " + file.getName());
+//		
+//		return new GFFAnnotatationAndFastaExtractor(reader); 
+//	}
+	
+	BufferedReader getReader(File file) throws IOException {
+		
+		BufferedReader reader = null;
+		
+		FileInputStream fileStream = new FileInputStream(file);
+		
+		if (file.getName().endsWith("gz")) {
+			logger.info("unzipping");
+		    reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(fileStream)));
+		} else {
+			reader = new BufferedReader(new InputStreamReader(fileStream));
+		}
+		
+		return reader;
 	}
 	
 	
@@ -81,13 +153,16 @@ public class GFFIndexBuilder extends IndexBuilder {
 	 * @param args
 	 * @throws IOException 
 	 * @throws ParseException 
+	 * @throws IllegalAccessException 
+	 * @throws NoSuchFieldException 
+	 * @throws IllegalArgumentException 
+	 * @throws SecurityException 
 	 */
-	public static void main(String[] args) throws IOException, ParseException {
+	public static void main(String[] args) throws IOException, ParseException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
 		GFFIndexBuilder gffIndexBuilder = new GFFIndexBuilder();
 		CmdLineParser parser = new CmdLineParser(gffIndexBuilder);
 		
 		try {
-			
 			
 			parser.parseArgument(args);
 		
@@ -100,7 +175,7 @@ public class GFFIndexBuilder extends IndexBuilder {
 			gffIndexBuilder.run();
 		
 		} catch (CmdLineException e) {
-			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
             parser.setUsageWidth(80);
             parser.printUsage(System.out);
             System.exit(1);

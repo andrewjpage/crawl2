@@ -19,10 +19,10 @@ public class LocatedFeature extends Feature {
 	@XmlAttribute(required=false)
 	public String parentRelationshipType;
 	
-	@XmlAttribute
+	@XmlAttribute(required=true)
 	public Integer phase;
 	
-	@XmlAttribute
+	@XmlAttribute(required=true)
 	public int strand;
 	
 	public Boolean fmin_partial;
