@@ -1,0 +1,219 @@
+<html>
+
+<head>
+<title>Crawl - The Java Edition</title>
+<link rel="stylesheet" href="http://www.genedb.org/includes/style/genedb/main.css" type="text/css" />
+
+<style>
+
+body {
+    font-size: 1em;
+    padding-left:25%;
+    padding-right:25%;
+}
+
+p {
+    font-size:0.8em;
+    padding:15px;
+}
+
+pre {
+    margin:10px;
+    padding-bottom:10px;
+}
+
+pre {
+     border: 1px dashed grey;
+}
+
+table {
+    margin:20px;
+    
+}
+
+table, td, th {
+    border: 1px dashed grey;
+}
+
+td, th {
+    padding:10px;
+}
+
+</style>
+</head>
+<body>
+
+<h1>Crawl - The Java Edition</h1>
+
+<h2>Building & deploying</h2>
+
+<p>This is all done through the use of ant tasks. </p>
+
+<h3>Resolving dependencies</h3>
+
+<p>Currently, this is managed with ivy, to do this use :</p>
+
+<pre><code>
+ ant resolve
+</code></pre>
+
+<h3>Packaging the jar </h3>
+
+<pre><code>
+ ant package-jar
+</code></pre>
+
+
+<h3>Packaging the war </h3>
+
+<p>Here you must specify a config property file. Several of examples are bundled in the top level folder. For example :</p>
+<pre><code>
+ ant -Dconfig=resource-elasticsearch-remote.properties package-war
+</code></pre>
+
+<h3>Testing the war using Jetty-runner </h3>
+
+This can be used to run crawler without having to configure a servlet container. This is not good for production use. Only use it for testing.
+
+<pre><code>
+ ant -Dconfig=resource-elasticsearch-remote.properties run-jetty
+</code></pre>
+
+<h3>Deploying the war using to a J2EE container  </h3>
+
+For production, or even beta test sites, it should be deployed to a container as follows.
+
+<pre><code>
+ ant -Dconfig=resource-elasticsearch-remote.properties deploy
+</code></pre>
+
+<h3>Cleaning up</h3>
+
+To be run whenever method signatures change and you want to spot external references to them. 
+
+<pre><code>
+ ant clean
+</code></pre>
+
+
+<h2>Indexing</h2>
+
+<p>These are done using shell scripts.</p> 
+
+<h3>Indexing GFF files</h3>
+
+<p>GFF files do not mention what organism they belong to, so this must be supplied. This can be done as follows :</p>
+
+<pre><code>
+ ./sh/gff2es.sh -g /Users/gv1/Documents/Data/gffs/ \
+    -oc Pfalciparum -og Plasmodium -os falciparum -oid 27 -ott 1 \
+    -pe resource-elasticsearch-remote.properties
+</code></pre>
+
+<p>If the organism already exists, you should only have to supply the oc (organism_common_name) flag for the organism. </p>
+
+<h3>Incrementally indexing Chado</h3>
+
+<p>This relies on the use of the timelastmodified stamp. You can indexing everything that has changed since 2011-01-05, as follows :</p>
+
+<pre><code>
+ ./sh/chado2es.sh -pc resource-chado-gv1.properties \
+    -pe resource-elasticsearch-remote.properties -s 2011-01-05
+</code></pre>
+
+<p>You can filter on organism:</p>
+
+<pre><code>
+ ./sh/chado2es.sh -pc resource-chado-gv1.properties \
+    -pe resource-elasticsearch-remote.properties -o Lmajor -s 2011-01-05 
+</code></pre>
+
+<p>And if you want to index the entire organism, currently the way to do it is to choose a suitably distant since date, for example :</p>
+
+<pre><code>
+ ./sh/chado2es.sh -pc resource-chado-gv1.properties \
+    -pe resource-elasticsearch-remote.properties -o Lmajor -s 2001-01-01 
+</code></pre>
+
+
+
+<h2>Property files</h2>
+
+
+
+<p>The purpose of these is to specify environmental variables used by crawl. Sometimes only one is used, as is the case when building a war. Sometimes two are used, as is the case when indexing from one data source to another. The following table describes what they are for :</p>
+
+<table >
+<tr><th>Property</th><th>Description</th><th>Configurations</th></tr>
+
+<tr><td>resource.type</td>
+<td>Currently be either chado-postgres, elasticsearch-local, elasticsearch-remote</td>
+<td>all</td></tr>
+
+<tr><td>deploy.dir</td>
+<td>The tomcat webapps folder to which any war that is built using this file is deployed to.</td>
+<td>all</td></tr>
+
+<tr><td>deploy.name</td>
+<td>what the war will be called, which will reflected in the URL domain path.</td>
+<td>all</td></tr>
+
+<tr><td>alignments</td>
+<td>the path to an alignments.json file. This is where BAM alignments are specified.</td>
+<td>all</td></tr>
+
+<tr><td>showParameters</td>
+<td>whether or not to always return request parameters in the reponse.</td>
+<td>all</td></tr>
+
+
+
+
+<tr><td>dbhost</td>
+<td>the chado database host</td>
+<td>chado-postgres</td></tr>
+
+<tr><td>dbport</td>
+<td>the chado database port</td>
+<td>chado-postgres</td></tr>
+
+<tr><td>dbname</td>
+<td>the chado database name</td>
+<td>chado-postgres</td></tr>
+
+<tr><td>dbuser</td>
+<td>the chado database user</td>
+<td>chado-postgres</td></tr>
+
+<tr><td>dbpassword</td>
+<td>the chado database password</td>
+<td>chado-postgres</td></tr>
+
+<tr><td>sqlPath</td>
+<td>the chado database mybatis XML files</td>
+<td>chado-postgres</td></tr>
+
+
+<tr><td>resource.elasticsearch.address.host</td>
+<td>the elastic search host </td>
+<td>elasticsearch-remote</td></tr>
+<tr><td>resource.elasticsearch.address.port</td>
+<td>the elastic search port </td>
+<td>elasticsearch-remote</td></tr>
+<tr><td>resource.elasticsearch.local.pathlogs</td>
+<td>the elastic search log path </td>
+<td>elasticsearch-local</td></tr>
+<tr><td>resource.elasticsearch.local.pathdata</td>
+<td>the elastic search data path </td>
+<td>elasticsearch-local</td></tr>
+
+
+
+</table>
+
+
+<p>Not all of these parameters are used in all property files, the third column specifies in what context they are applicable.</p>
+
+</body>
+
+</html>
