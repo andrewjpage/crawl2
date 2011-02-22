@@ -3,6 +3,7 @@ package org.genedb.crawl.elasticsearch.index.gff;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
@@ -45,9 +46,7 @@ public class GFFIndexBuilder extends IndexBuilder {
 	@Option(name = "-ott", aliases = {"--organism_translation_table"}, usage = "The organism's translation table")
 	public Integer translationTable;
 	
-	public GFFIndexBuilder() {
-		super();
-	}
+	
 	
 	private ElasticSearchFeatureMapper featureMapper;
 	private ElasticSearchOrganismsMapper organismsMapper;
@@ -62,15 +61,13 @@ public class GFFIndexBuilder extends IndexBuilder {
 		organismsMapper = new ElasticSearchOrganismsMapper();
 		organismsMapper.setConnection(connection);
 		
-		Organism organism = storeOrganism();
-		
-		convertPath(gffs, organism);
+		convertPath(gffs, getAndPossiblyStoreOrganism());
 		
 		logger.debug("Complete");
 		
 	}
 	
-	Organism storeOrganism() throws JsonParseException, JsonMappingException, IOException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+	private Organism getAndPossiblyStoreOrganism() throws JsonParseException, JsonMappingException, IOException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		
 		Organism organism = new Organism();
 		organism.common_name = commonName;
@@ -96,7 +93,7 @@ public class GFFIndexBuilder extends IndexBuilder {
 		return organism;
 	}
 	
-	void convertPath(String path, Organism organism) throws ParseException, IOException {
+	private void convertPath(String path, Organism organism) throws ParseException, IOException {
 		
 		File gffFile = new File(path);
 		
@@ -117,22 +114,11 @@ public class GFFIndexBuilder extends IndexBuilder {
 	
 	private void convertFile(File gffFile, Organism organism) throws ParseException, IOException {
 		BufferedReader reader = getReader(gffFile);
-		GFFAnnotatationAndFastaExtractor extractor = new GFFAnnotatationAndFastaExtractor(reader, organism, featureMapper);
-		
-//		GFFFileToFeatureListConverter converter = new GFFFileToFeatureListConverter(organism);
-//		converter.parse(extractFile(gffFile));
-//		sendFeaturesToIndex(converter.getFeatures());
-//		sendSequencesToIndex(converter.getSequences());
-//		converter = null;
+		new GFFAnnotatationAndFastaExtractor(reader, organism, featureMapper);
 	}
 	
-//	GFFAnnotatationAndFastaExtractor extractFile(File file) throws ParseException, IOException {
-//		logger.info("Processing file " + file.getName());
-//		
-//		return new GFFAnnotatationAndFastaExtractor(reader); 
-//	}
-	
-	BufferedReader getReader(File file) throws IOException {
+
+	private BufferedReader getReader(File file) throws IOException {
 		
 		BufferedReader reader = null;
 		

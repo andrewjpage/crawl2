@@ -204,7 +204,7 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		for (SearchHit hit : response.getHits()) {
 		
 			String source = hit.sourceAsString();
-			logger.debug(source);
+			//logger.debug(source);
 			
 			LocatedFeature feature = this.getFeatureFromJson(source);
 			if (feature != null) {

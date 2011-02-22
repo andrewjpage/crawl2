@@ -1,5 +1,8 @@
 package org.genedb.crawl.elasticsearch.index.sql;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.text.ParseException;
@@ -9,6 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.ibatis.io.Resources;
@@ -38,7 +42,10 @@ import org.kohsuke.args4j.Option;
 
 public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	
-	
+	protected OrganismsMapper organismMapper;
+	protected FeaturesMapper featuresMapper;
+	protected FeatureMapper featureMapper;
+	protected RegionsMapper regionsMapper;
 	
 	@Option(name = "-s", aliases = {"--since"}, usage = "The date formatted as yyyy-MM-dd", required = true)
 	public String since;
@@ -46,16 +53,14 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	@Option(name = "-o", aliases = {"--organism"}, usage = "The organism common name", required = false)
 	public String organismCommonName;
 	
+	@Option(name = "-pc", aliases = {"--properties_chado"}, usage = "A properties file specifying SQL connection details", required=true)
+	public File chadoPropertiesFile;
+	
+	private Properties chadoProperties;
 	
 	private static final String resource = "sql/test.xml";
-	
 	private SqlSessionFactory sqlMapper = null;
 	private SqlSession session ;
-	
-	private OrganismsMapper organismMapper;
-	private FeaturesMapper featuresMapper;
-	private FeatureMapper featureMapper;
-	private RegionsMapper regionsMapper;
 	
 	private ElasticSearchOrganismsMapper esOrganismMapper;
 	private ElasticSearchFeatureMapper esFeatureMapper;
@@ -65,13 +70,17 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		setupIndex();
 		setupSession();
 		
+		organismMapper = session.getMapper(OrganismsMapper.class);
+		featuresMapper = session.getMapper(FeaturesMapper.class);
+		featureMapper = session.getMapper(FeatureMapper.class);
+		regionsMapper = session.getMapper(RegionsMapper.class);
+		
+		
 		esOrganismMapper = new ElasticSearchOrganismsMapper();
 		esOrganismMapper.setConnection(connection);
 		
 		esFeatureMapper = new ElasticSearchFeatureMapper();
 		esFeatureMapper.setConnection(connection);
-		
-		
 		
 		List<Feature> features = null;
 		
@@ -94,10 +103,25 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		
 	}
 	
+	protected void setupSession() throws IOException {
+		
+		chadoProperties = new Properties();
+		chadoProperties.load(new FileInputStream(chadoPropertiesFile));
+		
+		Reader reader = null;
+		reader = Resources.getResourceAsReader(resource);
+		sqlMapper = new SqlSessionFactoryBuilder().build(reader, chadoProperties);
+		session = sqlMapper.openSession();
+	}
+	
+	protected void closeSession() {
+		if (session != null) {
+			session.close();
+		}
+	}
+	
 	void generateAllSequences(List<Feature> features) {
 		Set<String> regions = new HashSet<String>(); 
-		
-		List<LocatedFeature> lFeatures = new ArrayList<LocatedFeature>();
 		
 		for (Feature f : features) {
 			if (f.coordinates != null) {
@@ -155,31 +179,7 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		
 	}
 	
-	void setupSession() {
-		Reader reader = null;
-
-		try {
-			reader = Resources.getResourceAsReader(resource);
-			
-			sqlMapper = new SqlSessionFactoryBuilder().build(reader, System.getProperties());
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		session = sqlMapper.openSession();
-		
-		organismMapper = session.getMapper(OrganismsMapper.class);
-		featuresMapper = session.getMapper(FeaturesMapper.class);
-		featureMapper = session.getMapper(FeatureMapper.class);
-		regionsMapper = session.getMapper(RegionsMapper.class);
-	}
 	
-	void closeSession() {
-		if (session != null) {
-			session.close();
-		}
-	}
 	
 	/**
 	 * @param args
@@ -194,7 +194,6 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		CmdLineParser parser = new CmdLineParser(incrementalBuilder);
 		
 		try {
-			
 			
 			parser.parseArgument(args);
 		
