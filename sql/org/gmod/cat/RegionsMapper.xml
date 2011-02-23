@@ -40,7 +40,8 @@
     fl.strand,
     fl.phase,
     f.is_obsolete,
-    f2.uniquename as part_of,
+    f2.uniquename as parent,
+    frt.name as parent_relationship_type,
     fl.is_fmin_partial,
     fl.is_fmax_partial
 
@@ -50,8 +51,11 @@
 	JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = 
         (select feature_id from feature where uniqueName = #{region} ) )
 	
-	LEFT OUTER JOIN feature_relationship fr ON f.feature_id = fr.subject_id AND fr.type_id = (select cvterm_id from cvterm where name = 'part_of')
-	LEFT OUTER JOIN feature f2 ON fr.object_id = f2.feature_id
+	LEFT OUTER JOIN feature_relationship fr ON f.feature_id = fr.subject_id
+	LEFT JOIN feature f2 ON fr.object_id = f2.feature_id 
+	LEFT JOIN cvterm frt ON fr.type_id = frt.cvterm_id AND frt.cvterm_id in 
+	                           (select cvterm_id from cvterm where name in ('part_of', 'derives_from'))  
+	
 	
 	WHERE 
 	<![CDATA[
@@ -81,6 +85,8 @@
     <result property="strand" column="strand"/>
     <result property="fmin" column="fmin"/>
     <result property="fmax" column="fmax"/>
+    <result property="parent" column="parent"/>
+    <result property="parentRelationshipType" column="parent_relationship_type"/>
     <result property="fmin_partial" column="is_fmin_partial"/>
     <result property="fmax_partial" column="is_fmax_partial"/>
     
