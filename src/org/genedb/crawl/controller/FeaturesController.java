@@ -165,6 +165,12 @@ public class FeaturesController extends BaseQueryController {
 	}
 	
 	@ResourceDescription(value="Return feature cvterms")
+	@RequestMapping(method=RequestMethod.POST, value="/terms")
+	public Results termsPOST(Results results, @RequestParam(value="features") List<String> features, @RequestParam(value="cvs", required=false) List<String> cvs) {
+		return terms(results, features, cvs);
+	}
+	
+	@ResourceDescription(value="Return feature cvterms")
 	@RequestMapping(method=RequestMethod.GET, value="/terms")
 	public Results terms(Results results, @RequestParam(value="features") List<String> features, @RequestParam(value="cvs", required=false) List<String> cvs) {
 		results.features = featuresMapper.terms(features, cvs);

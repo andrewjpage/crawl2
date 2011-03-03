@@ -69,6 +69,18 @@ public class RegionsController extends BaseQueryController {
 		}
 	}
 	
+	@RequestMapping(method=RequestMethod.POST, value={"/locations", "/locations.*"})
+	@ResourceDescription("Returns features and their locations on a region of interest")
+	public ResultsRegions locationsPOST(
+			ResultsRegions results,
+			@RequestParam("region") String region, 
+			@RequestParam("start") int start, 
+			@RequestParam("end") int end, 
+			@RequestParam(value="exclude", required=false) @ResourceDescription("A list of features to exclude.") List<String> exclude
+			) throws CrawlException {
+		return locations(results, region, start, end, exclude);
+	}
+	
 	/**
 	 * The exclude parameter works in this form:
 	 * 	&exclude=repeat_region&exclude=gene
