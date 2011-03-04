@@ -1,5 +1,6 @@
 package org.genedb.crawl.controller;
 
+import java.beans.PropertyEditorSupport;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -20,6 +21,9 @@ import org.genedb.crawl.model.Service;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.gmod.cat.OrganismsMapper;
 import org.gmod.cat.TermsMapper;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +34,38 @@ public abstract class BaseQueryController {
 	
 	private Logger logger = Logger.getLogger(BaseQueryController.class);
 	
+	class ListSplittingPropertyEditor extends PropertyEditorSupport {
+		
+		@Override
+		public void setAsText(String text) {
+			logger.info("setAsText");
+			logger.info(text);
+			
+			List<String> list = Arrays.asList(text.split(","));
+			
+			this.setValue(list);
+			
+			logger.info("value??");
+			logger.info(this.getValue());
+		}
+		
+		
+		@Override
+		public String getAsText() {
+			
+			@SuppressWarnings("unchecked")
+			List<String> list = (List<String>) this.getValue();
+			String str = StringUtils.arrayToCommaDelimitedString(list.toArray());
+			logger.info(str);
+			return str;
+		}
+	}
+	
+	@InitBinder
+    public void initBinder(WebDataBinder binder) {
+		// we might be able to use this to split lists...
+		binder.registerCustomEditor(List.class, new ListSplittingPropertyEditor());
+	}
 	
 	private Map<String, String> relationshipTypes;
 	
