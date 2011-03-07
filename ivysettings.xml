@@ -20,6 +20,9 @@
                 <artifact pattern="http://repository.springsource.com/ivy/bundles/snapshot/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
             </url>
             -->
+            
+            <ibiblio name="sonata" root="http://oss.sonatype.org/content/repositories/releases/" m2compatible="true" /> 
+            
             <ibiblio name="java.net2" root="http://download.java.net/maven/2/" m2compatible="true"/>
             <ibiblio name="lab.public.rel" root="http://ulisse.pin.unifi.it:8080/archiva/repository/lab.public.rel" m2compatible="true"/>
             
@@ -33,9 +36,9 @@
             
             -->
             
-            <!-- -->
-            <ibiblio name="sonata" root="http://oss.sonatype.org/content/repositories/releases/" m2compatible="true" /> 
-            <ibiblio name="sonata" root="https://oss.sonatype.org/content/repositories/snapshots/" m2compatible="true" />
+            <!--<ibiblio name="sonata" root="https://oss.sonatype.org/content/repositories/snapshots/" m2compatible="true" /> -->
+            
+            
             
             
             <ibiblio name="public" m2compatible="true"/>
