@@ -6,40 +6,14 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.genedb.crawl.elasticsearch.json.JsonIzer;
 import org.genedb.crawl.model.XMLResponseWrapper;
 import org.springframework.web.servlet.View;
-
-
-
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.AnnotationIntrospector;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
-
 
 public class JacksonView extends BaseView implements View {
 	
 	private String contentType = "application/json";
-	
-	private ObjectMapper mapper;
-	
-	public JacksonView() {
-		super();
-		
-		mapper = new ObjectMapper();
-	    AnnotationIntrospector jaxbIntrospector = new JaxbAnnotationIntrospector();
-	    
-	    AnnotationIntrospector jacksonIntrospector = new JacksonAnnotationIntrospector();
-	    AnnotationIntrospector introspector = AnnotationIntrospector.pair(jaxbIntrospector, jacksonIntrospector);
-	    
-	    mapper.getDeserializationConfig().setAnnotationIntrospector(introspector);
-	    mapper.getSerializationConfig().setAnnotationIntrospector(introspector);
-	    mapper.getSerializationConfig().setSerializationInclusion(Inclusion.NON_DEFAULT);
-	    
-	}
+	protected JsonIzer jsonIzer = JsonIzer.getJsonIzer();
 	
 	@Override
 	public String getContentType() {
@@ -54,27 +28,18 @@ public class JacksonView extends BaseView implements View {
 		
 		XMLResponseWrapper wrapper = wrap(request.getServletPath(), map, request.getParameterMap());
 		
-		String callback = request.getParameter("callback");
-		
 		Writer writer = response.getWriter();
+		String callback = request.getParameter("callback");
 		
 		if (callback!=null) {
 			writer.append(callback + "( ");
 		}
 		
-		JsonFactory jFact = new JsonFactory();
-		
-		JsonGenerator jGen = jFact.createJsonGenerator(writer);
-		
-	    
-	    mapper.writeValue(jGen, wrapper);
-
+		jsonIzer.toJson(wrapper, writer);
 		
 		if (callback!=null) {
 			writer.append(" )");
 		}
-		
-		
 		
 	}
 	

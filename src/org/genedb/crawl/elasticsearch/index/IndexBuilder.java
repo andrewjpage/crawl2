@@ -19,6 +19,7 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.genedb.crawl.elasticsearch.Connection;
 import org.genedb.crawl.elasticsearch.LocalConnection;
 import org.genedb.crawl.elasticsearch.TransportConnection;
+import org.genedb.crawl.elasticsearch.json.JsonIzer;
 
 
 import org.kohsuke.args4j.Option;
@@ -33,7 +34,7 @@ public abstract class IndexBuilder {
 	
 	private Properties elasticSearchProperties;
 	
-	protected JsonIzer jsonIzer = new JsonIzer();
+	protected JsonIzer jsonIzer = JsonIzer.getJsonIzer();
 	protected Client client;
 	protected Connection connection;
 	

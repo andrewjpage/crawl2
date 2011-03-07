@@ -1,23 +1,22 @@
 package org.genedb.crawl.business;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Map.Entry;
+
 
 import net.sf.samtools.SAMFileReader;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.type.TypeReference;
+import org.genedb.crawl.elasticsearch.json.JsonIzer;
 import org.springframework.util.StringUtils;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class AlignmentStore {
 	
@@ -26,6 +25,8 @@ public class AlignmentStore {
 	int fileID = 0;
 	
 	List<Alignment> alignments = new ArrayList<Alignment>();
+	
+	private JsonIzer jsonIzer = JsonIzer.getJsonIzer();
 	
 	public SAMFileReader getReader(int fileID) {
 		if (fileID < alignments.size()) {
@@ -36,6 +37,24 @@ public class AlignmentStore {
 	
 	public List<Alignment> getAlignments() {
 		return alignments;
+	}
+	
+	
+	public void setAlignmentFiles(File alignmentFile) throws JsonParseException, JsonMappingException, IOException {
+		
+		logger.info(String.format("Alignment file : %s" , alignmentFile));
+		
+		if (alignmentFile == null) {
+			return;
+		}
+		
+		if (alignmentFile.isFile() == false) {
+			return;
+		}
+		
+		alignments = (List<Alignment>) jsonIzer.fromJson(alignmentFile,  new TypeReference<List<Alignment>>() {} );
+		generateMetaFields();
+		
 	}
 	
 	public void generateMetaFields() {
@@ -81,59 +100,7 @@ public class AlignmentStore {
 		}
 		
 	}
-	
-	public void setAlignmentFiles(File alignmentFile) throws FileNotFoundException {
-		
-		logger.info(alignmentFile);
-		
-		final JsonParser parser = new JsonParser();
 
-		final JsonElement jsonElement = parser.parse(new FileReader(alignmentFile));
-		
-		logger.info(jsonElement);
-		
-		JsonArray jAlignments = jsonElement.getAsJsonArray();
-		
-		
-		
-		for (JsonElement jAlignment : jAlignments) {
-			
-			if (jAlignment.isJsonObject()) {
-				
-				JsonObject jsonObject = jAlignment.getAsJsonObject();
-				
-				Alignment alignment = new Alignment();
-				alignment.fileID = fileID++;
-				alignments.add(alignment);
-				
-				for (final Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-					final String key = entry.getKey();
-					final JsonElement value = entry.getValue();
-					
-					if (key.equals("file")) {
-						alignment.file = new File(value.getAsString());
-					} else if (key.equals("organism")) {
-						alignment.organism = value.getAsString();
-					} else if (key.equals("chromosome")) {
-						
-						JsonArray jChromosomes = value.getAsJsonArray();
-						
-						if (jChromosomes.size() == 1) {
-							for (JsonElement jChromosome : jChromosomes ) {
-								alignment.chromosomes.add(jChromosome.getAsString());
-							}
-						}
-						
-					}
-
-				}
-			}
-			
-		}
-		
-		generateMetaFields();
-		
-	}
 	
 
 	

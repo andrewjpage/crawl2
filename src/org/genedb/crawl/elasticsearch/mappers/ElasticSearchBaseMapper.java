@@ -12,7 +12,7 @@ import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.genedb.crawl.elasticsearch.Connection;
-import org.genedb.crawl.elasticsearch.index.JsonIzer;
+import org.genedb.crawl.elasticsearch.json.JsonIzer;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ElasticSearchBaseMapper {
 	
 	private Logger logger = Logger.getLogger(ElasticSearchBaseMapper.class);
-	protected JsonIzer jsonIzer = new JsonIzer();
+	protected JsonIzer jsonIzer = JsonIzer.getJsonIzer();
 	
 	private static final Field[] featureFields = Feature.class.getDeclaredFields();
 	

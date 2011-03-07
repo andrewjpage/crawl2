@@ -1,7 +1,9 @@
-package org.genedb.crawl.elasticsearch.index;
+package org.genedb.crawl.elasticsearch.json;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
@@ -9,14 +11,25 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
+import org.codehaus.jackson.type.TypeReference;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 
 public class JsonIzer {
 	
 	private ObjectMapper mapper;
 	
-	public JsonIzer () {
+	private static JsonIzer inst;
+	
+	public static final JsonIzer getJsonIzer() {
+		if (inst == null) {
+			inst = new JsonIzer();
+		}
+		return inst;
+	}
+	
+	private JsonIzer () {
 		mapper = new ObjectMapper();
 	    AnnotationIntrospector jaxbIntrospector = new JaxbAnnotationIntrospector();
 	    
@@ -25,14 +38,21 @@ public class JsonIzer {
 	    
 	    mapper.getDeserializationConfig().setAnnotationIntrospector(introspector);
 	    mapper.getSerializationConfig().setAnnotationIntrospector(introspector);
+	    mapper.getSerializationConfig().setSerializationInclusion(Inclusion.NON_DEFAULT);
+	    
 	}
 	
-	public Object fromJson(String string, Class cls) throws JsonParseException, JsonMappingException, IOException {
-		
-		Object obj = mapper.readValue(string, cls);
+	public Object fromJson(String string, @SuppressWarnings("rawtypes") Class cls) throws JsonParseException, JsonMappingException, IOException {
+		@SuppressWarnings("unchecked")
+		Object obj =  mapper.readValue(string, cls);
 		return obj;
-		
 	}
+	
+	public Object fromJson(File file, @SuppressWarnings("rawtypes") TypeReference type) throws JsonParseException, JsonMappingException, IOException {
+		Object obj = mapper.readValue(file, type);
+		return obj;
+	}
+	
 	
 	public String toJson(Object object) throws IOException {
 		
@@ -44,7 +64,12 @@ public class JsonIzer {
 		
 		mapper.writeValue(jGen, object);
 		
-		
 		return writer.toString();
+	}
+	
+	public void toJson(Object object, Writer writer) throws IOException {
+		JsonFactory jFact = new JsonFactory();
+		JsonGenerator jGen = jFact.createJsonGenerator(writer);
+		mapper.writeValue(jGen, object);
 	}
 }

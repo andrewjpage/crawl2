@@ -30,7 +30,7 @@ import org.elasticsearch.search.SearchParseException;
 import org.genedb.crawl.CrawlErrorType;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.elasticsearch.Connection;
-import org.genedb.crawl.elasticsearch.index.JsonIzer;
+import org.genedb.crawl.elasticsearch.json.JsonIzer;
 import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.CrawlError;
 import org.genedb.crawl.model.Cvterm;
