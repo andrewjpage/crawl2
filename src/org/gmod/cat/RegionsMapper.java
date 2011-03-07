@@ -3,6 +3,7 @@ package org.gmod.cat;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
 
@@ -21,5 +22,5 @@ public interface RegionsMapper {
 			@Param("exclude") List<String> exclude);
 	
 	public String sequence(@Param("region") String region);
-	public List<String> inorganism(@Param("organismid") int organismid);
+	public List<Feature> inorganism(@Param("organismid") int organismid);
 }

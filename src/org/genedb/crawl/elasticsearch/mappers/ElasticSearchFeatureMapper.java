@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
-import org.genedb.crawl.model.ElasticSequence;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.FeatureProperty;
 import org.genedb.crawl.model.LocatedFeature;
@@ -40,23 +39,23 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 		return feature.coordinates;
 	}
 	
-	public void createOrUpdate(ElasticSequence sequence) {
-		
-		try {
-			String json = jsonIzer.toJson(sequence);
-			
-			logger.debug("Storing sequence: " + sequence.name);
-			
-			connection.getClient().prepareIndex("sequences", "Sequence", sequence.name)
-				.setSource(json)
-				.execute()
-				.actionGet();
-		
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
-	}
+//	public void createOrUpdate(ElasticSequence sequence) {
+//		
+//		try {
+//			String json = jsonIzer.toJson(sequence);
+//			
+//			logger.debug("Storing sequence: " + sequence.name);
+//			
+//			connection.getClient().prepareIndex("sequences", "Sequence", sequence.name)
+//				.setSource(json)
+//				.execute()
+//				.actionGet();
+//		
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+//		
+//	}
 	
 	public void createOrUpdate(Feature feature) {
 		
@@ -90,23 +89,22 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 			
 			logger.debug("Storing: " + feature.uniqueName);
 			
-			IndexRequestBuilder builder = connection.getClient().prepareIndex("features", "Feature", feature.uniqueName);
+			IndexRequestBuilder builder = connection.getClient().prepareIndex(index, type, feature.uniqueName);
 			String json = jsonIzer.toJson(feature);
 			
-			
-			
-			//logger.debug("Source:");
-			//logger.debug(json);
+//			
+//			logger.debug("Source:");
+//			logger.debug(json);
 			
 			builder.setSource(json);
 			
-			if (feature instanceof LocatedFeature) {
-				LocatedFeature lFeature = (LocatedFeature) feature;
-				if (lFeature.parent != null) {
-					logger.debug(String.format("Setting %s as parent of %s!", lFeature.parent, feature.uniqueName));
-					builder.setParent(lFeature.parent);
-				}
-			}
+//			if (feature instanceof LocatedFeature) {
+//				LocatedFeature lFeature = (LocatedFeature) feature;
+//				if (lFeature.parent != null) {
+//					logger.debug(String.format("Setting %s as parent of %s!", lFeature.parent, feature.uniqueName));
+//					builder.setParent(lFeature.parent);
+//				}
+//			}
 			
 			builder.execute().actionGet();
 			

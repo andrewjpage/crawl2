@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import net.sf.samtools.SAMRecord;
 
@@ -25,12 +26,14 @@ import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.elasticsearch.index.query.xcontent.XContentQueryBuilder;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchParseException;
 import org.genedb.crawl.CrawlErrorType;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.elasticsearch.Connection;
 import org.genedb.crawl.elasticsearch.index.JsonIzer;
 import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.CrawlError;
+import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
@@ -52,31 +55,169 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 	public List<HierarchyGeneFetchResult> getGeneForFeature(
 			List<String> features) {
 		
+		List<HierarchyGeneFetchResult> results = new ArrayList<HierarchyGeneFetchResult>();
 		
-		//XContentQueryBuilder getFeatureQuery = QueryBuilders.termQuery("uniqueName", feature);
+		String[] fields = new String[]{"uniqueName", "parent"};
 		
-		// TODO Auto-generated method stub
-		return null;
+		for (String uniqueName : features) {
+			HierarchyGeneFetchResult res = new HierarchyGeneFetchResult();
+			results.add(res);
+			logger.info(uniqueName);
+			try {
+				logger.info(getFromElastic(uniqueName, fields));
+				LocatedFeature f = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(uniqueName, fields), LocatedFeature.class);
+				res.f = f.uniqueName;
+				res.ftype = f.type.name;
+				logger.info("parent?");
+				logger.info(f.parent);
+				if (f.parent != null) {
+					LocatedFeature f2 = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(f.parent, fields), LocatedFeature.class);
+					res.f2 = f2.uniqueName;
+					res.ftype2 = f2.type.name;
+					
+					logger.info("parent2?");
+					logger.info(f2.parent);
+					
+					if (f2.parent != null) {
+						
+						LocatedFeature f3 = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(f2.parent, fields), LocatedFeature.class);
+						res.f3 = f3.uniqueName;
+						res.ftype3 = f3.type.name;
+						
+						logger.info(">>");
+						logger.info(f3.uniqueName);
+					}
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+			
+		}
+		
+		
+		return results;
 	}
 
 	@Override
 	public List<HierarchyRelation> getRelationshipsParents(String feature,
-			List<Integer> relationships) {
+			List<Cvterm> relationships) {
 		
-		//XContentQueryBuilder getFeatureQuery = QueryBuilders.termQuery("uniqueName", feature);
-		//XContentQueryBuilder builder = QueryBuilders.hasChildQuery(type, getFeatureQuery);
+		String[] fields = new String[]{"uniqueName", "parent", "type", "name"};
+		HierarchyRelation hr = new HierarchyRelation();
+		hr.feature = feature;
 		
-		connection.getClient().prepareSearch("features");
+		logger.info("Searching for parent of " + feature);
 		
+		List<String> relationshipNames = new ArrayList<String>();
+		for (Cvterm rel : relationships) {
+			relationshipNames.add(rel.name);
+		}
 		
-		return null;
+		relationshipNames.add("parent");
+		
+		try {
+			LocatedFeature f = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(feature, fields), LocatedFeature.class);
+			logger.info(f);
+			logger.info(f.parent);
+			logger.info(f.parentRelationshipType);
+			if (f.parent == null || f.parentRelationshipType == null) {
+				return null;
+			}
+			
+			if (! relationshipNames.contains(f.parentRelationshipType.toLowerCase())) {
+				return null;
+			}
+			
+			hr.uniqueName = f.parent;
+			hr.relationship_type = f.parentRelationshipType;
+			
+			LocatedFeature p = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(f.parent, fields), LocatedFeature.class);
+			logger.info(p);
+			hr.type = p.type.name;
+			hr.name = p.name;
+			hr.relationship = "parent";
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		List<HierarchyRelation> hrs = new ArrayList<HierarchyRelation>();
+		hrs.add(hr);
+		
+		return hrs;
 	}
 
+	private static final String LUCENE_ESCAPE_CHARS = "[\\\\+\\-\\!\\(\\)\\:\\^\\]\\{\\}\\~\\*\\?]";
+	private static final Pattern LUCENE_PATTERN = Pattern.compile(LUCENE_ESCAPE_CHARS);
+	private static final String REPLACEMENT_STRING = "\\\\$0";
+
+	
 	@Override
 	public List<HierarchyRelation> getRelationshipsChildren(String feature,
-			List<Integer> relationships) {
-		// TODO Auto-generated method stub
-		return null;
+			List<Cvterm> relationships) {
+		
+		logger.info("Searching for child of " + feature);
+		List<HierarchyRelation> hrs = new ArrayList<HierarchyRelation>();
+		
+		try {
+			
+			
+			String escaped = LUCENE_PATTERN.matcher(feature).replaceAll(REPLACEMENT_STRING);
+			
+			// Using a standard term query was retrieving matches that had the same prefix
+			// SearchRequestBuilder srb = connection.getClient().prepareSearch(index).setQuery (QueryBuilders.fieldQuery("parent", escaped));
+			
+			// this is the closest I think I can get to an exact match query...
+			// by encapsulating the query in quotes, and making sure the phrase slop is 0
+			
+			String queryString = String.format("parent:\"%s\"", escaped);
+			logger.debug(queryString);
+			
+			SearchResponse response = 
+				connection.getClient()			
+				.prepareSearch(index)
+				.setQuery (QueryBuilders.queryString(queryString).phraseSlop(0))
+				.execute()
+				.actionGet();
+			
+			
+			for (SearchHit hit : response.getHits()) {
+				
+				try {
+					LocatedFeature child = (LocatedFeature) jsonIzer.fromJson(hit.sourceAsString(), LocatedFeature.class);
+					
+					logger.info(" - " + child.uniqueName + " parent: " + child.parent);
+					
+					// make sure we only exact matches
+					if (! child.parent.equals(feature)) {
+						 logger.warn("       SKIPPING");
+						 continue;
+					}
+					
+					
+					HierarchyRelation hr = new HierarchyRelation();
+					hr.feature = feature;
+					
+					hr.uniqueName = child.uniqueName;
+					hr.name = child.name;
+					hr.type = child.type.name;
+					hr.relationship = "child";
+					hr.relationship_type = child.parentRelationshipType;
+					
+					hrs.add(hr);
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		
+		
+		return hrs;
 	}
 
 	@Override

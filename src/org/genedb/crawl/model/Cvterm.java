@@ -34,7 +34,10 @@ public class Cvterm {
 	
 	@XmlElement(name="pub")
 	@XmlElementWrapper(name="pubs", required=false)
-	public List<Pub> pubs; 
+	public List<Pub> pubs;
+
+	@XmlAttribute(required=false)
+	public Integer cvterm_id; 
 	
 	public void addPub(Pub pub) {
 		if (pubs == null) {

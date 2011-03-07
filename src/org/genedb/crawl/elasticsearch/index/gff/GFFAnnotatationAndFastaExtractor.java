@@ -7,42 +7,46 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
-import org.genedb.crawl.model.ElasticSequence;
+import org.genedb.crawl.model.Cvterm;
+import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.SequenceType;
 
 public class GFFAnnotatationAndFastaExtractor {
 	
 	private static Logger logger = Logger.getLogger(GFFAnnotatationAndFastaExtractor.class);
 	
-	class SequenceBuilder {
+	class RegionFeatureBuilder {
 		private StringBuilder buffer = new StringBuilder();
-		private ElasticSequence sequence = new ElasticSequence();
+		private Feature region = new Feature();
 		
-		public SequenceBuilder(String name, SequenceType sequenceType, int organism_id) {
-			sequence = new ElasticSequence(name, sequenceType, organism_id);
+		public RegionFeatureBuilder(String uniquename, int organism_id) {
+			region.uniqueName = uniquename;
+			region.organism_id = organism_id;
+			region.type = new Cvterm();
+			region.type.name = "region";
+			region.topLevel = true;
 		}
 		
 		public void addSequence(String line) {
 			buffer.append(line);
 		}
 		
-		public ElasticSequence getSequence() {
-			sequence.sequence = buffer.toString();
-			return sequence;
+		public Feature getRegion() {
+			region.residues = buffer.toString();
+			return region;
 		}
 	}
 	
 	public GFFAnnotatationAndFastaExtractor(BufferedReader buf, Organism organism, ElasticSearchFeatureMapper mapper) throws IOException {
 		
-		List<SequenceBuilder> sequences = new ArrayList<SequenceBuilder>();
+		List<RegionFeatureBuilder> sequences = new ArrayList<RegionFeatureBuilder>();
 		
 		try {
 			
 			String line = "";
 			boolean parsingAnnotations = true;
-			SequenceBuilder sequence = null;
+			RegionFeatureBuilder sequence = null;
 			
 			while ((line=buf.readLine())!=null) {
 				// logger.debug(line);
@@ -67,7 +71,7 @@ public class GFFAnnotatationAndFastaExtractor {
 					if (line.startsWith(">")) {
 						String sequenceName = line.substring(1);
 						
-						sequence = new SequenceBuilder(sequenceName, SequenceType.AMINO_ACID, organism.ID);
+						sequence = new RegionFeatureBuilder(sequenceName, organism.ID);
 						logger.debug("Parsing sequence : " + sequenceName);
 						sequences.add(sequence);
 						
@@ -79,8 +83,8 @@ public class GFFAnnotatationAndFastaExtractor {
 				
 			}
 			
-			for (SequenceBuilder seq : sequences) {
-				mapper.createOrUpdate(seq.getSequence());
+			for (RegionFeatureBuilder regionBuilder : sequences) {
+				mapper.createOrUpdate(regionBuilder.getRegion());
 			}
 			
 		} finally {

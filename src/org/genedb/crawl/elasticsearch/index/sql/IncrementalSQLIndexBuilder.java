@@ -2,12 +2,10 @@ package org.genedb.crawl.elasticsearch.index.sql;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -24,12 +22,9 @@ import org.genedb.crawl.elasticsearch.index.IndexBuilder;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchOrganismsMapper;
 import org.genedb.crawl.model.Coordinates;
-import org.genedb.crawl.model.ElasticSequence;
 import org.genedb.crawl.model.Feature;
-import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.OrganismProp;
-import org.genedb.crawl.model.SequenceType;
 import org.gmod.cat.FeatureMapper;
 import org.gmod.cat.FeaturesMapper;
 import org.gmod.cat.OrganismsMapper;
@@ -134,12 +129,8 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		for (String region : regions) {
 			Feature f = featureMapper.get(region, null, null);
 			if (f != null) {
-				ElasticSequence sequence = new ElasticSequence();
-				sequence.name = region;
-				sequence.organism_id = f.organism_id;
-				sequence.sequenceType = SequenceType.DNA;
-				sequence.sequence = regionsMapper.sequence(region);
-				esFeatureMapper.createOrUpdate(sequence);
+				f.residues = regionsMapper.sequence(region);
+				esFeatureMapper.createOrUpdate(f);
 			}
 		}
 	}

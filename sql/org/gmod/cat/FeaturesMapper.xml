@@ -50,13 +50,24 @@
 		FROM feature target
 		
 		JOIN feature_relationship fr ON fr.subject_id = target.feature_id and fr.type_id IN 
-		      <foreach item="item" index="index" collection="relationships" open="(" separator="," close=")">#{item}</foreach>
+		      <foreach item="cvterm" index="index" collection="relationships" open="(" separator="," close=")">#{cvterm.cvterm_id}</foreach>
 		JOIN feature parent ON fr.object_id = parent.feature_id
 		JOIN cvterm relationship_type ON fr.type_id = relationship_type.cvterm_id
 		JOIN cvterm type ON parent.type_id = type.cvterm_id
 		
 		WHERE target.uniquename = #{feature}  
+		
   </select>
+  
+  <sql id="getCvtermIDs">
+        SELECT cvterm_id from cvterm 
+            JOIN cv on cvterm.cv_id = cv.cv_id
+            where cvterm.name in 
+                <foreach item="item" index="index" collection="cvterms" open="(" separator="," close=")"> 
+                    #{item} 
+                </foreach> 
+            and cv.name = #{cv}
+  </sql>
   
   <select id="getRelationshipsChildren" resultType="org.genedb.crawl.model.HierarchyRelation" >
         SELECT
@@ -71,7 +82,7 @@
 		FROM feature target
 		
 		JOIN feature_relationship fr2 ON fr2.object_id = target.feature_id and fr2.type_id IN 
-             <foreach item="item" index="index" collection="relationships" open="(" separator="," close=")">#{item}</foreach>
+             <foreach item="cvterm" index="index" collection="relationships" open="(" separator="," close=")">#{cvterm.cvterm_id}</foreach>
 		JOIN feature child ON fr2.subject_id = child.feature_id
 		JOIN cvterm relationship_type ON fr2.type_id = relationship_type.cvterm_id
 		JOIN cvterm type ON child.type_id = type.cvterm_id
@@ -585,8 +596,12 @@
     </sql>
     
     
-    <select id="timelastmodified" resultType="org.genedb.crawl.model.Feature">
-        SELECT feature_id, organism_id, uniqueName, name FROM feature f
+    <select id="timelastmodified" resultMap="timelastmodified">
+        SELECT feature_id, organism_id, uniqueName, name, c.name as type 
+        
+        FROM feature f
+        
+        JOIN cvterm c on f.type_id = c.cvterm_id
         
         <include refid="featureLocRegion" />
          
@@ -596,10 +611,17 @@
           AND f.organism_id = #{organism_id}
         </if>
         
-        
-        
     </select>
     
+    <resultMap type="org.genedb.crawl.model.Feature" id="timelastmodified">
+        <result property="feature_id" column="feature_id" />
+        <result property="uniqueName" column="uniqueName" />
+        <result property="name" column="name" />
+        <result property="organism_id" column="organism_id" />
+        <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+            <result property="name" column="type" />
+        </association>
+    </resultMap>
     
     
     

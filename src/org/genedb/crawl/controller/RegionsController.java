@@ -2,6 +2,7 @@ package org.genedb.crawl.controller;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
+import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.ResultsRegions;
@@ -46,7 +48,7 @@ public class RegionsController extends BaseQueryController {
 	OrganismsMapper organismsMapper;
 	
 	private boolean cacheRegionsOnStartup = false;
-	private Map<String, List<String>> organismRegionMap = new HashMap<String, List<String>>();
+	private Map<String, List<Feature>> organismRegionMap = new HashMap<String, List<Feature>>();
 	
 	/**
 	 * Force the controller to cache all organism regions on startup.
@@ -62,8 +64,8 @@ public class RegionsController extends BaseQueryController {
 			return;
 		}
 		for (Organism o : organismsMapper.list()) {
-			List<String> r = regionsMapper.inorganism( o.ID );
-			Collections.sort(r);
+			List<Feature> r = regionsMapper.inorganism( o.ID );
+			Collections.sort(r, new FeatureUniqueNameSorter());
 			organismRegionMap.put(String.valueOf(o.ID), r);
 			logger.info(String.format("Cached %s.", o.common_name));
 		}
@@ -202,12 +204,12 @@ public class RegionsController extends BaseQueryController {
 		
 		Organism o = getOrganism(organismsMapper, organism);
 		
-		List<String> r = null;
+		List<Feature> r = null;
 		if (organismRegionMap.containsKey(o.ID)) {
 			r = organismRegionMap.get(o.ID);
 		} else {
 			r = regionsMapper.inorganism( o.ID);
-			Collections.sort(r);
+			Collections.sort(r, new FeatureUniqueNameSorter());
 			organismRegionMap.put(String.valueOf(o.ID), r);
 		}
 		
@@ -216,5 +218,11 @@ public class RegionsController extends BaseQueryController {
 		return results;
 	}
 	
+	class FeatureUniqueNameSorter implements Comparator<Feature> {
+		@Override
+		public int compare(Feature f1, Feature f2) {
+			return f1.uniqueName.compareTo(f2.uniqueName);
+		}
+	}
 	
 }

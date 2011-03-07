@@ -8,10 +8,18 @@ import java.io.IOException;
 import java.util.Properties;
 
 
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.Requests;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import static org.elasticsearch.common.xcontent.XContentFactory.*;
+import static org.elasticsearch.node.NodeBuilder.*;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+
 import org.genedb.crawl.elasticsearch.Connection;
 import org.genedb.crawl.elasticsearch.LocalConnection;
 import org.genedb.crawl.elasticsearch.TransportConnection;
+
 
 import org.kohsuke.args4j.Option;
 
@@ -63,6 +71,7 @@ public abstract class IndexBuilder {
 		}
 		
 		client = connection.getClient();
+		
 	}
 	
 	protected void closeIndex() {
@@ -71,5 +80,5 @@ public abstract class IndexBuilder {
 		}
 	}
 	
-
+	
 }

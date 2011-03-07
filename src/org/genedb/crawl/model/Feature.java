@@ -18,6 +18,12 @@ public class Feature {
 	@XmlAttribute(required=false)
 	public String name;
 	
+	@XmlAttribute(required=false)
+	public String residues;
+	
+	@XmlAttribute(required=false)
+	public Boolean topLevel;
+	
 	@XmlElement(required=false)
 	public List<String> genes;
 	

@@ -67,7 +67,7 @@ public class FeaturesController extends BaseQueryController {
 			relationships = defaultRelationshipTypes;
 		}
 		
-		List<Integer> relationshipTypeIDs = getRelationshipTypeIDs(terms, Arrays.asList(relationships));
+		List<Cvterm> relationshipTypes = getRelationshipTypes(Arrays.asList(relationships), terms);
 		List<String> featuresToRecurse = features;
 		List<HierarchicalFeature> hfs = new ArrayList<HierarchicalFeature>();
 		
@@ -87,8 +87,8 @@ public class FeaturesController extends BaseQueryController {
 			HierarchicalFeature hf = new HierarchicalFeature();
 			hf.uniqueName = feature;
 			
-			this.searchForRelations(hf, relationshipTypeIDs, HierarchicalSearchType.CHILDREN);
-			this.searchForRelations(hf, relationshipTypeIDs, HierarchicalSearchType.PARENTS);
+			this.searchForRelations(hf, relationshipTypes, HierarchicalSearchType.CHILDREN);
+			this.searchForRelations(hf, relationshipTypes, HierarchicalSearchType.PARENTS);
 			
 			hfs.add(hf);
 			
@@ -305,14 +305,14 @@ public class FeaturesController extends BaseQueryController {
 	 * @param relationshipTypeIDs
 	 * @param searchType
 	 */
-	private void searchForRelations(HierarchicalFeature feature, List<Integer> relationshipTypeIDs, HierarchicalSearchType searchType) {
+	private void searchForRelations(HierarchicalFeature feature, List<Cvterm> relationshipTypes, HierarchicalSearchType searchType) {
 		
 		List<HierarchyRelation> relations = null;
 		
 		if (searchType == HierarchicalSearchType.CHILDREN) {
-			relations = featuresMapper.getRelationshipsChildren(feature.uniqueName, relationshipTypeIDs);
+			relations = featuresMapper.getRelationshipsChildren(feature.uniqueName, relationshipTypes);
 		} else {
-			relations = featuresMapper.getRelationshipsParents(feature.uniqueName, relationshipTypeIDs);
+			relations = featuresMapper.getRelationshipsParents(feature.uniqueName, relationshipTypes);
 		}
 		
 		if (relations == null) {
@@ -334,7 +334,7 @@ public class FeaturesController extends BaseQueryController {
 				feature.parents.add(hf);
 			}
 			
-			searchForRelations(hf, relationshipTypeIDs, searchType);
+			searchForRelations(hf, relationshipTypes, searchType);
 			
 		}
 		

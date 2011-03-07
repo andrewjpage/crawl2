@@ -15,6 +15,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.model.Argument;
+import org.genedb.crawl.model.Cv;
+import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Resource;
 import org.genedb.crawl.model.Service;
@@ -74,16 +76,22 @@ public abstract class BaseQueryController {
 		this.relationshipTypes = relationshipTypes;
 	}
 	
-	protected List<Integer> getRelationshipTypeIDs(TermsMapper terms, List<String> types) {
-		List<Integer> type_ids = new ArrayList<Integer>();
+	protected List<Cvterm> getRelationshipTypes(List<String> types, TermsMapper termsMapper) {
+		List<Cvterm> terms = new ArrayList<Cvterm>();
 		for (String type : types) {
 			if (relationshipTypes.containsKey(type)) {
-				String cv = relationshipTypes.get(type);
-				int cvTermID = terms.getCvtermID(cv, type);
-				type_ids.add(cvTermID);
+				
+				Cvterm cvterm = new Cvterm();
+				cvterm.name = type;
+				cvterm.cv = new Cv();
+				cvterm.cv.name = relationshipTypes.get(type);
+				
+				cvterm.cvterm_id = termsMapper.getCvtermID(cvterm.cv.name, cvterm.name);
+				
+				terms.add(cvterm);
 			}
 		}
-		return type_ids;
+		return terms;
 	}
 	
 	

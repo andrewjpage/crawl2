@@ -23,7 +23,7 @@ public class ResultsRegions extends Results {
 	
 	@XmlElementWrapper(name="regions")
 	@XmlElement(name="region", type=String.class)
-	public List<String> regions;
+	public List<Feature> regions;
 	
 	
 }

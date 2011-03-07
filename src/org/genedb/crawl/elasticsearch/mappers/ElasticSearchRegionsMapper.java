@@ -1,19 +1,15 @@
 package org.genedb.crawl.elasticsearch.mappers;
 
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.SortOrder;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.xcontent.ToXContent;
-import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
 import org.elasticsearch.index.query.xcontent.BoolQueryBuilder;
 import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
@@ -22,11 +18,9 @@ import org.elasticsearch.index.query.xcontent.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.genedb.crawl.model.Coordinates;
-import org.genedb.crawl.model.ElasticSequence;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
-import org.genedb.crawl.model.Organism;
 import org.gmod.cat.RegionsMapper;
 import org.springframework.stereotype.Component;
 
@@ -67,7 +61,6 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			QueryBuilders.boolQuery()
 				.must(startLowerThanRequested)
 				.must(endHigherThanRequested);
-		
 		
 		RangeQueryBuilder startInRange = 
 			QueryBuilders.rangeQuery("fmin")
@@ -233,12 +226,12 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	@Override
 	public String sequence(String region) {
 		
-		String json = connection.getClient().prepareGet("sequences", "Sequence", region).execute().actionGet().sourceAsString();
+		String json = connection.getClient().prepareGet().setIndex(index).setId(region).execute().actionGet().sourceAsString();
 		
 		try {
-			ElasticSequence sequence = (ElasticSequence) jsonIzer.fromJson(json, ElasticSequence.class);
+			Feature regionFeature = (Feature) jsonIzer.fromJson(json, Feature.class);
 			
-			return sequence.sequence;
+			return regionFeature.residues;
 			
 		} catch (Exception e) {
 			logger.error("Could not find a sequence for " + region);
@@ -249,18 +242,33 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	}
 
 	@Override
-	public List<String> inorganism(int organismid) {
+	public List<Feature> inorganism(int organismid) {
 		
 		logger.debug(String.format("%s %s %s", "sequences", "organism_id", String.valueOf(organismid)));
 		
-		List<String> regions = new ArrayList<String>();
+		FieldQueryBuilder organismQuery = 
+			QueryBuilders.fieldQuery("organism_id", organismid);
 		
-		List<ElasticSequence> sequences = getAllMatches("sequences", "organism_id", String.valueOf(organismid), ElasticSequence.class);
+		FieldQueryBuilder regionQuery =
+			QueryBuilders.fieldQuery("topLevel", true);
 		
-		logger.debug(sequences);
+		BoolQueryBuilder regionInOrganismQuery = 
+			QueryBuilders.boolQuery()
+				.must(organismQuery)
+				.must(regionQuery);
+			
+		SearchResponse response = connection.getClient()
+			.prepareSearch()
+			.setQuery(regionInOrganismQuery)
+			.execute()
+			.actionGet();
 		
-		for (ElasticSequence sequence : sequences) {
-			regions.add(sequence.name);
+		logger.info(response);
+		
+		List<Feature> regions = this.getAllMatches(response, Feature.class);
+		
+		for (Feature region : regions) {
+			region.residues = null;
 		}
 		
 		return regions;
