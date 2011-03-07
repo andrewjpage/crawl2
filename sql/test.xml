@@ -16,7 +16,7 @@
         </environment>
     </environments>
   <mappers>
-    <mapper resource="sql/org/gmod/cat/FeatureCvTermMapper.xml"/>
+    <mapper resource="sql/org/gmod/cat/FeatureCvtermMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/OrganismsMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/FeaturesMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/FeatureMapper.xml"/>

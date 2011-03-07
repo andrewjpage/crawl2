@@ -7,7 +7,7 @@
 
   <mappers>
   
-    <mapper resource="sql/org/gmod/cat/FeatureCvTermMapper.xml"/>
+    <mapper resource="sql/org/gmod/cat/FeatureCvtermMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/OrganismsMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/RegionsMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/TermsMapper.xml"/>
