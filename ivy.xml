@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="org.genedb" module="ng" />
+    <info organisation="org.genedb" module="crawl" />
         <configurations>
             <conf name="war" />
             <conf name="jar"  />

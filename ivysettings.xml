@@ -1,4 +1,5 @@
 <ivysettings>
+    <property name="ivy.checksums" value=""/>
     <settings defaultResolver="chain"/>
     <resolvers>
         <chain name="chain">
