@@ -13,12 +13,16 @@
         <dependency org="org.mybatis" name="mybatis" rev="3.0.4"/>
         
         <dependency org="log4j" name="log4j" rev="1.2.16"/>
+        
+        <dependency org="org.slf4j" name="com.springsource.slf4j.api" rev="1.5.8" />
+        <dependency org="javax.mail" name="com.springsource.javax.mail" rev="1.4.1" />
+        
         <dependency org="org.codehaus.jackson" name="jackson-xc" rev="1.6.2"/>
         <dependency org="commons-lang" name="commons-lang" rev="2.5"  />
         <dependency org="org.elasticsearch" name="elasticsearch" rev="0.15.0" />
         
         <!-- only needed at compile time -->
-        <dependency org="javax.servlet" name="servlet-api" rev="2.5" conf="compile->default" />
+        <dependency org="javax.servlet" name="com.springsource.javax.servlet" rev="2.5.0" conf="compile->compile"/>
         <dependency org="junit" name="junit" rev="4.8.2" conf="compile->default" />
         
         <!--  only ever needed to run jetty -->
