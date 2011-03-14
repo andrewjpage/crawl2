@@ -12,7 +12,7 @@
         <dependency org="org.postgresql" name="com.springsource.org.postgresql.jdbc4" rev="8.3.604" conf="*->compile" />
         <dependency org="org.mybatis" name="mybatis" rev="3.0.4"/>
         
-        <dependency org="org.apache.log4j" name="com.springsource.org.apache.log4j" rev="1.2.16"  conf="*->compile" />
+        <dependency org="log4j" name="log4j" rev="1.2.16"/>
         <dependency org="org.codehaus.jackson" name="jackson-xc" rev="1.6.2"/>
         <dependency org="commons-lang" name="commons-lang" rev="2.5"  />
         <dependency org="org.elasticsearch" name="elasticsearch" rev="0.15.0" />
