@@ -3,6 +3,7 @@
     <settings defaultResolver="chain"/>
     <resolvers>
         <chain name="chain">
+            
             <url name="com.springsource.repository.bundles.release">
                 <ivy pattern="http://repository.springsource.com/ivy/bundles/release/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
                 <artifact pattern="http://repository.springsource.com/ivy/bundles/release/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
@@ -11,38 +12,10 @@
                 <ivy pattern="http://repository.springsource.com/ivy/bundles/external/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
                 <artifact pattern="http://repository.springsource.com/ivy/bundles/external/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
             </url>
-            <url name="com.springsource.repository.bundles.milestone">
-                <ivy pattern="http://repository.springsource.com/ivy/bundles/milestone/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-                <artifact pattern="http://repository.springsource.com/ivy/bundles/milestone/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-            </url>
-            <!--
-            <url name="com.springsource.repository.bundles.snapshot">
-                <ivy pattern="http://repository.springsource.com/ivy/bundles/snapshot/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-                <artifact pattern="http://repository.springsource.com/ivy/bundles/snapshot/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-            </url>
-            -->
             
             <ibiblio name="sonata" root="http://oss.sonatype.org/content/repositories/releases/" m2compatible="true" /> 
-            
-            <ibiblio name="java.net2" root="http://download.java.net/maven/2/" m2compatible="true"/>
-            <ibiblio name="lab.public.rel" root="http://ulisse.pin.unifi.it:8080/archiva/repository/lab.public.rel" m2compatible="true"/>
-            
-            
-            <!--<ibiblio name="terrastore-repo" root="http://m2.terrastore.googlecode.com/hg/repo" m2compatible="true"/>
-            
-            --><!--<ibiblio name="jboss" root="http://repository.jboss.org/maven2" m2compatible="true" />
-            
-            --><!-- required to fetch resteasy 2.0.0.GA.jar -->
-            <!--<ibiblio name="jboss-releases" root="https://maven.atlassian.com/content/repositories/jboss-releases" m2compatible="true" />
-            
-            -->
-            
-            <!--<ibiblio name="sonata" root="https://oss.sonatype.org/content/repositories/snapshots/" m2compatible="true" /> -->
-            
-            
-            
-            
             <ibiblio name="public" m2compatible="true"/>
+            <ibiblio name="ibiblio" m2compatible="true"/>
             
         </chain>
     </resolvers>

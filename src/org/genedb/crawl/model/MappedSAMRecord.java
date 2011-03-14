@@ -5,9 +5,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
-
 import net.sf.samtools.AlignmentBlock;
 import net.sf.samtools.CigarElement;
 import net.sf.samtools.SAMRecord;
@@ -20,11 +17,11 @@ import net.sf.samtools.SAMRecord;
  * @author gv1
  *
  */
-@XStreamAlias("record")
+
 @Deprecated
 public class MappedSAMRecord {
 	
-	@XStreamOmitField
+	
 	private Logger logger = Logger.getLogger(MappedSAMRecord.class);
 	
 	public int alignmentStart;
@@ -83,7 +80,6 @@ public class MappedSAMRecord {
 	
 }
 
-@XStreamAlias("flags")
 class MappedFlags {
 	
 	public boolean readPairedFlag;
@@ -124,13 +120,13 @@ class MappedFlags {
 }
 
 
-@XStreamAlias("cigar")
+
 class MappedCigarElement {
 	public int length;
 	public String operator;
 }
 
-@XStreamAlias("alignmentBlock")
+
 class MappedAlignmentBlock {
 	public int readStart;
 	public int referenceStart;
