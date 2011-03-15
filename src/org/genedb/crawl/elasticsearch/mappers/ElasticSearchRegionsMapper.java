@@ -168,7 +168,41 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		return lb;
 		
 	}
-
+	
+	
+	@Override
+	public List<LocatedFeature> locationsPaged(String region, int limit,
+			int offset, List<String> exclude) {
+		
+		SearchRequestBuilder builder = connection.getClient()
+			.prepareSearch(index)
+			.addSort(SortBuilders.fieldSort("fmin"))
+			.addSort(SortBuilders.fieldSort("fmax"));
+		
+		FieldQueryBuilder regionQuery = 
+			QueryBuilders.fieldQuery("region", region);
+		
+		RangeQueryBuilder rangeQuery = 
+			QueryBuilders.rangeQuery("fmin").from(0);
+		
+		BoolQueryBuilder locations =
+			QueryBuilders.boolQuery()
+				.must(rangeQuery)
+				.must(regionQuery);
+		
+		SearchResponse response = builder
+			.setQuery(locations)
+			.setExplain(true)
+			.setSize(limit)
+			.setFrom(offset)
+			.execute()
+			.actionGet();
+		
+		return parseLocations(region, response);
+	}
+	
+	
+	
 	@Override
 	public List<LocatedFeature> locations(String region, int start, int end,
 			List<String> exclude) {
@@ -190,6 +224,11 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		logger.info(toString(builder.internalBuilder()));
 		
 		
+		return parseLocations(region, response);
+		
+	}
+	
+	private List<LocatedFeature> parseLocations(String region, SearchResponse response) {
 		List<LocatedFeature> features = new ArrayList<LocatedFeature>();
 		
 		String[] fieldNames = new String[] {"uniqueName", "fmin", "fmax", "isObsolete", "parent", "phase", "type", "strand"};
@@ -220,7 +259,6 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		}
 		
 		return features;
-		
 	}
 
 	@Override
@@ -274,5 +312,8 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		return regions;
 
 	}
+
+
+	
 
 }

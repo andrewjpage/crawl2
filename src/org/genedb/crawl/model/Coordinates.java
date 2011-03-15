@@ -1,8 +1,10 @@
 package org.genedb.crawl.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class Coordinates {
+public class Coordinates implements Serializable {
 	
 	@XmlAttribute(required=true)
 	public String region;

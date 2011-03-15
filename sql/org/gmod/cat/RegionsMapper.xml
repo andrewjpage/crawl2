@@ -4,6 +4,8 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="org.gmod.cat.RegionsMapper">  
 
+  <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/>
+    
   
   <select id="locationsMinAndMaxBoundaries" resultType="org.genedb.crawl.model.LocationBoundaries">
     SELECT 
@@ -30,8 +32,8 @@
     ]]>
   </select>
   
-  <select id="locations" resultMap="locations" >
-    
+  
+  <sql id="locations">
     SELECT
     f.uniqueName as uniqueName, 
     type.name as type, 
@@ -44,17 +46,41 @@
     frt.name as parent_relationship_type,
     fl.is_fmin_partial,
     fl.is_fmax_partial
-
-	FROM feature f
-	
-	JOIN cvterm type ON f.type_id = type.cvterm_id 
-	JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = 
+    
+        FROM feature f
+    
+    JOIN cvterm type ON f.type_id = type.cvterm_id 
+    JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = 
         (select feature_id from feature where uniqueName = #{region} ) )
-	
-	LEFT OUTER JOIN feature_relationship fr ON f.feature_id = fr.subject_id
-	LEFT JOIN feature f2 ON fr.object_id = f2.feature_id 
-	LEFT JOIN cvterm frt ON fr.type_id = frt.cvterm_id AND frt.cvterm_id in 
-	                           (select cvterm_id from cvterm where name in ('part_of', 'derives_from'))  
+    
+    LEFT OUTER JOIN feature_relationship fr ON f.feature_id = fr.subject_id
+    LEFT JOIN feature f2 ON fr.object_id = f2.feature_id 
+    LEFT JOIN cvterm frt ON fr.type_id = frt.cvterm_id AND frt.cvterm_id in 
+                               (select cvterm_id from cvterm where name in ('part_of', 'derives_from'))  
+                               
+  </sql>
+  
+  
+  <select id="locationsPaged" resultMap="locations" >
+    
+    <include refid="locations" />
+    
+    <if test="exclude != null"> 
+        WHERE type.name NOT IN 
+        <foreach item="item" index="index" collection="exclude" open="(" separator="," close=")"> 
+            #{item} 
+        </foreach> 
+    </if> 
+    
+    ORDER BY fl.fmin, fl.fmax
+    
+    LIMIT #{limit} OFFSET #{offset}
+    
+  </select>
+  
+  <select id="locations" resultMap="locations" >
+    
+    <include refid="locations" />
 	
 	
 	WHERE 

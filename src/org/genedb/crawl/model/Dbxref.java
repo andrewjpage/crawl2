@@ -1,8 +1,10 @@
 package org.genedb.crawl.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class Dbxref {
+public class Dbxref implements Serializable {
 	
 	@XmlAttribute
 	public String database;

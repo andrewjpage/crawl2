@@ -1,8 +1,10 @@
 package org.genedb.crawl.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class Synonym {
+public class Synonym implements Serializable {
 	
 	@XmlAttribute
 	public String synonym;

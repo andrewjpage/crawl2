@@ -1,8 +1,10 @@
 package org.genedb.crawl.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class Pub {
+public class Pub implements Serializable {
 	
 	@XmlAttribute
 	public String uniqueName;

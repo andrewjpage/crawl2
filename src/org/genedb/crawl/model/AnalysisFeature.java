@@ -1,9 +1,11 @@
 package org.genedb.crawl.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-public class AnalysisFeature {
+public class AnalysisFeature implements Serializable {
 	
 	@XmlElement
 	public Analysis analysis;

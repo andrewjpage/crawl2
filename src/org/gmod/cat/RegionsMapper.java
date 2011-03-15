@@ -21,6 +21,12 @@ public interface RegionsMapper {
 			@Param("end") int end,
 			@Param("exclude") List<String> exclude);
 	
+	public List<LocatedFeature> locationsPaged(
+			@Param("region") String region, 
+			@Param("limit") int limit, 
+			@Param("offset") int offset,
+			@Param("exclude") List<String> exclude);
+	
 	public String sequence(@Param("region") String region);
 	public List<Feature> inorganism(@Param("organismid") int organismid);
 }
