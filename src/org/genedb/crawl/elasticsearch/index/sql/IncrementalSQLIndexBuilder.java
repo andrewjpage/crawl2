@@ -33,6 +33,8 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import com.hazelcast.core.Hazelcast;
+
 
 
 public class IncrementalSQLIndexBuilder extends IndexBuilder {
@@ -107,11 +109,13 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		reader = Resources.getResourceAsReader(resource);
 		sqlMapper = new SqlSessionFactoryBuilder().build(reader, chadoProperties);
 		session = sqlMapper.openSession();
+		session.clearCache();
 	}
 	
 	protected void closeSession() {
 		if (session != null) {
 			session.close();
+			Hazelcast.shutdownAll();
 		}
 	}
 	

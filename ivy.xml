@@ -11,6 +11,7 @@
         <!-- shared by all -->
         <dependency org="org.postgresql" name="com.springsource.org.postgresql.jdbc4" rev="8.3.604" conf="*->compile" />
         <dependency org="org.mybatis" name="mybatis" rev="3.0.4"/>
+        <dependency org="org.mybatis" name="mybatis-hazelcast" rev="1.0.0" conf="*->*"/>
         
         <dependency org="org.codehaus.jackson" name="jackson-xc" rev="1.7.4"/>
         
@@ -34,7 +35,7 @@
         <dependency org="org.springframework" name="org.springframework.transaction" rev="3.0.5.RELEASE"  conf="war,compile->compile" />
         <dependency org="org.springframework" name="org.springframework.jdbc" rev="3.0.5.RELEASE" conf="war,compile->compile" />
         <dependency org="org.mybatis" name="mybatis-spring" rev="1.0.0" conf="war,compile->*"/>
-        <dependency org="org.mybatis" name="mybatis-hazelcast" rev="1.0.0" conf="war,compile->*"/>
+        
         
     </dependencies>
 </ivy-module>

@@ -603,7 +603,7 @@
     
     
     <select id="timelastmodified" resultMap="timelastmodified">
-        SELECT feature_id, organism_id, uniqueName, name, c.name as type 
+        SELECT feature_id, organism_id, uniqueName, f.name, c.name as type 
         
         FROM feature f
         

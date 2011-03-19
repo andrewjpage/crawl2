@@ -4,6 +4,11 @@
     "http://www.mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <!--  note here the www has been removed from the PUBLIC uri in doctype at the top, this is to prevent mybatis scanning the internets. -->
+    
+    <settings>
+        <setting name="cacheEnabled" value="false"/>
+    </settings>
+    
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC" />
@@ -22,5 +27,6 @@
     <mapper resource="sql/org/gmod/cat/FeatureMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/RegionsMapper.xml"/>
   </mappers>
+   
   
 </configuration>
