@@ -35,6 +35,7 @@ import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.CrawlError;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.FeatureProperty;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.LocatedFeature;
@@ -232,9 +233,12 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 	}
 	
 	
-
+	/*
+	 * TODO this method does not filter on type!
+	 * @see org.gmod.cat.FeaturesMapper#properties(java.util.List, java.util.List)
+	 */
 	@Override
-	public List<Feature> properties(List<String> features) {
+	public List<Feature> properties(List<String> features, List<String> types) {
 		return fetchAndCopy(features,  new String[]{"uniqueName", "properties"});
 	}
 

@@ -134,8 +134,8 @@ public class FeaturesController extends BaseQueryController {
 	
 	@ResourceDescription("Return feature properties")
 	@RequestMapping(method=RequestMethod.GET, value="/properties")
-	public Results properties(Results results, @RequestParam(value="features") List<String> features) {
-		results.features = featuresMapper.properties(features);
+	public Results properties(Results results, @RequestParam(value="features") List<String> features, @RequestParam(value="types", required=false) List<String> types) {
+		results.features = featuresMapper.properties(features,types);
 		return results;
 	}
 	

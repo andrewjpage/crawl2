@@ -208,6 +208,12 @@
        LEFT JOIN cvterm on cvterm.cvterm_id = featureprop.type_id 
        LEFT JOIN feature on featureprop.feature_id = feature.feature_id
        WHERE uniquename in <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach>
+       
+       <if test="types != null">
+            AND cvterm.name IN <foreach item="item" index="index" collection="types" open="(" separator="," close=")">#{item}</foreach> 
+       </if>
+       
+       
     </select>
     
     <resultMap id="propertiesList" type="org.genedb.crawl.model.Feature">

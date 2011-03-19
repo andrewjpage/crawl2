@@ -31,7 +31,7 @@ public class Results {
 	@XmlElement(name="feature", type=HierarchicalFeature.class)
 	public List<HierarchicalFeature> hierarchy;
 	
-	public Service service;
+	//public Service service;
 	
 	public void addOrganism(Organism organism) {
 		if (organisms == null) {

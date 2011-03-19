@@ -114,12 +114,19 @@ public class RegionsController extends BaseQueryController {
 	public ResultsRegions locations(
 			ResultsRegions results,
 			@RequestParam("region") String region, 
-			@RequestParam("start") int start, 
-			@RequestParam("end") int end, 
+			@RequestParam(value="start",required=false) Integer start, 
+			@RequestParam(value="end", required=false) Integer end, 
 			@RequestParam(value="exclude", required=false) @ResourceDescription("A list of features to exclude.") List<String> exclude
 			) throws CrawlException {
 		
-		//int regionID = featuresMapper.getFeatureID(region);
+		
+		if (start == null) {
+			start = 0;
+		}
+		
+		if (end == null) {
+			end = regionsMapper.sequence(region).length();
+		}
 		
 		logger.info(String.format("Getting locations for %s.", region));
 				
@@ -183,18 +190,42 @@ public class RegionsController extends BaseQueryController {
 	public ResultsRegions sequence(
 			ResultsRegions results,
 			@RequestParam("region") String region, 
-			@RequestParam("start") int start, 
-			@RequestParam("end") int end) {
+			@RequestParam(value="start", required=false) Integer start, 
+			@RequestParam(value="end", required=false) Integer end,
+			@RequestParam(value="metadata_only", required=false, defaultValue="false") boolean metadataOnly) {
 		
 		List<Sequence> sequences = new ArrayList<Sequence>();
 		results.sequences = sequences;
 		
 		//int regionID = featuresMapper.getFeatureID(region);
 		String sequenceResidues = regionsMapper.sequence(region);
-		int length = sequenceResidues.length();
 		
+		int length = sequenceResidues.length();
 		if (length == 0) {
 			return results;
+		}
+		
+		if (start == null && end == null) {
+			Sequence sequence = new Sequence();
+			if (! metadataOnly) {
+				sequence.dna = sequenceResidues;
+			}
+			sequence.start = 0;
+			sequence.end = length -1;
+			sequence.length = length;
+			sequence.region = region;
+			
+			sequences.add(sequence);
+			
+			return results;
+		}
+		
+		if (start == null) {
+			start = 0;
+		}
+		
+		if (end == null) {
+			end = length;
 		}
 		
 		int lastResiduePosition = length -1;
@@ -213,7 +244,9 @@ public class RegionsController extends BaseQueryController {
 		String dna = sequenceResidues.substring(actualStart, actualEnd);
 		
 		Sequence sequence = new Sequence();
-		sequence.dna = dna;
+		if (! metadataOnly) {
+			sequence.dna = dna;
+		}
 		sequence.start = start;
 		sequence.end = end;
 		sequence.length = length;

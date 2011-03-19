@@ -22,7 +22,7 @@ public interface FeaturesMapper {
 	List<Feature> coordinates(@Param("features") List<String> features, @Param("region") String region );
 	List<Feature> synonyms(@Param("features") List<String> features, @Param("types") List<String> types );
 	
-	List<Feature> properties(@Param("features") List<String> features);
+	List<Feature> properties(@Param("features") List<String> features, @Param("types") List<String> types );
 	
 	
 	

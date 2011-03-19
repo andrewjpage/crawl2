@@ -1,6 +1,8 @@
 package org.genedb.crawl.model;
 
-public class LocationBoundaries {
+import java.io.Serializable;
+
+public class LocationBoundaries implements Serializable {
 	public Integer start;
 	public Integer end;
 }
