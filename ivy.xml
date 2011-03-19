@@ -15,7 +15,7 @@
         <dependency org="org.codehaus.jackson" name="jackson-xc" rev="1.7.4"/>
         
         <dependency org="commons-lang" name="commons-lang" rev="2.5"  />
-        <dependency org="org.elasticsearch" name="elasticsearch" rev="0.15.0" />
+        <dependency org="org.elasticsearch" name="elasticsearch" rev="0.15.2" />
         
         <!-- only needed at compile time -->
         <dependency org="javax.servlet" name="com.springsource.javax.servlet" rev="2.5.0" conf="compile->compile"/>
