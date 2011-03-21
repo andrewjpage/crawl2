@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
+import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.Organism;
@@ -64,7 +65,7 @@ public class RegionsController extends BaseQueryController {
 			return;
 		}
 		for (Organism o : organismsMapper.list()) {
-			List<Feature> r = regionsMapper.inorganism( o.ID );
+			List<Feature> r = regionsMapper.inorganism( o.ID, null, null, null );
 			Collections.sort(r, new FeatureUniqueNameSorter());
 			organismRegionMap.put(String.valueOf(o.ID), r);
 			logger.info(String.format("Cached %s.", o.common_name));
@@ -258,8 +259,12 @@ public class RegionsController extends BaseQueryController {
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="inorganism")
-	@ResourceDescription("Returns the sequence on a region.")
-	public ResultsRegions inorganism(ResultsRegions results, @RequestParam("organism") String organism) throws CrawlException {
+	@ResourceDescription("Returns the regions in an organism.")
+	public ResultsRegions inorganism(ResultsRegions results, 
+			@RequestParam("organism") String organism,
+			@RequestParam(value="limit", required=false) Integer limit, 
+			@RequestParam(value="offset", required=false) Integer offset,
+			@RequestParam(value="type", required=false) String type) throws CrawlException {
 		
 		Organism o = getOrganism(organismsMapper, organism);
 		
@@ -267,12 +272,34 @@ public class RegionsController extends BaseQueryController {
 		if (organismRegionMap.containsKey(o.ID)) {
 			r = organismRegionMap.get(o.ID);
 		} else {
-			r = regionsMapper.inorganism( o.ID);
+			r = regionsMapper.inorganism( o.ID, limit, offset, type);
 			Collections.sort(r, new FeatureUniqueNameSorter());
 			organismRegionMap.put(String.valueOf(o.ID), r);
 		}
 		
 		results.regions = r;
+		
+		return results;
+	}
+	
+	@RequestMapping(method=RequestMethod.GET, value="typesinorganism")
+	@ResourceDescription("Returns the types of region present in an organism.")
+	public ResultsRegions typesInOrganism(ResultsRegions results, 
+			@RequestParam("organism") String organism
+			) throws CrawlException {
+		
+		Organism o = getOrganism(organismsMapper, organism);
+		
+		List<Cvterm> regionTypes = regionsMapper.typesInOrganism( o.ID );
+		List<Feature> regions = new ArrayList<Feature>();
+		
+		for (Cvterm regionType : regionTypes) {
+			Feature region = new Feature();
+			region.type = regionType;
+			regions.add(region);
+		}
+		
+		results.regions = regions;
 		
 		return results;
 	}

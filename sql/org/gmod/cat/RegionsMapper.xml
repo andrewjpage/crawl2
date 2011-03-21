@@ -134,14 +134,36 @@
 		join featureprop using (feature_id)
 		join cvterm c on f.type_id = c.cvterm_id
 		where f.organism_id = #{organismid}
-			and featureprop.type_id = (<include refid="topleveltype"/>)
+		  and featureprop.type_id = (<include refid="topleveltype"/>)
+		
+		<if test="type != null">
+          and c.name = #{type} 
+        </if>
+		
+		<if test="limit != null">
+		  LIMIT #{limit} 
+		</if>
+		<if test="offset != null">
+		  OFFSET #{offset}
+		</if>
+			
   </select>
-
-	<resultMap type="org.genedb.crawl.model.Feature" id="inorganism">
-		<result property="uniqueName" column="uniqueName" />
-		<association property="type" javaType="org.genedb.crawl.model.Cvterm">
-			<result property="name" column="type" />
-		</association>
-	</resultMap>
-    
+  
+  <resultMap type="org.genedb.crawl.model.Feature" id="inorganism">
+        <result property="uniqueName" column="uniqueName" />
+        <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+            <result property="name" column="type" />
+        </association>
+    </resultMap>
+  
+  <select id="typesInOrganism" resultType="org.genedb.crawl.model.Cvterm">
+        select distinct (c.name ) 
+        from feature f
+        join featureprop using (feature_id)
+        join cvterm c on f.type_id = c.cvterm_id
+        where f.organism_id = #{organismid}
+            and featureprop.type_id = (<include refid="topleveltype"/>)
+        
+  </select>
+  
 </mapper> 

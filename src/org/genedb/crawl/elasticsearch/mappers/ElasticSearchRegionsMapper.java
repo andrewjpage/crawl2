@@ -2,7 +2,9 @@ package org.genedb.crawl.elasticsearch.mappers;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 import org.apache.log4j.Logger;
@@ -18,6 +20,7 @@ import org.elasticsearch.index.query.xcontent.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.genedb.crawl.model.Coordinates;
+import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
@@ -280,26 +283,31 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	}
 
 	@Override
-	public List<Feature> inorganism(int organismid) {
+	public List<Feature> inorganism(int organismid, Integer limit, Integer offset, String type_name) {
 		
 		logger.debug(String.format("%s %s %s", "sequences", "organism_id", String.valueOf(organismid)));
 		
-		FieldQueryBuilder organismQuery = 
-			QueryBuilders.fieldQuery("organism_id", organismid);
-		
-		FieldQueryBuilder regionQuery =
-			QueryBuilders.fieldQuery("topLevel", true);
-		
-		BoolQueryBuilder regionInOrganismQuery = 
-			QueryBuilders.boolQuery()
-				.must(organismQuery)
-				.must(regionQuery);
+		BoolQueryBuilder regionInOrganismQuery = regionInOrganismQuery(organismid);
 			
-		SearchResponse response = connection.getClient()
+		if (type_name != null) {
+			FieldQueryBuilder typeQuery =
+				QueryBuilders.fieldQuery("type.name", type_name);
+			regionInOrganismQuery.must(typeQuery);
+		}
+		
+		SearchRequestBuilder srb = connection.getClient()
 			.prepareSearch()
-			.setQuery(regionInOrganismQuery)
-			.execute()
-			.actionGet();
+			.setQuery(regionInOrganismQuery);
+		
+		if (limit != null) {
+			srb.setSize(limit);
+		}
+		
+		if (offset != null) {
+			srb.setFrom(offset);
+		}
+		
+		SearchResponse response = srb.execute().actionGet();
 		
 		logger.info(response);
 		
@@ -311,6 +319,38 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		
 		return regions;
 
+	}
+	
+	BoolQueryBuilder regionInOrganismQuery(int organismid) {
+		FieldQueryBuilder organismQuery = 
+			QueryBuilders.fieldQuery("organism_id", organismid);
+		
+		FieldQueryBuilder regionQuery =
+			QueryBuilders.fieldQuery("topLevel", true);
+		
+		BoolQueryBuilder regionInOrganismQuery = 
+			QueryBuilders.boolQuery()
+				.must(organismQuery)
+				.must(regionQuery);
+		return regionInOrganismQuery;
+	}
+
+	@Override
+	public List<Cvterm> typesInOrganism(int organismid) {
+		BoolQueryBuilder regionInOrganismQuery = regionInOrganismQuery(organismid);
+		
+		SearchResponse response = 
+			connection.getClient()
+			.prepareSearch()
+			.setQuery(regionInOrganismQuery).execute().actionGet();
+		
+		List<Feature> regions = this.getAllMatches(response, Feature.class);
+		Set<Cvterm> terms = new HashSet<Cvterm>();
+		for (Feature region : regions) {
+			terms.add(region.type);
+		}
+		
+		return new ArrayList<Cvterm>(terms);
 	}
 
 
