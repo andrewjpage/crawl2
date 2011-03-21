@@ -237,7 +237,7 @@
     <delete file="${deploy.dir}/${build.war.name}.war" />
 </target>
 	
-<target name="deploy" depends="package-war, undeploy" >
+<target name="deploy" depends="package-war" >
 	<fail message="The 'config' property must be set" unless="config"/>
     <copy file="${build.packages.home}/${build.war.name}.war" todir="${deploy.dir}/"/>
 </target>
