@@ -136,11 +136,11 @@
 		where f.organism_id = #{organismid}
 		  and featureprop.type_id = (<include refid="topleveltype"/>)
 		
-		order by f.uniqueName
-		
 		<if test="type != null">
           and c.name = #{type} 
         </if>
+        
+        order by f.uniqueName
 		
 		<if test="limit != null">
 		  LIMIT #{limit} 
