@@ -9,7 +9,7 @@ public class CrawlServletContextListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		//Hazelcast.shutdownAll();
+		Hazelcast.shutdownAll();
 	}
 
 	@Override
