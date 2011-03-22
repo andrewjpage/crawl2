@@ -6,21 +6,30 @@
     
     <select id="featureCvTermPubs" resultMap="featureCvTermPubsResults">
     
-        SELECT pub.uniquename as uniqueName
+        SELECT 
+                pub.uniquename as uniqueName,
+                split_part(pub.uniquename, ':', 1) as database,
+                split_part(pub.uniquename, ':', 2) as accession
             FROM feature_cvterm 
             JOIN pub on feature_cvterm.pub_id = pub.pub_id
             WHERE feature_cvterm.feature_cvterm_id = #{feature_cvterm_id}
+                AND uniqueName != 'null'
         UNION
-        SELECT pub.uniquename as uniqueName
+        SELECT 
+                pub.uniquename as uniqueName,
+                split_part(pub.uniquename, ':', 1) as database,
+                split_part(pub.uniquename, ':', 2) as accession
             FROM feature_cvterm_pub
             JOIN pub on feature_cvterm_pub.pub_id = pub.pub_id
             WHERE feature_cvterm_pub.feature_cvterm_id = #{feature_cvterm_id}
-    
+                AND uniqueName != 'null'
     
     </select>
     
     <resultMap id="featureCvTermPubsResults" type="org.genedb.crawl.model.Pub">
         <result property="uniqueName" column="uniqueName"/> 
+        <result property="database" column="database"/> 
+        <result property="accession" column="accession"/> 
     </resultMap>
     
     
