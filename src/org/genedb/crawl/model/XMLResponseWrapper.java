@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * */
 
-@XmlRootElement(name="response") // the root element's name is set to response for JAXB XML marshaling, but is ignored by Jackson JSON. 
+@XmlRootElement(name="returned") // the root element's name is set to response for JAXB XML marshaling, but is ignored by Jackson JSON. 
 public class XMLResponseWrapper {
 	
 	public XMLResponseWrapper () {
@@ -33,15 +33,12 @@ public class XMLResponseWrapper {
 			Object value = entry.getValue();
 			
 			if (value instanceof ResultsSAM) {
-				response = (ResultsSAM) value;
-				response.name = name;
+				response = new Response (name, (ResultsSAM) value);
 			} else if (value instanceof ResultsRegions) {
-				response = (ResultsRegions) value;
-				response.name = name;
+				response = new Response (name, (ResultsRegions) value);
 			}
 			else if (value instanceof Results) {
-				response = (Results) value;
-				response.name = name;
+				response = new Response (name, (Results) value);
 			}
 			else if (value instanceof CrawlError) {
 				error = (CrawlError) value;
@@ -59,13 +56,15 @@ public class XMLResponseWrapper {
 	}
 	
 	// Explicitly define all the different kinds of Results subclass, so that JAXB maps them properly.
-	@XmlElements({
-        @XmlElement(name="results", type=Results.class),
-        @XmlElement(name="results", type=ResultsRegions.class),
-        @XmlElement(name="results", type=ResultsSAM.class)
-	})
-	// This property has to be called "response", so that the Jackson mapper writes this element out with that name.  
-	public Results response;
+//	@XmlElements({
+//        @XmlElement(name="results", type=Results.class),
+//        @XmlElement(name="results", type=ResultsRegions.class),
+//        @XmlElement(name="results", type=ResultsSAM.class)
+//	})
+	// This property has to be called "response", so that the Jackson mapper writes this element out with that name.
+	
+	@XmlElement(name="response")
+	public Response response;
 	
 	@XmlElement(name="error")
 	public CrawlError error;
@@ -126,6 +125,19 @@ public class XMLResponseWrapper {
 		@XmlElementWrapper(name="values")
 		@XmlElement(name="value")
 		public List<String> values = new ArrayList<String>();
+	}
+	
+	static class Response {
+		
+		public Results results;
+		
+		public Response() {}
+		
+		public Response(String name, Results results) {
+			this.results=results;
+			this.results.name = name;
+		}
+		
 	}
 	
 }
