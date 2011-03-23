@@ -10,6 +10,7 @@ import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
+import org.genedb.crawl.model.Statistic;
 
 public interface FeaturesMapper {
 	
@@ -57,6 +58,8 @@ public interface FeaturesMapper {
 	List<Feature> timelastmodified(@Param("date") Date date, @Param("organism_id") Integer organism_id);
 	
 	List<Feature> annotationModified(@Param("date") Date date, @Param("organism_id") Integer organism_id, @Param("region") String region);
+	
+	List<Statistic> annotationModifiedStatistics(@Param("date") Date date, @Param("organism_id") Integer organism_id, @Param("region") String region);
 	
 	List<BlastPair> blastPairs(
 		@Param("regex") String f1, @Param("regex") int start1, @Param("regex") int end1, 

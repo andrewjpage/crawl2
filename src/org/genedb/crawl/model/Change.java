@@ -12,4 +12,7 @@ public class Change {
 	
 	@XmlAttribute(required=false)
 	public String detail;
+	
+	@XmlAttribute(required=false)
+	public String type;
 }

@@ -643,26 +643,7 @@
 			to_date (fcp_date.value, 'YYYYMMDD' ) as changedate,
 			fcp_user.value as changeuser
 			
-		FROM feature f
-			JOIN feature_cvterm fc ON f.feature_id = fc.feature_id 
-			JOIN cvterm ftype ON f.type_id = ftype.cvterm_id 
-			
-			JOIN cvterm fctype ON fc.cvterm_id = fctype.cvterm_id 
-			JOIN cv fctypecv ON fctypecv.cv_id = fctype.cv_id AND fctypecv.name = 'annotation_change'
-			
-			JOIN feature_cvtermprop fcp_date ON fc.feature_cvterm_id = fcp_date.feature_cvterm_id AND fcp_date.type_id = 
-			     (select cvterm_id from cvterm join cv on cv.cv_id = cvterm.cv_id and cv.name = 'feature_property' where cvterm.name='date')
-			
-			JOIN feature_cvtermprop fcp_detail ON fc.feature_cvterm_id = fcp_detail.feature_cvterm_id AND fcp_detail.type_id = 
-			     (select cvterm_id from cvterm join cv on cv.cv_id = cvterm.cv_id and cv.name = 'genedb_misc' where cvterm.name='qualifier')
-			
-			JOIN feature_cvtermprop fcp_user ON fc.feature_cvterm_id = fcp_user.feature_cvterm_id AND fcp_user.type_id = 
-			     (select cvterm_id from cvterm join cv on cv.cv_id = cvterm.cv_id and cv.name = 'genedb_misc' where cvterm.name='curatorName')
-			
-			<include refid="featureLocRegion" />
-			
-		WHERE f.organism_id = #{organism_id}  
-			AND to_date (fcp_date.value, 'YYYYMMDD' ) >= #{date} 
+		<include refid="annotationModifiedSnippet"/>
     
     </select>
     
@@ -677,8 +658,50 @@
 	        <result property="detail" column="changedetail"/>
 	        <result property="date" column="changedate"/>
 	        <result property="user" column="changeuser"/>
+	        <result property="type" column="type"/>
         </collection>
     </resultMap>
+    
+    <!-- distinct fctype.name -->
+    
+     <select id="annotationModifiedStatistics" resultType="org.genedb.crawl.model.Statistic" >
+    
+        SELECT
+            
+             distinct fctype.name as name , 
+             count (fcp_date.feature_cvtermprop_id) as value
+            
+            <include refid="annotationModifiedSnippet"/>
+        
+        GROUP BY fctype.name
+    
+    </select>
+    
+    <sql id="annotationModifiedSnippet">
+            FROM feature f
+            JOIN feature_cvterm fc ON f.feature_id = fc.feature_id 
+            JOIN cvterm ftype ON f.type_id = ftype.cvterm_id 
+            
+            JOIN cvterm fctype ON fc.cvterm_id = fctype.cvterm_id 
+            JOIN cv fctypecv ON fctypecv.cv_id = fctype.cv_id AND fctypecv.name = 'annotation_change'
+            
+            JOIN feature_cvtermprop fcp_date ON fc.feature_cvterm_id = fcp_date.feature_cvterm_id AND fcp_date.type_id = 
+                 (select cvterm_id from cvterm join cv on cv.cv_id = cvterm.cv_id and cv.name = 'feature_property' where cvterm.name='date')
+            
+            JOIN feature_cvtermprop fcp_detail ON fc.feature_cvterm_id = fcp_detail.feature_cvterm_id AND fcp_detail.type_id = 
+                 (select cvterm_id from cvterm join cv on cv.cv_id = cvterm.cv_id and cv.name = 'genedb_misc' where cvterm.name='qualifier')
+            
+            JOIN feature_cvtermprop fcp_user ON fc.feature_cvterm_id = fcp_user.feature_cvterm_id AND fcp_user.type_id = 
+                 (select cvterm_id from cvterm join cv on cv.cv_id = cvterm.cv_id and cv.name = 'genedb_misc' where cvterm.name='curatorName')
+            
+            <include refid="featureLocRegion" />
+            
+        WHERE f.organism_id = #{organism_id}  
+            AND to_date (fcp_date.value, 'YYYYMMDD' ) >= #{date} 
+    </sql>
+    
+    
+    
     
     <!-- 
         ##################################################################

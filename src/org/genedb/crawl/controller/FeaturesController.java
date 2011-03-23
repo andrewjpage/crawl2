@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
+import org.genedb.crawl.model.Change;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
@@ -221,6 +223,17 @@ public class FeaturesController extends BaseQueryController {
 			@RequestParam(value="region", required = false) String region) throws CrawlException {
 		Organism o = getOrganism(organismsMapper, organism);
 		results.features = featuresMapper.annotationModified(date, o.ID, region);
+		return results; 
+	}
+	
+	@ResourceDescription(value="Return features that have had annotation changes", type="Results")
+	@RequestMapping(method=RequestMethod.GET, value="/annotation_changes_statistics")
+	public Results annotationModifiedStatistics(Results results, 
+			@RequestParam(value="date") Date date, 
+			@RequestParam("organism") String organism, 
+			@RequestParam(value="region", required = false) String region) throws CrawlException {
+		Organism o = getOrganism(organismsMapper, organism);
+		results.statistics  = featuresMapper.annotationModifiedStatistics(date, o.ID, region);
 		return results; 
 	}
 	

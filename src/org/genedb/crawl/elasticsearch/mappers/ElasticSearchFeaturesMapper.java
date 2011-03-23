@@ -39,6 +39,7 @@ import org.genedb.crawl.model.FeatureProperty;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.LocatedFeature;
+import org.genedb.crawl.model.Statistic;
 import org.gmod.cat.FeaturesMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -308,6 +309,20 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 	@Override
 	public List<BlastPair> blastPairs(String f1, int start1, int end1,
 			String f2, int start2, int end2, Integer length, Integer normscore) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Feature> annotationModified(Date date, Integer organism_id,
+			String region) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Statistic> annotationModifiedStatistics(Date date,
+			Integer organism_id, String region) {
 		// TODO Auto-generated method stub
 		return null;
 	}

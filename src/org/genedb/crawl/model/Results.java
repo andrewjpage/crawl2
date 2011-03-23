@@ -31,6 +31,10 @@ public class Results {
 	@XmlElement(name="feature", type=HierarchicalFeature.class)
 	public List<HierarchicalFeature> hierarchy;
 	
+	@XmlElementWrapper(name="statistics")
+	@XmlElement(name="statistic", type=Statistic.class)
+	public List<Statistic> statistics;
+	
 	//public Service service;
 	
 	public void addOrganism(Organism organism) {
@@ -39,5 +43,7 @@ public class Results {
 		}
 		organisms.add(organism);
 	}
+	
+	
 	
 }
