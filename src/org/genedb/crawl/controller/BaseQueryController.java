@@ -4,8 +4,11 @@ import java.beans.PropertyEditorSupport;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -63,10 +66,35 @@ public abstract class BaseQueryController {
 		}
 	}
 	
+	class DatePropertyEditor extends PropertyEditorSupport {
+		
+		
+		final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		
+		@Override
+		public void setAsText(String text) {
+			
+			try {
+				Date date = df.parse(text);
+				this.setValue(date);
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+			
+		}
+		
+		@Override
+		public String getAsText() {
+			Date date = (Date) this.getValue();
+			return df.format(date);
+		}
+	}
+	
 	@InitBinder
     public void initBinder(WebDataBinder binder) {
 		// we might be able to use this to split lists...
 		binder.registerCustomEditor(List.class, new ListSplittingPropertyEditor());
+		binder.registerCustomEditor(Date.class, new DatePropertyEditor());
 	}
 	
 	private Map<String, String> relationshipTypes;

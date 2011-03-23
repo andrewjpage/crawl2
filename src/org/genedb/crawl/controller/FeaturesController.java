@@ -3,6 +3,7 @@ package org.genedb.crawl.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,8 +18,10 @@ import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.HierarchicalFeature;
+import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Results;
 import org.gmod.cat.FeaturesMapper;
+import org.gmod.cat.OrganismsMapper;
 import org.gmod.cat.TermsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,6 +42,9 @@ public class FeaturesController extends BaseQueryController {
 	
 	@Autowired
 	TermsMapper terms;
+	
+	@Autowired
+	OrganismsMapper organismsMapper;
 	
 	private enum HierarchicalSearchType {
 		PARENTS,
@@ -206,6 +212,18 @@ public class FeaturesController extends BaseQueryController {
 		results.features = featuresMapper.clusters(features);
 		return results; 
 	}
+	
+	@ResourceDescription(value="Return features that have had annotation changes", type="Results")
+	@RequestMapping(method=RequestMethod.GET, value="/annotation_changes")
+	public Results annotationModified(Results results, 
+			@RequestParam(value="date") Date date, 
+			@RequestParam("organism") String organism, 
+			@RequestParam(value="region", required = false) String region) throws CrawlException {
+		Organism o = getOrganism(organismsMapper, organism);
+		results.features = featuresMapper.annotationModified(date, o.ID, region);
+		return results; 
+	}
+	
 	
 	@ResourceDescription("Return blast hits between two features")
 	@RequestMapping(method=RequestMethod.GET, value="/blastpair")

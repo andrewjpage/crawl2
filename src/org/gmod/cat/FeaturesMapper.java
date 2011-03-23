@@ -56,6 +56,8 @@ public interface FeaturesMapper {
 	
 	List<Feature> timelastmodified(@Param("date") Date date, @Param("organism_id") Integer organism_id);
 	
+	List<Feature> annotationModified(@Param("date") Date date, @Param("organism_id") Integer organism_id, @Param("region") String region);
+	
 	List<BlastPair> blastPairs(
 		@Param("regex") String f1, @Param("regex") int start1, @Param("regex") int end1, 
 		@Param("regex") String f2, @Param("regex") int start2, @Param("regex") int end2, 
