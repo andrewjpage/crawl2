@@ -253,7 +253,7 @@ public abstract class BaseQueryController {
 		return arguments.get(index);
 	}
 	
-	protected Organism getOrganism(OrganismsMapper organisms, String organism) throws CrawlException {
+	protected Organism getOrganism(OrganismsMapper organisms, String organism) {
 		Organism mappedOrganism = null;
 		
 		if (organism.contains(":")) {

@@ -10,10 +10,10 @@ import org.genedb.crawl.model.OrganismProp;
 
 public interface OrganismsMapper {
 	
-	List<Organism> list() throws CrawlException;
-	Organism getByID(int ID) throws CrawlException;
-	Organism getByTaxonID(String taxonID) throws CrawlException;
-	Organism getByCommonName(String commonName) throws CrawlException;
+	List<Organism> list() ;
+	Organism getByID(int ID) ;
+	Organism getByTaxonID(String taxonID) ;
+	Organism getByCommonName(String commonName) ;
 	OrganismProp getOrganismProp(@Param("ID") int ID, @Param("cv") String cv, @Param("cvterm") String cvterm);
 	
 }
