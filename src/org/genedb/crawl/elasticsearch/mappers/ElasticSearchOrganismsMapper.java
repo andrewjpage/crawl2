@@ -19,7 +19,7 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 	private Logger logger = Logger.getLogger(ElasticSearchOrganismsMapper.class);
 	
 	@Override
-	public List<Organism> list() throws CrawlException {
+	public List<Organism> list() {
 		
 		SearchResponse response = connection.getClient().prepareSearch("organisms")
 			.setQuery(QueryBuilders.matchAllQuery())
@@ -31,17 +31,17 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 	}
 
 	@Override
-	public Organism getByID(int ID) throws CrawlException {
+	public Organism getByID(int ID) {
 		return (Organism) this.getFirstMatch("organisms", "ID", String.valueOf(ID), Organism.class);
 	}
 
 	@Override
-	public Organism getByTaxonID(String taxonID) throws CrawlException {
+	public Organism getByTaxonID(String taxonID) {
 		return (Organism) this.getFirstMatch("organisms", "taxonID", taxonID, Organism.class);
 	}
 
 	@Override
-	public Organism getByCommonName(String commonName) throws CrawlException {
+	public Organism getByCommonName(String commonName) {
 		return (Organism) this.getFirstMatch("organisms", "common_name", commonName, Organism.class);
 	}
 
