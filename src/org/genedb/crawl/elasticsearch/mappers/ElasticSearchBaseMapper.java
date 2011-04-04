@@ -17,16 +17,22 @@ import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ElasticSearchBaseMapper {
+public abstract class ElasticSearchBaseMapper {
 	
 	private Logger logger = Logger.getLogger(ElasticSearchBaseMapper.class);
 	protected JsonIzer jsonIzer = JsonIzer.getJsonIzer();
 	
 	private static final Field[] featureFields = Feature.class.getDeclaredFields();
 	
-	String index = "features";
-	String type = "Feature";
+	//String index = "features";
+	//String type = "Feature";
 	
+//	public static String getIndex() {
+//		return "index";
+//	}
+//	public static String getType() {
+//		return "type";
+//	}
 	
 	@Autowired
 	Connection connection;
@@ -80,10 +86,10 @@ public class ElasticSearchBaseMapper {
 		return copy;
 	}
 	
-	protected List<Feature> fetchAndCopy(List<String> features, String[] fields) {
+	protected List<Feature> fetchAndCopy(String index, String type, List<String> features, String[] fields) {
 		List<Feature> featureResults = new ArrayList<Feature>();
 		for (String uniqueName : features) {
-			String json = getFromElastic(uniqueName, fields);
+			String json = getFromElastic(index, type, uniqueName, fields);
 			Feature feature = getFeatureFromJson(json);
 			Feature featureToAdd = copy(feature, fields);
 			if (featureToAdd != null) {
@@ -93,8 +99,8 @@ public class ElasticSearchBaseMapper {
 		return featureResults;
 	}
 	
-	protected String getFromElastic(String uniqueName, String[] fields) {
-		return connection.getClient().prepareGet(index, type, uniqueName).execute().actionGet().sourceAsString();
+	protected String getFromElastic(String index, String type, String uniqueName, String[] fields) {
+		return connection.getClient().prepareGet(index,type, uniqueName).execute().actionGet().sourceAsString();
 		
 //		logger.debug("Searching for uniqueName " + uniqueName);
 //		
@@ -163,12 +169,14 @@ public class ElasticSearchBaseMapper {
 	}
 	
 	
-	protected <T extends Object> T getFirstMatch(String indexName, String fieldName, String value, Class<T> cls) {
+	protected <T extends Object> T getFirstMatch(String indexName, String typeName, String fieldName, String value, Class<T> cls) {
 		
 		FieldQueryBuilder regionQuery = 
 		QueryBuilders.fieldQuery(fieldName, value);
 	
-		SearchResponse response = connection.getClient().prepareSearch(indexName)
+		SearchResponse response = connection.getClient()
+			.prepareSearch(indexName)
+			.setTypes(typeName)
 			.setQuery(regionQuery)
 			.execute()
 			.actionGet();
@@ -235,6 +243,27 @@ public class ElasticSearchBaseMapper {
 		}
 		
 		return list;
+	}
+	
+	
+	public void createOrUpdate(String index, String type, String key, Object obj) {
+		
+		try {
+			
+			String json = jsonIzer.toJson(obj);
+			logger.debug("Source:");
+			logger.debug(json);
+			
+			connection
+				.getClient()
+				.prepareIndex(index, type, key)
+				.setSource(json)
+				.execute()
+				.actionGet();
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 }

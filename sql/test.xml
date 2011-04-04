@@ -26,6 +26,7 @@
     <mapper resource="sql/org/gmod/cat/FeaturesMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/FeatureMapper.xml"/>
     <mapper resource="sql/org/gmod/cat/RegionsMapper.xml"/>
+    <mapper resource="sql/org/gmod/cat/TermsMapper.xml"/>
   </mappers>
    
   

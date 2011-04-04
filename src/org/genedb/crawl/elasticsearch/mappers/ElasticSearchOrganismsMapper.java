@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
-import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.OrganismProp;
 import org.gmod.cat.OrganismsMapper;
@@ -21,7 +20,9 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 	@Override
 	public List<Organism> list() {
 		
-		SearchResponse response = connection.getClient().prepareSearch("organisms")
+		SearchResponse response = connection.getClient()
+			.prepareSearch(connection.getIndex())
+			.setTypes(connection.getOrganismType())
 			.setQuery(QueryBuilders.matchAllQuery())
 			.execute()
 			.actionGet();
@@ -32,17 +33,19 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 
 	@Override
 	public Organism getByID(int ID) {
-		return (Organism) this.getFirstMatch("organisms", "ID", String.valueOf(ID), Organism.class);
+		Organism o = (Organism) this.getFirstMatch(connection.getIndex(), connection.getOrganismType(), "ID", String.valueOf(ID), Organism.class);
+		logger.info(o);
+		return o;
 	}
 
 	@Override
 	public Organism getByTaxonID(String taxonID) {
-		return (Organism) this.getFirstMatch("organisms", "taxonID", taxonID, Organism.class);
+		return (Organism) this.getFirstMatch(connection.getIndex(), connection.getOrganismType(), "taxonID", taxonID, Organism.class);
 	}
 
 	@Override
 	public Organism getByCommonName(String commonName) {
-		return (Organism) this.getFirstMatch("organisms", "common_name", commonName, Organism.class);
+		return (Organism) this.getFirstMatch(connection.getIndex(), connection.getOrganismType(), "common_name", commonName, Organism.class);
 	}
 
 	@Override
@@ -55,12 +58,23 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 		
 		try {
 			String source = jsonIzer.toJson(organism);
-			connection.getClient().prepareIndex("organisms", "Organism", organism.common_name).setSource(source).execute().actionGet();
+			logger.info(source);
+			connection.getClient().prepareIndex(connection.getIndex(), connection.getOrganismType(), organism.common_name).setSource(source).execute().actionGet();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 		
 		
 	}
+
+	
+//	public static String getIndex() {
+//		return "organisms";
+//	}
+//
+//	
+//	public static String getType() {
+//		return "Organism";
+//	}
 
 }

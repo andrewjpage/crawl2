@@ -15,6 +15,7 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.type.TypeReference;
 import org.genedb.crawl.elasticsearch.json.JsonIzer;
+import org.genedb.crawl.model.Alignment;
 import org.springframework.util.StringUtils;
 
 
@@ -40,6 +41,7 @@ public class AlignmentStore {
 	}
 	
 	
+	
 	public void setAlignmentFiles(File alignmentFile) throws JsonParseException, JsonMappingException, IOException {
 		
 		logger.info(String.format("Alignment file : %s" , alignmentFile));
@@ -53,11 +55,12 @@ public class AlignmentStore {
 		}
 		
 		alignments = (List<Alignment>) jsonIzer.fromJson(alignmentFile,  new TypeReference<List<Alignment>>() {} );
-		generateMetaFields();
 		
+		generateMetaFields();
+		assignFileIDs();
 	}
 	
-	public void generateMetaFields() {
+	void generateMetaFields() {
 		
 		Set<String> found = new HashSet<String>();
 		Set<String> uniques = new HashSet<String>();
@@ -101,7 +104,11 @@ public class AlignmentStore {
 		
 	}
 
-	
+	void assignFileIDs() {
+		for (Alignment alignment : alignments) {
+			alignment.fileID = fileID++;
+		}
+	}
 
 	
 }

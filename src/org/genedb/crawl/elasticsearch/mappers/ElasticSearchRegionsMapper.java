@@ -4,6 +4,7 @@ package org.genedb.crawl.elasticsearch.mappers;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -18,12 +19,14 @@ import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.elasticsearch.index.query.xcontent.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
+import org.genedb.crawl.model.Sequence;
 import org.gmod.cat.RegionsMapper;
 import org.springframework.stereotype.Component;
 
@@ -35,21 +38,43 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	private int getTotalInRegion(String region) {
 		FieldQueryBuilder regionQuery = QueryBuilders.fieldQuery("region", region);
 		
+		logger.debug(String.format("Index %s, Type %s", connection.getIndex(), connection.getFeatureType()));
+		
 		CountResponse cr = connection.getClient()
-		 	.prepareCount(index)
+		 	.prepareCount()
+		 	.setIndices(connection.getIndex())
+		 	.setTypes(connection.getFeatureType())
 		 	.setQuery(regionQuery)
 		 	.execute()
 	        .actionGet();
 		
 		long count = cr.count();
 		
+		
 		logger.debug(String.format("Count in %s : %s", region, count));
 		
 		return (int) count;
 	}
 	
+	private int getTotalRegionsInOrganism(int organism_id) {
+		FieldQueryBuilder regionQuery = QueryBuilders.fieldQuery("organism_id", organism_id);
+		
+		CountResponse cr = connection.getClient()
+		 	.prepareCount(connection.getIndex())
+		 	.setTypes(connection.getRegionType())
+		 	.setQuery(regionQuery)
+		 	.execute()
+	        .actionGet();
+		
+		long count = cr.count();
+		
+		logger.debug(String.format("Count in organism %s : %s", organism_id, count));
+		
+		return (int) count;
+	}
 	
-	private BoolQueryBuilder isOverlap(String region, int start, int end) {
+	
+	private BoolQueryBuilder isOverlap(String region, int start, int end, List<String> exclude) {
 		
 		RangeQueryBuilder startLowerThanRequested = 
 			QueryBuilders.rangeQuery("fmin")
@@ -97,7 +122,13 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			.must(isOverlap)
 			.must(regionQuery);
 		
-		
+		if (exclude != null) {
+			for (String exclude_type : exclude) {
+				FieldQueryBuilder excludeQuery = 
+					QueryBuilders.fieldQuery("type.name", exclude_type);
+				isOverlapOnRegion.mustNot(excludeQuery);
+			}
+		}
 		
 		return isOverlapOnRegion;
 	}
@@ -118,9 +149,13 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	public LocationBoundaries locationsMinAndMaxBoundaries(String region,
 			int start, int end, List<Integer> types) {
 		
-		BoolQueryBuilder isOverlap = isOverlap(region, start, end);
+		BoolQueryBuilder isOverlap = isOverlap(region, start, end, new ArrayList<String>());
 		
-		SearchRequestBuilder builder = connection.getClient().prepareSearch(index);
+		SearchRequestBuilder builder = 
+			connection
+			.getClient()
+			.prepareSearch(connection.getIndex())
+			.setTypes(connection.getFeatureType());
 		
 		
 		SearchResponse response = builder
@@ -142,24 +177,42 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			
 			//logger.debug(source);
 			
-			Feature feature = this.getFeatureFromJson(source);
+			LocatedFeature feature = this.getFeatureFromJson(source);
+			
 			
 			if (feature != null) {
 				
-				for (Coordinates co : feature.coordinates) {
-					if (co.region.equals(region)) {
+				
+				if (feature.fmax != null && feature.fmin != null && feature.region != null) {
+					if (feature.region.equals(region)) {
 						
-						if (co.fmin < lb.start) {
-							lb.start = co.fmin;
+						if (feature.fmin < lb.start) {
+							lb.start = feature.fmin;
 						} 
 						
-						if (co.fmax > lb.end) {
-							lb.end = co.fmax;
+						if (feature.fmax > lb.end) {
+							lb.end = feature.fmax;
 						} 
-							
-						break;
 					}
 				}
+				
+				else if (feature.coordinates != null) {
+					for (Coordinates co : feature.coordinates) {
+						if (co.region.equals(region)) {
+							
+							if (co.fmin < lb.start) {
+								lb.start = co.fmin;
+							} 
+							
+							if (co.fmax > lb.end) {
+								lb.end = co.fmax;
+							} 
+								
+							break;
+						}
+					}
+				}
+				
 				
 				
 			}
@@ -178,7 +231,8 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			int offset, List<String> exclude) {
 		
 		SearchRequestBuilder builder = connection.getClient()
-			.prepareSearch(index)
+			.prepareSearch(connection.getIndex())
+			.setTypes(connection.getFeatureType())
 			.addSort(SortBuilders.fieldSort("fmin"))
 			.addSort(SortBuilders.fieldSort("fmax"));
 		
@@ -210,10 +264,11 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	public List<LocatedFeature> locations(String region, int start, int end,
 			List<String> exclude) {
 		
-		BoolQueryBuilder isOverlap = isOverlap(region, start, end);
+		BoolQueryBuilder isOverlap = isOverlap(region, start, end, exclude);
 		
 		SearchRequestBuilder builder = connection.getClient()
-			.prepareSearch(index)
+			.prepareSearch(connection.getIndex())
+			.setTypes(connection.getFeatureType())
 			.addSort(SortBuilders.fieldSort("fmin"))
 			.addSort(SortBuilders.fieldSort("fmax"));
 		
@@ -243,9 +298,10 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			
 			LocatedFeature feature = this.getFeatureFromJson(source);
 			if (feature != null) {
-				for (Coordinates co : feature.coordinates) {
-					if (co.region.equals(region)) {
-						
+				
+				
+				if (feature.fmax != null && feature.fmin != null && feature.region != null) {
+					if (feature.region.equals(region)) {
 						try {
 							features.add(copy(feature, fieldNames, LocatedFeature.class));
 						} catch (InstantiationException e) {
@@ -255,9 +311,26 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 							logger.error(e);
 							e.printStackTrace();
 						}
-						break;
 					}
 				}
+				else if (feature.coordinates != null) {
+					for (Coordinates co : feature.coordinates) {
+						if (co.region.equals(region)) {
+							
+							try {
+								features.add(copy(feature, fieldNames, LocatedFeature.class));
+							} catch (InstantiationException e) {
+								logger.error(e);
+								e.printStackTrace();
+							} catch (IllegalAccessException e) {
+								logger.error(e);
+								e.printStackTrace();
+							}
+							break;
+						}
+					}
+				}
+				
 			}
 		}
 		
@@ -265,21 +338,33 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	}
 
 	@Override
-	public String sequence(String region) {
-		
-		String json = connection.getClient().prepareGet().setIndex(index).setId(region).execute().actionGet().sourceAsString();
+	public Sequence sequence(String region) {
 		
 		try {
+			logger.debug(String.format("%s %s %s %s %s",connection.getIndex(), connection.getRegionType(), region, connection, connection.getClient()));
+			String json = connection
+							.getClient()
+							.prepareGet()
+							.setIndex(connection.getIndex())
+							.setType(connection.getRegionType())
+							.setId(region)
+							.execute()
+							.actionGet()
+							.sourceAsString();
 			Feature regionFeature = (Feature) jsonIzer.fromJson(json, Feature.class);
 			
-			return regionFeature.residues;
+			Sequence sequence = new Sequence();
+			sequence.dna = regionFeature.residues;
+			sequence.length = regionFeature.residues.length();
+			sequence.organism_id = regionFeature.organism_id;
+			
+			return sequence;
 			
 		} catch (Exception e) {
-			logger.error("Could not find a sequence for " + region);
-			e.printStackTrace();
+			throw new RuntimeException(e);
+			
 		} 
 		
-		return "";
 	}
 
 	@Override
@@ -287,7 +372,12 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		
 		logger.debug(String.format("%s %s %s", "sequences", "organism_id", String.valueOf(organismid)));
 		
-		BoolQueryBuilder regionInOrganismQuery = regionInOrganismQuery(organismid);
+		BoolQueryBuilder regionInOrganismQuery = QueryBuilders.boolQuery();
+		
+		FieldQueryBuilder organismQuery = 
+			QueryBuilders.fieldQuery("organism_id", organismid);
+		
+		regionInOrganismQuery.must(organismQuery);
 			
 		if (type_name != null) {
 			FieldQueryBuilder typeQuery =
@@ -296,22 +386,53 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		}
 		
 		SearchRequestBuilder srb = connection.getClient()
-			.prepareSearch()
+			.prepareSearch(connection.getIndex())
+			.setTypes(connection.getRegionType())
 			.setQuery(regionInOrganismQuery);
 		
-		if (limit != null) {
-			srb.setSize(limit);
+		if (limit == null) {
+			limit = getTotalRegionsInOrganism(organismid); 
 		}
+		
+		srb.setSize(limit);
 		
 		if (offset != null) {
 			srb.setFrom(offset);
 		}
 		
-		SearchResponse response = srb.execute().actionGet();
+		//srb.addFields ( new String[] {"uniqueName", "organism_id" } );
+		
+		logger.info(toString(srb.internalBuilder()));
+		
+		
+		SearchResponse response = srb.execute()
+			.actionGet();
 		
 		logger.info(response);
 		
-		List<Feature> regions = this.getAllMatches(response, Feature.class);
+		SearchHits hits = response.getHits();
+		
+		List<Feature> regions = new ArrayList<Feature>();
+		
+		for (SearchHit hit : hits) {
+			
+			logger.info(hit.id());
+			
+			// we want to avoid pulling in the sequence here, so we do a manual map to feature conversion
+			Map<String, Object> source = hit.getSource();
+			
+			Feature region = new Feature();
+			region.uniqueName = hit.getId();
+			region.type = new Cvterm();
+			region.type.name = (String) ((Map) source.get("type")).get("name"); 
+			region.organism_id = (Integer) source.get("organism_id");
+			
+			regions.add(region);
+			
+		}
+		
+		
+		//List<Feature> regions = this.getAllMatches(response, Feature.class);
 		
 		for (Feature region : regions) {
 			region.residues = null;
@@ -321,28 +442,30 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 
 	}
 	
-	BoolQueryBuilder regionInOrganismQuery(int organismid) {
-		FieldQueryBuilder organismQuery = 
-			QueryBuilders.fieldQuery("organism_id", organismid);
-		
-		FieldQueryBuilder regionQuery =
-			QueryBuilders.fieldQuery("topLevel", true);
-		
-		BoolQueryBuilder regionInOrganismQuery = 
-			QueryBuilders.boolQuery()
-				.must(organismQuery)
-				.must(regionQuery);
-		return regionInOrganismQuery;
-	}
+//	QueryBuilder regionInOrganismQuery(int organismid) {
+//		FieldQueryBuilder organismQuery = 
+//			QueryBuilders.fieldQuery("organism_id", organismid);
+//		
+////		FieldQueryBuilder regionQuery =
+////			QueryBuilders.fieldQuery("topLevel", true);
+//		
+////		BoolQueryBuilder regionInOrganismQuery = 
+////			QueryBuilders.boolQuery()
+////				.must(organismQuery)
+////				.must(regionQuery);
+//		
+//		return organismQuery;
+//	}
 
 	@Override
 	public List<Cvterm> typesInOrganism(int organismid) {
-		BoolQueryBuilder regionInOrganismQuery = regionInOrganismQuery(organismid);
+		FieldQueryBuilder organismQuery = 
+			QueryBuilders.fieldQuery("organism_id", organismid);
 		
 		SearchResponse response = 
 			connection.getClient()
 			.prepareSearch()
-			.setQuery(regionInOrganismQuery).execute().actionGet();
+			.setQuery(organismQuery).execute().actionGet();
 		
 		List<Feature> regions = this.getAllMatches(response, Feature.class);
 		Set<Cvterm> terms = new HashSet<Cvterm>();
@@ -352,6 +475,18 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		
 		return new ArrayList<Cvterm>(terms);
 	}
+
+
+	
+//	public static String getIndex() {
+//		return "regions";
+//	}
+//
+//
+//	
+//	public static String getType() {
+//		return "Region";
+//	}
 
 
 	

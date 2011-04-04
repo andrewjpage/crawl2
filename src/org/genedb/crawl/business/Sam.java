@@ -1,5 +1,6 @@
 package org.genedb.crawl.business;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,12 +19,13 @@ import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.SAMSequenceRecord;
 
 import org.apache.log4j.Logger;
+import org.genedb.crawl.model.Alignment;
 import org.genedb.crawl.model.FileInfo;
 import org.genedb.crawl.model.MappedCoverage;
 import org.genedb.crawl.model.MappedQuery;
-import org.genedb.crawl.model.MappedQueryRecordElementList;
 import org.genedb.crawl.model.MappedSAMHeader;
 import org.genedb.crawl.model.MappedSAMSequence;
+
 
 
 public class Sam {
@@ -34,6 +36,8 @@ public class Sam {
 	
 	private final String[] defaultProperties = {"alignmentStart", "alignmentEnd", "flags", "readName"};
 	private final Method[] methods = SAMRecord.class.getDeclaredMethods();
+	
+	//private final Field[] recordFields = Records.class.getFields();
 	
 	private SAMFileReader getSamOrBam(int fileID) throws Exception {
 		final SAMFileReader inputSam = alignmentStore.getReader(fileID); 
@@ -126,29 +130,41 @@ public class Sam {
 		Set<String> propertySet = new HashSet<String>(Arrays.asList(properties));
 		Map<Method,String> methods2properties = new HashMap<Method,String>();
 		
+//		Hashtable<String, Field> recordFieldSet = new Hashtable<String, Field>();
+//		for (Field f : recordFields) {
+//			recordFieldSet.put(f.getName(), f);
+//		}
+//		
+		//Map<String, MappedQueryRecordElementList> map = new Hashtable<String, MappedQueryRecordElementList>();
 		
-		Map<String, MappedQueryRecordElementList> map = new Hashtable<String, MappedQueryRecordElementList>();
-		
+		List<String> props = new ArrayList<String>();
 		for (Method method : methods) {
 			String methodName = method.getName();
 			if (methodName.startsWith("get")) {
 				String propertyName = methodName.substring(3);
 				propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
 				// logger.info(methodName + " " + propertyName);
+				props.add(propertyName);
 				
 				if (propertySet.contains(propertyName)) {
-					//logger.info("added!");
+					// logger.info("added!");
 					
-					MappedQueryRecordElementList mqrle = new MappedQueryRecordElementList();
-					mqrle.name = propertyName;
-					mqrle.fields = new ArrayList();
+//					MappedQueryRecordElementList mqrle = new MappedQueryRecordElementList();
+//					mqrle.name = propertyName;
+//					mqrle.fields = new ArrayList();
 					
-					map.put(propertyName, mqrle);
+					//map.put(propertyName, mqrle);
 					methods2properties.put(method, propertyName);
+					
+					
+					
+					model.records.put(propertyName, new ArrayList());
 				}
 				
 			}
 		}
+		
+		logger.info(props);
 		
 		model.count = 0;
 		
@@ -193,8 +209,11 @@ public class Sam {
 					Method method = entry.getKey();
 					String propertyName = entry.getValue();
 					Object result = method.invoke(record, new Object[]{});
-					List list = map.get(propertyName).fields;
-					list.add(result);
+					//List list = map.get(propertyName).fields;
+					//list.add(result);
+					
+					model.records.get(propertyName).add(result);
+					
 				}
 				
 				model.count++;
@@ -221,7 +240,9 @@ public class Sam {
 		model.time = Float.toString(time);
 		model.filter = filter;
 		
-		model.records = new ArrayList(map.values());
+		//model.records;// = new Records(); //new ArrayList(map.values());
+		
+		
 		
 		return model;
 	}

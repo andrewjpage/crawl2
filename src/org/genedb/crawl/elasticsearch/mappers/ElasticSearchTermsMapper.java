@@ -20,4 +20,16 @@ public class ElasticSearchTermsMapper extends ElasticSearchBaseMapper implements
 		return null;
 	}
 
+	
+//	public static String getIndex() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	
+//	public static String getType() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
 }

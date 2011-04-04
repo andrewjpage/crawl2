@@ -1,47 +1,24 @@
 package org.genedb.crawl.elasticsearch.mappers;
 
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.sf.samtools.SAMRecord;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.action.get.GetRequestBuilder;
-import org.elasticsearch.client.action.search.SearchRequestBuilder;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
-import org.elasticsearch.index.query.xcontent.XContentQueryBuilder;
-import org.elasticsearch.node.Node;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchParseException;
-import org.genedb.crawl.CrawlErrorType;
-import org.genedb.crawl.CrawlException;
-import org.genedb.crawl.elasticsearch.Connection;
-import org.genedb.crawl.elasticsearch.json.JsonIzer;
 import org.genedb.crawl.model.BlastPair;
-import org.genedb.crawl.model.CrawlError;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
-import org.genedb.crawl.model.FeatureProperty;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Statistic;
 import org.gmod.cat.FeaturesMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -66,14 +43,14 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 			results.add(res);
 			logger.info(uniqueName);
 			try {
-				logger.info(getFromElastic(uniqueName, fields));
-				LocatedFeature f = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(uniqueName, fields), LocatedFeature.class);
+				logger.info(getFromElastic(connection.getIndex(), connection.getFeatureType(), uniqueName, fields));
+				LocatedFeature f = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(connection.getIndex(), connection.getFeatureType(), uniqueName, fields), LocatedFeature.class);
 				res.f = f.uniqueName;
 				res.ftype = f.type.name;
 				logger.info("parent?");
 				logger.info(f.parent);
 				if (f.parent != null) {
-					LocatedFeature f2 = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(f.parent, fields), LocatedFeature.class);
+					LocatedFeature f2 = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(connection.getIndex(), connection.getFeatureType(), f.parent, fields), LocatedFeature.class);
 					res.f2 = f2.uniqueName;
 					res.ftype2 = f2.type.name;
 					
@@ -82,7 +59,7 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 					
 					if (f2.parent != null) {
 						
-						LocatedFeature f3 = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(f2.parent, fields), LocatedFeature.class);
+						LocatedFeature f3 = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(connection.getIndex(), connection.getFeatureType(), f2.parent, fields), LocatedFeature.class);
 						res.f3 = f3.uniqueName;
 						res.ftype3 = f3.type.name;
 						
@@ -119,7 +96,7 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 		relationshipNames.add("parent");
 		
 		try {
-			LocatedFeature f = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(feature, fields), LocatedFeature.class);
+			LocatedFeature f = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(connection.getIndex(), connection.getFeatureType(), feature, fields), LocatedFeature.class);
 			logger.info(f);
 			logger.info(f.parent);
 			logger.info(f.parentRelationshipType);
@@ -134,7 +111,7 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 			hr.uniqueName = f.parent;
 			hr.relationship_type = f.parentRelationshipType;
 			
-			LocatedFeature p = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(f.parent, fields), LocatedFeature.class);
+			LocatedFeature p = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(connection.getIndex(), connection.getFeatureType(), f.parent, fields), LocatedFeature.class);
 			logger.info(p);
 			hr.type = p.type.name;
 			hr.name = p.name;
@@ -178,7 +155,8 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 			
 			SearchResponse response = 
 				connection.getClient()			
-				.prepareSearch(index)
+				.prepareSearch(connection.getIndex())
+				.setTypes(connection.getFeatureType())
 				.setQuery (QueryBuilders.queryString(queryString).phraseSlop(0))
 				.execute()
 				.actionGet();
@@ -224,7 +202,7 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 
 	@Override
 	public List<Feature> coordinates(List<String> features, String region) {
-		return fetchAndCopy(features,  new String[]{"uniqueName", "coordinates"});
+		return fetchAndCopy(connection.getIndex(), connection.getFeatureType(), features,  new String[]{"uniqueName", "coordinates"});
 	}
 
 	@Override
@@ -240,7 +218,9 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 	 */
 	@Override
 	public List<Feature> properties(List<String> features, List<String> types) {
-		return fetchAndCopy(features,  new String[]{"uniqueName", "properties"});
+		logger.debug("features");
+		logger.debug(features);
+		return fetchAndCopy(connection.getIndex(), connection.getFeatureType(), features,  new String[]{"uniqueName", "properties"});
 	}
 
 	@Override
@@ -251,17 +231,25 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 
 	@Override
 	public List<Feature> dbxrefs(List<String> features) {
-		return fetchAndCopy(features,  new String[]{"uniqueName", "dbxrefs"});
+		return fetchAndCopy(connection.getIndex(), connection.getFeatureType(), features,  new String[]{"uniqueName", "dbxrefs"});
 	}
 
 	@Override
 	public List<Feature> terms(List<String> features, List<String> cvs) {
-		return fetchAndCopy(features,  new String[]{"uniqueName", "terms"});
+		List<Feature> featureObjects = fetchAndCopy(connection.getIndex(), connection.getFeatureType(), features,  new String[]{"uniqueName", "terms"});
+		// currently there is no way to load terms from GFFs
+		// create empty terms arrays for web artemis
+		for (Feature feature : featureObjects) {
+			if (feature.terms == null) {
+				feature.terms = new ArrayList<Cvterm>();
+			}
+		}
+		return featureObjects;
 	}
 
 	@Override
 	public List<Feature> orthologues(List<String> features) {
-		return fetchAndCopy(features,  new String[]{"uniqueName", "orthologues"});
+		return fetchAndCopy(connection.getIndex(), connection.getFeatureType(), features,  new String[]{"uniqueName", "orthologues"});
 	}
 
 	@Override
@@ -326,8 +314,18 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	
-	
+//	public static String getIndex() {
+//		return "features";
+//	}
+//
+//	
+//	public static String getType() {
+//		return "Feature";
+//	}
+//	
+//	
 	
 	
 	

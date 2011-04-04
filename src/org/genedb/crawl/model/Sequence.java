@@ -1,9 +1,12 @@
 package org.genedb.crawl.model;
 
-public class Sequence {
+import java.io.Serializable;
+
+public class Sequence implements Serializable {
 	public int start;
 	public int end;
-	public int length;
+	public Integer length;
 	public String dna;
 	public String region;
+	public Integer organism_id;
 }

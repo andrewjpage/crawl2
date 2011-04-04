@@ -22,6 +22,12 @@
     <bean id="connection" class="org.genedb.crawl.elasticsearch.LocalConnection">
         <property name="pathLogs" value="${resource.elasticsearch.local.pathlogs}" />
         <property name="pathData" value="${resource.elasticsearch.local.pathdata}" />
+        
+        <property name="index" value="${resource.elasticsearch.index}" />
+        <property name="featureType" value="${resource.elasticsearch.featureType}" />
+        <property name="regionType" value="${resource.elasticsearch.regionType}" />
+        <property name="organismType" value="${resource.elasticsearch.organismType}" />
+        
     </bean>
 
 </beans>

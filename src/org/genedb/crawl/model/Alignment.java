@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.genedb.crawl.business;
+package org.genedb.crawl.model;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,9 +9,9 @@ import java.util.List;
 
 import net.sf.samtools.SAMFileReader;
 
-class Alignment {
+public class Alignment {
 	
-	public int fileID;
+	public Integer fileID;
 	public File file;
 	public String organism;
 	public List<String> chromosomes = new ArrayList<String>();

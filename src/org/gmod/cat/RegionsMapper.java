@@ -7,6 +7,7 @@ import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
+import org.genedb.crawl.model.Sequence;
 
 public interface RegionsMapper {
 	
@@ -28,7 +29,7 @@ public interface RegionsMapper {
 			@Param("offset") int offset,
 			@Param("exclude") List<String> exclude);
 	
-	public String sequence(
+	public Sequence sequence(
 			@Param("region") String region);
 	
 	public List<Feature> inorganism(
@@ -39,4 +40,5 @@ public interface RegionsMapper {
 	
 	public List<Cvterm> typesInOrganism(
 			@Param("organismid") int organismid);
+	
 }

@@ -89,12 +89,12 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 			
 			logger.debug("Storing: " + feature.uniqueName);
 			
-			IndexRequestBuilder builder = connection.getClient().prepareIndex(index, type, feature.uniqueName);
+			IndexRequestBuilder builder = connection.getClient().prepareIndex( connection.getIndex(), connection.getFeatureType(), feature.uniqueName);
 			String json = jsonIzer.toJson(feature);
 			
 //			
-//			logger.debug("Source:");
-//			logger.debug(json);
+			logger.debug("Source:");
+			logger.debug(json);
 			
 			builder.setSource(json);
 			
@@ -106,11 +106,24 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 //				}
 //			}
 			
+			//logger.debug(connection.getClient().prepareGet(index, type, feature.uniqueName).execute().actionGet().sourceAsString());
+			
+			
 			builder.execute().actionGet();
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
+
+	
+//	public static String getIndex() {
+//		return "features";
+//	}
+//
+//	
+//	public static String getType() {
+//		return "Feature";
+//	}
 	
 }

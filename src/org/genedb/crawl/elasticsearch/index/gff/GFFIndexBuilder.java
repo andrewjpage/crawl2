@@ -15,6 +15,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.genedb.crawl.elasticsearch.index.IndexBuilder;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchOrganismsMapper;
+import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
 import org.genedb.crawl.model.Organism;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -50,6 +51,7 @@ public class GFFIndexBuilder extends IndexBuilder {
 	
 	private ElasticSearchFeatureMapper featureMapper;
 	private ElasticSearchOrganismsMapper organismsMapper;
+	private ElasticSearchRegionsMapper regionsMapper;
 	
 	public void run() throws IOException, ParseException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
 		
@@ -60,6 +62,9 @@ public class GFFIndexBuilder extends IndexBuilder {
 		
 		organismsMapper = new ElasticSearchOrganismsMapper();
 		organismsMapper.setConnection(connection);
+		
+		regionsMapper = new ElasticSearchRegionsMapper();
+		regionsMapper.setConnection(connection);
 		
 		convertPath(gffs, getAndPossiblyStoreOrganism());
 		
@@ -114,7 +119,7 @@ public class GFFIndexBuilder extends IndexBuilder {
 	
 	private void convertFile(File gffFile, Organism organism) throws ParseException, IOException {
 		BufferedReader reader = getReader(gffFile);
-		new GFFAnnotatationAndFastaExtractor(reader, organism, featureMapper);
+		new GFFAnnotatationAndFastaExtractor(reader, organism, featureMapper, regionsMapper);
 	}
 	
 

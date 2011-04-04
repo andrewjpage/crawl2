@@ -72,17 +72,7 @@ public class RegionsController extends BaseQueryController {
 		}
 	}
 	
-	@RequestMapping(method=RequestMethod.POST, value={"/locations", "/locations.*"})
-	@ResourceDescription("Returns features and their locations on a region of interest")
-	public ResultsRegions locationsPOST(
-			ResultsRegions results,
-			@RequestParam("region") String region, 
-			@RequestParam("start") int start, 
-			@RequestParam("end") int end, 
-			@RequestParam(value="exclude", required=false) @ResourceDescription("A list of features to exclude.") List<String> exclude
-			) throws CrawlException {
-		return locations(results, region, start, end, exclude);
-	}
+	
 	
 	/**
 	 * The exclude parameter works in this form:
@@ -126,7 +116,7 @@ public class RegionsController extends BaseQueryController {
 		}
 		
 		if (end == null) {
-			end = regionsMapper.sequence(region).length();
+			end = regionsMapper.sequence(region).length;
 		}
 		
 		logger.info(String.format("Getting locations for %s.", region));
@@ -196,30 +186,30 @@ public class RegionsController extends BaseQueryController {
 			@RequestParam(value="metadata_only", required=false, defaultValue="false") boolean metadataOnly) {
 		
 		List<Sequence> sequences = new ArrayList<Sequence>();
+		Sequence sequence = regionsMapper.sequence(region);
+		sequences.add(sequence);
 		results.sequences = sequences;
 		
-		//int regionID = featuresMapper.getFeatureID(region);
-		String sequenceResidues = regionsMapper.sequence(region);
+		String sequenceResidues = sequence.dna;
 		
-		int length = sequenceResidues.length();
+		int length = (sequence.length == null) ? sequenceResidues.length() : sequence.length;
 		if (length == 0) {
 			return results;
 		}
 		
+		// if it's a simple case of no start or end position, just return what we've got
 		if (start == null && end == null) {
-			Sequence sequence = new Sequence();
-			if (! metadataOnly) {
-				sequence.dna = sequenceResidues;
+			
+			if (metadataOnly) {
+				sequence.dna = null;
 			}
 			sequence.start = 0;
 			sequence.end = length -1;
-			sequence.length = length;
 			sequence.region = region;
-			
-			sequences.add(sequence);
 			
 			return results;
 		}
+		
 		
 		if (start == null) {
 			start = 0;
@@ -230,7 +220,6 @@ public class RegionsController extends BaseQueryController {
 		}
 		
 		int lastResiduePosition = length -1;
-		
 		int actualStart = start -1;
 		int actualEnd = end -1;
 		
@@ -242,18 +231,16 @@ public class RegionsController extends BaseQueryController {
 			actualEnd = lastResiduePosition;
 		}
 		
-		String dna = sequenceResidues.substring(actualStart, actualEnd);
-		
-		Sequence sequence = new Sequence();
 		if (! metadataOnly) {
-			sequence.dna = dna;
+			sequence.dna = sequenceResidues.substring(actualStart, actualEnd);
+		} else {
+			sequence.dna = null;
 		}
+		
 		sequence.start = start;
 		sequence.end = end;
-		sequence.length = length;
+		sequence.length = sequence.dna.length();
 		sequence.region = region;
-		
-		sequences.add(sequence);
 		
 		return results;
 	}

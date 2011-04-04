@@ -94,12 +94,27 @@
   
   <select id="coordinates" resultMap="regionCoordinatesList" >
   
-        SELECT sf.uniquename AS region, f.uniquename AS uniqueName, f.name as name, fl.fmin as fmin, fl.fmax as fmax, fl.phase as phase, fl.strand as strand
+        SELECT 
+            sf.uniquename AS region, 
+            f.uniquename AS uniqueName, 
+            f.name as name, 
+            f.organism_id, 
+            sfp.value as toplevel,
+            fl.fmin as fmin, 
+            fl.fmax as fmax, 
+            fl.phase as phase, 
+            fl.strand as strand
 		  FROM feature f
 		  JOIN featureloc fl ON f.feature_id = fl.feature_id 
 		  JOIN feature sf ON fl.srcfeature_id = sf.feature_id
+		  JOIN cvterm c on sf.type_id = c.cvterm_id 
+		  LEFT OUTER JOIN featureprop sfp on sf.feature_id = sfp.feature_id and sfp.type_id = 
+		      (select cvterm_id from cvterm join cv using (cv_id) where cv.name = 'genedb_misc' and cvterm.name = 'top_level_seq') 
+		  
 		WHERE f.uniquename in <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach> 
-	   
+	       
+	        
+	       
 	   <if test="region != null"> 
 		  AND sf.uniquename = #{region}
 	   </if>
@@ -109,12 +124,11 @@
   <resultMap id="regionCoordinatesList" type="org.genedb.crawl.model.Feature">
         <result property="uniqueName" column="uniqueName"/>
         <result property="name" column="name"/>
-        <collection property="coordinates" ofType="org.genedb.crawl.model.Coordinates"> 
-            <result property="region" column="region"/> 
-            <result property="fmin" column="fmin"/> 
-            <result property="fmax" column="fmax"/> 
-            <result property="strand" column="strand"/> 
-       </collection>
+        <result property="organism_id" column="organism_id"/>
+        
+        <collection property="coordinates" resultMap="org.gmod.cat.FeatureMapper.coordinates"/>
+
+        
     </resultMap>
     
   
@@ -602,7 +616,7 @@
     </sql>
     
     
-    <select id="timelastmodified" resultMap="timelastmodified">
+    <select id="timelastmodified" resultMap="basicFeatureResult">
         SELECT feature_id, organism_id, uniqueName, f.name, c.name as type 
         
         FROM feature f
@@ -619,7 +633,7 @@
         
     </select>
     
-    <resultMap type="org.genedb.crawl.model.Feature" id="timelastmodified">
+    <resultMap type="org.genedb.crawl.model.Feature" id="basicFeatureResult">
         <result property="feature_id" column="feature_id" />
         <result property="uniqueName" column="uniqueName" />
         <result property="name" column="name" />

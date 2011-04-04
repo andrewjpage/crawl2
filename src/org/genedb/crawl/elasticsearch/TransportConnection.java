@@ -6,7 +6,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
-public class TransportConnection implements Connection {
+public class TransportConnection extends BaseConnection implements Connection {
 	
 	TransportClient client;
 	private String host;

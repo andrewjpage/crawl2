@@ -8,7 +8,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
-public class LocalConnection implements Connection {
+public class LocalConnection extends BaseConnection implements Connection {
 
 	Client client;
 	

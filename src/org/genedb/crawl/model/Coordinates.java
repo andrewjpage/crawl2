@@ -20,4 +20,7 @@ public class Coordinates implements Serializable {
 	
 	@XmlAttribute(required=true)
 	public int strand;
+	
+	@XmlAttribute(required=false)
+	public String toplevel;
 }

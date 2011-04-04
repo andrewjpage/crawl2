@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
+import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
@@ -38,7 +39,7 @@ public class GFFAnnotatationAndFastaExtractor {
 		}
 	}
 	
-	public GFFAnnotatationAndFastaExtractor(BufferedReader buf, Organism organism, ElasticSearchFeatureMapper mapper) throws IOException {
+	public GFFAnnotatationAndFastaExtractor(BufferedReader buf, Organism organism, ElasticSearchFeatureMapper featureMapper, ElasticSearchRegionsMapper regionsMapper) throws IOException {
 		
 		List<RegionFeatureBuilder> sequences = new ArrayList<RegionFeatureBuilder>();
 		
@@ -63,7 +64,7 @@ public class GFFAnnotatationAndFastaExtractor {
 					
 					
 					LocatedFeature feature = new FeatureBeanFactory(organism, line).getFeature();
-					mapper.createOrUpdate(feature);
+					featureMapper.createOrUpdate(feature);
 					
 					
 				} else {
@@ -84,7 +85,8 @@ public class GFFAnnotatationAndFastaExtractor {
 			}
 			
 			for (RegionFeatureBuilder regionBuilder : sequences) {
-				mapper.createOrUpdate(regionBuilder.getRegion());
+				Feature region = regionBuilder.getRegion();
+				regionsMapper.createOrUpdate(region.uniqueName, region);
 			}
 			
 		} finally {

@@ -4,9 +4,15 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="org.gmod.cat.FeatureMapper">  
     
-    <select id="get" resultType="org.genedb.crawl.model.Feature">
-        SELECT feature_id, organism_id, uniqueName 
+    <select id="get" resultMap="org.gmod.cat.FeaturesMapper.basicFeatureResult" >
+        SELECT 
+            feature_id, 
+            organism_id, 
+            uniqueName,
+            f.name,
+            type.name as type 
         FROM feature f
+        JOIN cvterm type ON type.cvterm_id = f.type_id
         WHERE <include refid="featureSelector"/>
     </select>
     
@@ -80,23 +86,34 @@
     
     
     
-    <select id="coordinates" resultMap="regionCoordinatesList" >
+    <select id="coordinates" resultMap="coordinates" >
   
-        SELECT sf.uniquename AS region, f.uniquename AS uniqueName, f.name as name, fl.fmin as fmin, fl.fmax as fmax, fl.phase as phase, fl.strand as strand
+        SELECT 
+            sf.uniquename AS region, 
+            f.uniquename AS uniqueName, 
+            f.name as name, 
+            sfp.value as toplevel, 
+            fl.fmin as fmin, 
+            fl.fmax as fmax, 
+            fl.phase as phase, 
+            fl.strand as strand
           FROM feature f
           JOIN featureloc fl ON f.feature_id = fl.feature_id 
           JOIN feature sf ON fl.srcfeature_id = sf.feature_id
+          LEFT OUTER JOIN featureprop sfp on sf.feature_id = sfp.feature_id and sfp.type_id = 
+              (select cvterm_id from cvterm join cv using (cv_id) where cv.name = 'genedb_misc' and cvterm.name = 'top_level_seq')
           
         WHERE <include refid="featureSelector"/> 
        
   
   </select>
   
-    <resultMap id="regionCoordinatesList" type="org.genedb.crawl.model.Coordinates">
+    <resultMap id="coordinates" type="org.genedb.crawl.model.Coordinates">
        <result property="region" column="region"/> 
        <result property="fmin" column="fmin"/> 
        <result property="fmax" column="fmax"/> 
-       <result property="strand" column="strand"/> 
+       <result property="strand" column="strand"/>
+       <result property="toplevel" column="toplevel"/>  
     </resultMap>
     
     

@@ -35,7 +35,8 @@
   
   <sql id="locations">
     SELECT
-    f.uniqueName as uniqueName, 
+    f.uniqueName as uniqueName,
+    f.organism_id, 
     type.name as type, 
     fl.fmin, 
     fl.fmax,
@@ -107,6 +108,8 @@
   
   <resultMap type="org.genedb.crawl.model.LocatedFeature" id="locations">
     <result property="uniqueName" column="uniqueName"/>
+    <result property="feature_id" column="feature_id"/>
+    <result property="organism_id" column="organism_id"/>
     <result property="isObsolete" column="is_obsolete"/>
     <result property="strand" column="strand"/>
     <result property="fmin" column="fmin"/>
@@ -122,8 +125,14 @@
     
   </resultMap>
   
-  <select id="sequence" resultType="String">
-        SELECT residues as dna FROM feature WHERE feature_id = (select feature_id from feature where uniqueName = #{region} )
+  <select id="sequence" resultType="org.genedb.crawl.model.Sequence">
+        SELECT 
+            residues as dna, 
+            seqlen as length, 
+            organism_id 
+        FROM feature 
+        WHERE uniqueName = #{region}
+         
   </select>
   
   <sql id="topleveltype"> select cvterm_id from cvterm join cv using (cv_id) where cv.name = 'genedb_misc' and cvterm.name = 'top_level_seq' </sql> 

@@ -71,6 +71,12 @@ public abstract class IndexBuilder {
 			
 		}
 		
+		connection.setIndex(elasticSearchProperties.getProperty("resource.elasticsearch.index"));
+		connection.setFeatureType(elasticSearchProperties.getProperty("resource.elasticsearch.featureType"));
+		connection.setOrganismType(elasticSearchProperties.getProperty("resource.elasticsearch.organismType"));
+		connection.setRegionType(elasticSearchProperties.getProperty("resource.elasticsearch.regionType"));
+		
+		
 		client = connection.getClient();
 		
 	}

@@ -22,8 +22,8 @@ public class Feature implements Serializable {
 	@XmlAttribute(required=false)
 	public String residues;
 	
-	@XmlAttribute(required=false)
-	public Boolean topLevel;
+//	@XmlAttribute(required=false)
+//	public Boolean topLevel;
 	
 	@XmlElement(required=false)
 	public List<String> genes;

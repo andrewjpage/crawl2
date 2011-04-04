@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @ResourceDescription("Feature related queries")
 public class FeaturesController extends BaseQueryController {
 	
-	private Logger logger = Logger.getLogger(FeaturesController.class);
+	private static Logger logger = Logger.getLogger(FeaturesController.class);
 	
 	@Autowired
 	FeaturesMapper featuresMapper;
@@ -53,13 +53,13 @@ public class FeaturesController extends BaseQueryController {
 		CHILDREN
 	}
 	
-	private Set<String> geneTypes = new HashSet<String>(Arrays.asList(new String[]{"gene", "pseudogene"}));
+	
 	private String[] defaultRelationshipTypes = new String[] {"part_of", "derives_from"};
 	
 	@ResourceDescription("Get a feature's gene")
 	@RequestMapping(method=RequestMethod.GET, value="/genes")
 	public Results genes(Results results, @RequestParam(value="features") List<String> features) {
-		results.features = getGeneFeatures(features);
+		results.features = MapperUtil.getGeneFeatures(featuresMapper, features);
 		return results;
 		
 	}
@@ -82,7 +82,7 @@ public class FeaturesController extends BaseQueryController {
 		if (root_on_genes) {
 			featuresToRecurse = new ArrayList<String>();
 			
-			Collection<Feature> featureGenes = getGeneFeatures(features);
+			Collection<Feature> featureGenes = MapperUtil.getGeneFeatures(featuresMapper,features);
 			
 			for (Feature fg : featureGenes) {
 				featuresToRecurse.addAll(fg.genes);
@@ -284,49 +284,7 @@ public class FeaturesController extends BaseQueryController {
 //		return new ArrayList<FeatureGenes>(map.values());
 //	}
 
-	private List<Feature> getGeneFeatures(List<String> features) {
-		Map <String, Feature> map = new HashMap<String, Feature>();
-		List<HierarchyGeneFetchResult> possibleGenes = featuresMapper.getGeneForFeature(features);
-		
-		for (HierarchyGeneFetchResult result : possibleGenes) {
-			
-			String[] ftypes = new String[]{result.ftype,result.ftype2,result.ftype3};
-			String[] fs = new String[]{result.f,result.f2,result.f3};
-			
-			if (! map.containsKey(result.f)) {
-				//FeatureGenes fg = new FeatureGenes();
-				//fg.feature = result.f;
-				//fg.type = result.ftype;
-				
-				Feature feature = new Feature();
-				feature.uniqueName = result.f;
-				feature.genes = new ArrayList<String>();
-				//feature.t
-				
-				Cvterm c = new Cvterm();
-				c.name = result.ftype;
-				
-				map.put(result.f, feature);
-			}
-			
-			for (int i = 0; i < ftypes.length; i++) {
-				String ftype = ftypes[i];
-				String f = fs[i];
-				
-				logger.debug(String.format("Type: %s, Feature %s .", ftype, f));
-				
-				if (geneTypes.contains(ftype)) {
-					map.get(result.f).genes.add(f);
-				}
-				
-			}
-			
-		}
-		
-		logger.debug(map);
-		
-		return new ArrayList<Feature>(map.values());
-	}
+	
 	
 	/**
 	 * 
