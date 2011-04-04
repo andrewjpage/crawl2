@@ -116,7 +116,7 @@ public class RegionsController extends BaseQueryController {
 		}
 		
 		if (end == null) {
-			end = regionsMapper.sequence(region).length;
+			end = regionsMapper.sequence(region).dna.length();
 		}
 		
 		logger.info(String.format("Getting locations for %s.", region));
@@ -239,7 +239,7 @@ public class RegionsController extends BaseQueryController {
 		
 		sequence.start = start;
 		sequence.end = end;
-		sequence.length = sequence.dna.length();
+		sequence.length = length;
 		sequence.region = region;
 		
 		return results;
