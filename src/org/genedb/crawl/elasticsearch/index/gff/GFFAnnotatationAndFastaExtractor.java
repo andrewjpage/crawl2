@@ -26,7 +26,7 @@ public class GFFAnnotatationAndFastaExtractor {
 			region.organism_id = organism_id;
 			region.type = new Cvterm();
 			region.type.name = "region";
-			region.topLevel = true;
+			//region.topLevel = true;
 		}
 		
 		public void addSequence(String line) {
@@ -86,7 +86,7 @@ public class GFFAnnotatationAndFastaExtractor {
 			
 			for (RegionFeatureBuilder regionBuilder : sequences) {
 				Feature region = regionBuilder.getRegion();
-				regionsMapper.createOrUpdate(region.uniqueName, region);
+				regionsMapper.createOrUpdate(region);
 			}
 			
 		} finally {

@@ -1,12 +1,10 @@
 package org.genedb.crawl.business;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +12,7 @@ import java.util.Map.Entry;
 
 import net.sf.samtools.AlignmentBlock;
 import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFileReader.ValidationStringency;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.SAMSequenceRecord;
@@ -44,6 +43,7 @@ public class Sam {
 		if (inputSam == null) {
 			throw new Exception ("Could not find the file " + fileID);
 		}
+		inputSam.setValidationStringency(ValidationStringency.SILENT);
 		return inputSam;
 	}
 	
@@ -117,11 +117,13 @@ public class Sam {
 	
 	
 	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
-		logger.debug(String.format("fileID: %d\tlocation: '%s:%d-%d'\tcontained?%s\tfilter: %d(%s)", fileID, sequence, start, end, contained, filter, padLeft(Integer.toBinaryString(filter), 8)));
+		logger.debug("FileID : " + fileID);
 		return this.query(getSamOrBam(fileID), sequence, start, end, contained, properties, filter);
 	}
 	
 	public synchronized MappedQuery query(SAMFileReader file, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
+		
+		logger.debug(String.format("file: %s\tlocation: '%s:%d-%d'\tcontained?%s\tfilter: %d(%s)", file, sequence, start, end, contained, filter, padLeft(Integer.toBinaryString(filter), 8)));
 		
 		long startTime = System.currentTimeMillis();
 		
@@ -167,6 +169,8 @@ public class Sam {
 		logger.info(props);
 		
 		model.count = 0;
+		
+		
 		
 		SAMRecordIterator i = null;
 		try {
@@ -265,7 +269,7 @@ public class Sam {
 	    	coverage[i] = 0;  
 	    }
 		
-	    logger.debug("starting iterations");
+	    logger.debug("starting iterations, filter: " + filter);
 	    logger.debug(start + "," + end + "," + window + "," + nBins);
 		
 		SAMRecordIterator iter = null;

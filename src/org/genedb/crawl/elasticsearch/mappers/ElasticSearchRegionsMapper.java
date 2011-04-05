@@ -340,8 +340,14 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	@Override
 	public Sequence sequence(String region) {
 		
+		Sequence sequence = new Sequence();
+		sequence.dna = "";
+		sequence.length = 0;
+		sequence.organism_id = -1;
+		
 		try {
-			logger.debug(String.format("%s %s %s %s %s",connection.getIndex(), connection.getRegionType(), region, connection, connection.getClient()));
+			
+			logger.info(String.format("%s %s %s %s %s",connection.getIndex(), connection.getRegionType(), region, connection, connection.getClient()));
 			String json = connection
 							.getClient()
 							.prepareGet()
@@ -351,19 +357,22 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 							.execute()
 							.actionGet()
 							.sourceAsString();
+			
+			
+			
 			Feature regionFeature = (Feature) jsonIzer.fromJson(json, Feature.class);
 			
-			Sequence sequence = new Sequence();
 			sequence.dna = regionFeature.residues;
 			sequence.length = regionFeature.residues.length();
 			sequence.organism_id = regionFeature.organism_id;
 			
-			return sequence;
+			
 			
 		} catch (Exception e) {
-			throw new RuntimeException(e);
-			
+			logger.error(e);
 		} 
+		
+		return sequence;
 		
 	}
 
@@ -474,6 +483,10 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		}
 		
 		return new ArrayList<Cvterm>(terms);
+	}
+	
+	public void createOrUpdate(Feature feature) {
+		this.createOrUpdate(connection.getIndex(), connection.getRegionType(), feature.uniqueName, feature);
 	}
 
 
