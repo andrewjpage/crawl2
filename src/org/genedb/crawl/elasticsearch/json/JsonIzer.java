@@ -43,9 +43,6 @@ public class JsonIzer {
 	}
 	
 	public Object fromJson(String string, @SuppressWarnings("rawtypes") Class cls) throws JsonParseException, JsonMappingException, IOException {
-		System.out.println("?????????");
-		System.out.println(string);
-		System.out.println("?????????");
 		@SuppressWarnings("unchecked")
 		Object obj =  mapper.readValue(string, cls);
 		return obj;

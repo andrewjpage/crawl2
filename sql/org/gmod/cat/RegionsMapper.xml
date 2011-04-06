@@ -33,7 +33,11 @@
   </select>
   
   
-  <sql id="locations">
+
+ 
+  
+  <select id="locations" resultMap="locations" >
+    
     SELECT
     f.uniqueName as uniqueName,
     f.organism_id, 
@@ -58,30 +62,6 @@
     LEFT JOIN feature f2 ON fr.object_id = f2.feature_id 
     LEFT JOIN cvterm frt ON fr.type_id = frt.cvterm_id AND frt.cvterm_id in 
                                (select cvterm_id from cvterm where name in ('part_of', 'derives_from'))  
-                               
-  </sql>
-  
-  
-  <select id="locationsPaged" resultMap="locations" >
-    
-    <include refid="locations" />
-    
-    <if test="exclude != null"> 
-        WHERE type.name NOT IN 
-        <foreach item="item" index="index" collection="exclude" open="(" separator="," close=")"> 
-            #{item} 
-        </foreach> 
-    </if> 
-    
-    ORDER BY fl.fmin, fl.fmax
-    
-    LIMIT #{limit} OFFSET #{offset}
-    
-  </select>
-  
-  <select id="locations" resultMap="locations" >
-    
-    <include refid="locations" />
 	
 	
 	WHERE 
@@ -95,12 +75,11 @@
 		
 	]]>
 	
-	<if test="exclude != null"> 
-        AND type.name NOT IN 
-        <foreach item="item" index="index" collection="exclude" open="(" separator="," close=")"> 
+	<if test="types != null"> AND type.name <if test="exclude == true"> NOT </if> IN 
+        <foreach item="item" index="index" collection="types" open="(" separator="," close=")"> 
             #{item} 
         </foreach> 
-    </if> 
+    </if>
 	    
 	ORDER BY fl.fmin, fl.fmax
 	

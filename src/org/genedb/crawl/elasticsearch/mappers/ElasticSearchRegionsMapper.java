@@ -74,7 +74,7 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	}
 	
 	
-	private BoolQueryBuilder isOverlap(String region, int start, int end, List<String> exclude) {
+	private BoolQueryBuilder isOverlap(String region, int start, int end, boolean exclude, List<String> types) {
 		
 		RangeQueryBuilder startLowerThanRequested = 
 			QueryBuilders.rangeQuery("fmin")
@@ -122,12 +122,21 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			.must(isOverlap)
 			.must(regionQuery);
 		
-		if (exclude != null) {
-			for (String exclude_type : exclude) {
+		if (types != null) {
+			
+			BoolQueryBuilder typesQuery = QueryBuilders.boolQuery();
+			
+			for (String type : types) {
 				FieldQueryBuilder excludeQuery = 
-					QueryBuilders.fieldQuery("type.name", exclude_type);
-				isOverlapOnRegion.mustNot(excludeQuery);
+					QueryBuilders.fieldQuery("type.name", type);
+				if (exclude) {
+					typesQuery.mustNot(excludeQuery);
+				} else {
+					typesQuery.should(excludeQuery);
+				}
 			}
+			
+			isOverlapOnRegion.must(typesQuery);
 		}
 		
 		return isOverlapOnRegion;
@@ -149,7 +158,7 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	public LocationBoundaries locationsMinAndMaxBoundaries(String region,
 			int start, int end, List<Integer> types) {
 		
-		BoolQueryBuilder isOverlap = isOverlap(region, start, end, new ArrayList<String>());
+		BoolQueryBuilder isOverlap = isOverlap(region, start, end, false, null);
 		
 		SearchRequestBuilder builder = 
 			connection
@@ -226,45 +235,45 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	}
 	
 	
-	@Override
-	public List<LocatedFeature> locationsPaged(String region, int limit,
-			int offset, List<String> exclude) {
-		
-		SearchRequestBuilder builder = connection.getClient()
-			.prepareSearch(connection.getIndex())
-			.setTypes(connection.getFeatureType())
-			.addSort(SortBuilders.fieldSort("fmin"))
-			.addSort(SortBuilders.fieldSort("fmax"));
-		
-		FieldQueryBuilder regionQuery = 
-			QueryBuilders.fieldQuery("region", region);
-		
-		RangeQueryBuilder rangeQuery = 
-			QueryBuilders.rangeQuery("fmin").from(0);
-		
-		BoolQueryBuilder locations =
-			QueryBuilders.boolQuery()
-				.must(rangeQuery)
-				.must(regionQuery);
-		
-		SearchResponse response = builder
-			.setQuery(locations)
-			.setExplain(true)
-			.setSize(limit)
-			.setFrom(offset)
-			.execute()
-			.actionGet();
-		
-		return parseLocations(region, response);
-	}
+//	@Override
+//	public List<LocatedFeature> locationsPaged(String region, int limit,
+//			int offset,boolean exclude, List<String> types) {
+//		
+//		SearchRequestBuilder builder = connection.getClient()
+//			.prepareSearch(connection.getIndex())
+//			.setTypes(connection.getFeatureType())
+//			.addSort(SortBuilders.fieldSort("fmin"))
+//			.addSort(SortBuilders.fieldSort("fmax"));
+//		
+//		FieldQueryBuilder regionQuery = 
+//			QueryBuilders.fieldQuery("region", region);
+//		
+//		RangeQueryBuilder rangeQuery = 
+//			QueryBuilders.rangeQuery("fmin").from(0);
+//		
+//		BoolQueryBuilder locations =
+//			QueryBuilders.boolQuery()
+//				.must(rangeQuery)
+//				.must(regionQuery);
+//		
+//		SearchResponse response = builder
+//			.setQuery(locations)
+//			.setExplain(true)
+//			.setSize(limit)
+//			.setFrom(offset)
+//			.execute()
+//			.actionGet();
+//		
+//		return parseLocations(region, response);
+//	}
 	
 	
 	
 	@Override
-	public List<LocatedFeature> locations(String region, int start, int end,
-			List<String> exclude) {
+	public List<LocatedFeature> locations(String region, int start, int end, boolean exclude,
+			List<String> types) {
 		
-		BoolQueryBuilder isOverlap = isOverlap(region, start, end, exclude);
+		BoolQueryBuilder isOverlap = isOverlap(region, start, end, exclude, types);
 		
 		SearchRequestBuilder builder = connection.getClient()
 			.prepareSearch(connection.getIndex())

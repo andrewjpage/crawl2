@@ -107,7 +107,8 @@ public class RegionsController extends BaseQueryController {
 			@RequestParam("region") String region, 
 			@RequestParam(value="start",required=false) Integer start, 
 			@RequestParam(value="end", required=false) Integer end, 
-			@RequestParam(value="exclude", required=false) @ResourceDescription("A list of features to exclude.") List<String> exclude
+			@RequestParam(value="exclude", defaultValue="true") boolean exclude,
+			@RequestParam(value="types", required=false) @ResourceDescription("A list of features types to exclude or include.") List<String> types
 			) throws CrawlException {
 		
 		
@@ -141,7 +142,7 @@ public class RegionsController extends BaseQueryController {
         
 		logger.info( String.format("Locating on %s : %s-%s (%s)", region, actualStart, actualEnd, exclude));
 		
-		results.locations = regionsMapper.locations(region, actualStart, actualEnd, exclude);
+		results.locations = regionsMapper.locations(region, actualStart, actualEnd, exclude, types);
 		results.actual_end = actualEnd;
 		results.actual_start = actualStart;
 		
@@ -149,31 +150,32 @@ public class RegionsController extends BaseQueryController {
 
 	}
 	
-	@RequestMapping(method=RequestMethod.GET, value={"/locations_paged", "/locations_paged.*"})
-	@ResourceDescription("Returns features and their locations on a region of interest, paged by limit and offset.")
-	public ResultsRegions locationsPaged(
-			ResultsRegions results,
-			@RequestParam("region") String region, 
-			@RequestParam("limit") int limit, 
-			@RequestParam("offset") int offset, 
-			@RequestParam(value="exclude", required=false) @ResourceDescription("A list of features to exclude.") List<String> exclude
-			) throws CrawlException {
-		
-		
-		logger.info(String.format("Getting locations for %s.", region));
-				
-		// trying to speed up the boundary query by determining the types in advance
-        List<Integer> geneTypes = termsMapper.getCvtermIDs("sequence", new String[] {"gene", "pseudogene"});
-        
-        logger.info("Gene Types " + geneTypes);
-        
-		logger.info( String.format("Locating paged on %s : %s-%s (%s)", region, limit, offset, exclude));
-		
-		results.locations = regionsMapper.locationsPaged(region, limit, offset, exclude);
-		
-		return results;
-
-	}
+//	@RequestMapping(method=RequestMethod.GET, value={"/locations_paged", "/locations_paged.*"})
+//	@ResourceDescription("Returns features and their locations on a region of interest, paged by limit and offset.")
+//	public ResultsRegions locationsPaged(
+//			ResultsRegions results,
+//			@RequestParam("region") String region, 
+//			@RequestParam("limit") int limit, 
+//			@RequestParam("offset") int offset, 
+//			@RequestParam(value="exclude", defaultValue="true") boolean exclude,
+//			@RequestParam(value="types", required=false) @ResourceDescription("A list of features types to exclude or include.") List<String> types
+//			) throws CrawlException {
+//		
+//		
+//		logger.info(String.format("Getting locations for %s.", region));
+//				
+//		// trying to speed up the boundary query by determining the types in advance
+//        List<Integer> geneTypes = termsMapper.getCvtermIDs("sequence", new String[] {"gene", "pseudogene"});
+//        
+//        logger.info("Gene Types " + geneTypes);
+//        
+//		logger.info( String.format("Locating paged on %s : %s-%s (%s)", region, limit, offset, exclude));
+//		
+//		results.locations = regionsMapper.locationsPaged(region, limit, offset, exclude, types);
+//		
+//		return results;
+//
+//	}
 	
 	
 	@RequestMapping(method=RequestMethod.GET, value="/sequence")

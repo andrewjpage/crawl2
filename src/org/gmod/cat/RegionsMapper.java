@@ -21,13 +21,15 @@ public interface RegionsMapper {
 			@Param("region") String region, 
 			@Param("start") int start, 
 			@Param("end") int end,
-			@Param("exclude") List<String> exclude);
+			@Param("exclude") boolean exclude,
+			@Param("types") List<String> types);
 	
-	public List<LocatedFeature> locationsPaged(
-			@Param("region") String region, 
-			@Param("limit") int limit, 
-			@Param("offset") int offset,
-			@Param("exclude") List<String> exclude);
+//	public List<LocatedFeature> locationsPaged(
+//			@Param("region") String region, 
+//			@Param("limit") int limit, 
+//			@Param("offset") int offset,
+//			@Param("exclude") boolean exclude,
+//			@Param("types") List<String> types);
 	
 	public Sequence sequence(
 			@Param("region") String region);
