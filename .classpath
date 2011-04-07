@@ -6,8 +6,7 @@
 	<classpathentry kind="src" path="tst"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/local/artemis.jar"/>
-	<classpathentry kind="lib" path="lib/local/picard-1.27.jar"/>
-	<classpathentry kind="lib" path="lib/local/sam-1.27.jar"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?ivyXmlPath=ivy.xml&amp;confs=*"/>
+	<classpathentry kind="lib" path="lib/local/sam-1.42.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
