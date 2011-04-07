@@ -29,7 +29,9 @@
 <property name="elasticsearch.data.home" value="${basedir}/data" />
 
 <path id="lib.compile.path">
-	<fileset dir="${ivy.lib.dir}/compile" />
+	<fileset dir="${ivy.lib.dir}/compile" >
+		<include name="**/*.jar"/>
+	</fileset>
 	<fileset dir="${lib.dir}/local" />
 </path>
 
@@ -39,10 +41,8 @@
 </path>
 
 <path id="test">
-    <pathelement location="lib/ivy/compile/jar-junit-junit-4.8.2.jar" />
-	<pathelement location="lib/ivy/compile/jar-com.springsource.org.postgresql.jdbc4-com.springsource.org.postgresql.jdbc4-8.3.604.jar" />
-	<pathelement location="${build.packages.home}/jar-mybatis-mybatis-3.0.2.jar" />
-    <pathelement location="${build.classes.home}" />
+	<path refid="lib.compile.path" />
+	<pathelement location="${build.classes.home}" />
 	<pathelement location="${basedir}" />
 </path>
 
@@ -57,13 +57,17 @@
 	<mkdir dir="${report.home}" />
 </target>
 
+
 <target name="clean">
     <delete dir="${build}" includeEmptyDirs="true"/>
-    <delete dir="${ivy.lib.dir}" includeEmptyDirs="true"/>
 	<delete dir="${report.home}" includeEmptyDirs="true"/>
 	<delete dir="war/WEB-INF/classes/" includeEmptyDirs="true"/>
 	<delete file="war/WEB-INF/crawl-repository.xml" />
 	<delete dir="${build}" includeEmptyDirs="true"/>
+</target>
+	
+<target name="clean-ivy" >
+    <delete dir="${ivy.lib.dir}" includeEmptyDirs="true"/>
 </target>
 	
 <target name="clean-es">
@@ -243,7 +247,7 @@
 </target>
 
 	
-<target name="test" >
+<target name="test" depends="compile-test" >
 	<fail message="The 'config' property must be set" unless="config"/>
 	<junit printsummary="yes" fork="yes" haltonfailure="yes">
 		 <classpath>
@@ -260,9 +264,19 @@
 		        
         <!-- add tests or comment out as necessary -->
 
-        <test todir="${report.home}" 
+        <!--<test todir="${report.home}" 
               name="org.gmod.cat.TestSimple" 
-              haltonfailure="yes" />
+              haltonfailure="yes" />-->
+		
+		<batchtest fork="yes" todir="${report.home}">
+		    <fileset dir="${basedir}/tst">
+		      <include name="**/*Test*.java"/>
+		      <exclude name="**/AllTests.java"/>
+		    </fileset>
+		  </batchtest>
+
+		
+		
 	</junit>  
 	
 </target>
