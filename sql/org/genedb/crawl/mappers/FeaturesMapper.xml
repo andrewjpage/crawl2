@@ -2,7 +2,7 @@
 <!DOCTYPE mapper 
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
-<mapper namespace="org.gmod.cat.FeaturesMapper">  
+<mapper namespace="org.genedb.crawl.mappers.FeaturesMapper">  
 
   
   <select id="getFeatureID" resultType="int">
@@ -126,7 +126,7 @@
         <result property="name" column="name"/>
         <result property="organism_id" column="organism_id"/>
         
-        <collection property="coordinates" resultMap="org.gmod.cat.FeatureMapper.coordinates"/>
+        <collection property="coordinates" resultMap="org.genedb.crawl.mappers.FeatureMapper.coordinates"/>
 
         
     </resultMap>
@@ -344,8 +344,8 @@
                 <result property="value" column="prop"/>
                 <association property="type" resultMap="type" />
             </collection> 
-            <collection property="pubs" ofType="org.genedb.crawl.model.Pub" select="org.gmod.cat.FeatureCvtermMapper.featureCvTermPubs" column="feature_cvterm_id"  />
-            <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" select="org.gmod.cat.FeatureCvtermMapper.featureCvTermDbxrefs" column="feature_cvterm_id"  /> 
+            <collection property="pubs" ofType="org.genedb.crawl.model.Pub" select="org.genedb.crawl.mappers.FeatureCvtermMapper.featureCvTermPubs" column="feature_cvterm_id"  />
+            <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" select="org.genedb.crawl.mappers.FeatureCvtermMapper.featureCvTermDbxrefs" column="feature_cvterm_id"  /> 
         </collection>
     </resultMap>
     

@@ -2,9 +2,9 @@
 <!DOCTYPE mapper 
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
-<mapper namespace="org.gmod.cat.FeatureMapper">  
+<mapper namespace="org.genedb.crawl.mappers.FeatureMapper">  
     
-    <select id="get" resultMap="org.gmod.cat.FeaturesMapper.basicFeatureResult" >
+    <select id="get" resultMap="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult" >
         SELECT 
             feature_id, 
             organism_id, 

@@ -7,13 +7,12 @@
 
   <mappers>
   
-    <mapper resource="sql/org/gmod/cat/FeatureCvtermMapper.xml"/>
-    <mapper resource="sql/org/gmod/cat/OrganismsMapper.xml"/>
-    <mapper resource="sql/org/gmod/cat/RegionsMapper.xml"/>
-    <mapper resource="sql/org/gmod/cat/TermsMapper.xml"/>
-    <mapper resource="sql/org/gmod/cat/FeaturesMapper.xml"/>
-    
-    <mapper resource="sql/org/gmod/cat/FeatureMapper.xml"/>
+    <mapper resource="sql/org/genedb/crawl/mappers/FeatureCvtermMapper.xml"/>
+    <mapper resource="sql/org/genedb/crawl/mappers/OrganismsMapper.xml"/>
+    <mapper resource="sql/org/genedb/crawl/mappers/RegionsMapper.xml"/>
+    <mapper resource="sql/org/genedb/crawl/mappers/TermsMapper.xml"/>
+    <mapper resource="sql/org/genedb/crawl/mappers/FeaturesMapper.xml"/>
+    <mapper resource="sql/org/genedb/crawl/mappers/FeatureMapper.xml"/>
     
     
   </mappers>

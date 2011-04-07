@@ -2,7 +2,7 @@
 <!DOCTYPE mapper 
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
-<mapper namespace="org.gmod.cat.RegionsMapper">  
+<mapper namespace="org.genedb.crawl.mappers.RegionsMapper">  
 
   <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/>
     
@@ -17,8 +17,9 @@
 	
 	JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = 
 	   (select feature_id from feature where uniqueName = #{region} )  )
+	JOIN cvterm t ON f.type_id = t.cvterm_id
 	
-	WHERE f.type_id in 
+	WHERE t.name in 
 	    <foreach item="item" index="index" collection="types" open="(" separator="," close=")"> 
             #{item} 
         </foreach> 
