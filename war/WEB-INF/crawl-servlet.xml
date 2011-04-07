@@ -31,7 +31,7 @@
         <property name="showParameters"><value>${showParameters}</value></property>
     </bean>
     
-    <bean id="alignmentStore" class="org.genedb.crawl.business.AlignmentStore">
+    <bean id="alignmentStore" class="org.genedb.crawl.bam.AlignmentStore">
         <property name="alignmentFiles" ><value>${alignments}</value></property>
     </bean>
     
