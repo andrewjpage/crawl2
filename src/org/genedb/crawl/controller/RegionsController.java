@@ -1,6 +1,7 @@
 package org.genedb.crawl.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,16 +13,16 @@ import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
+import org.genedb.crawl.mappers.FeaturesMapper;
+import org.genedb.crawl.mappers.OrganismsMapper;
+import org.genedb.crawl.mappers.RegionsMapper;
+import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.ResultsRegions;
 import org.genedb.crawl.model.Sequence;
-import org.gmod.cat.FeaturesMapper;
-import org.gmod.cat.OrganismsMapper;
-import org.gmod.cat.RegionsMapper;
-import org.gmod.cat.TermsMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -123,14 +124,14 @@ public class RegionsController extends BaseQueryController {
 		logger.info(String.format("Getting locations for %s.", region));
 				
 		// trying to speed up the boundary query by determining the types in advance
-        List<Integer> geneTypes = termsMapper.getCvtermIDs("sequence", new String[] {"gene", "pseudogene"});
+        String[] geneTypes = new String[] {"gene", "pseudogene"};
         
         logger.info("Gene Types " + geneTypes);
         
         int actualStart = start;
         int actualEnd = end;
         
-        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(region, start, end, geneTypes);
+        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(region, start, end, Arrays.asList(geneTypes));
         if (expandedBoundaries != null) {
 			if (expandedBoundaries.start != null && expandedBoundaries.start < start) {
 				actualStart = expandedBoundaries.start;

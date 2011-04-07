@@ -2,9 +2,9 @@ package org.genedb.crawl.elasticsearch.mappers;
 
 import java.util.List;
 
+import org.genedb.crawl.mappers.FeatureCvtermMapper;
 import org.genedb.crawl.model.Dbxref;
 import org.genedb.crawl.model.Pub;
-import org.gmod.cat.FeatureCvtermMapper;
 import org.springframework.stereotype.Component;
 
 @Component

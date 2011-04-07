@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.genedb.crawl.mappers.FeaturesMapper;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
-import org.gmod.cat.FeaturesMapper;
 
 public class MapperUtil {
 	

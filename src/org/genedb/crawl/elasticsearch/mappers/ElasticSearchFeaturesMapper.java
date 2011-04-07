@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.genedb.crawl.mappers.FeaturesMapper;
 import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
@@ -18,7 +19,6 @@ import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Statistic;
-import org.gmod.cat.FeaturesMapper;
 import org.springframework.stereotype.Component;
 
 @Component

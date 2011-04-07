@@ -5,17 +5,32 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
+import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.OrganismProp;
-import org.gmod.cat.OrganismsMapper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implements OrganismsMapper {
 	
 	private Logger logger = Logger.getLogger(ElasticSearchOrganismsMapper.class);
+	
+	private int getTotalOrganisms() {
+		
+		CountResponse cr = connection.getClient()
+		 	.prepareCount(connection.getIndex())
+		 	.setTypes(connection.getOrganismType())
+		 	.setQuery( QueryBuilders.matchAllQuery())
+		 	.execute()
+	        .actionGet();
+		
+		long count = cr.count();
+		
+		return (int) count;
+	}
 	
 	@Override
 	public List<Organism> list() {
@@ -24,6 +39,7 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 			.prepareSearch(connection.getIndex())
 			.setTypes(connection.getOrganismType())
 			.setQuery(QueryBuilders.matchAllQuery())
+			.setSize(getTotalOrganisms())
 			.execute()
 			.actionGet();
 		
@@ -67,14 +83,5 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 		
 	}
 
-	
-//	public static String getIndex() {
-//		return "organisms";
-//	}
-//
-//	
-//	public static String getType() {
-//		return "Organism";
-//	}
 
 }

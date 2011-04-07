@@ -1,4 +1,4 @@
-package org.genedb.crawl.elasticsearch.json;
+package org.genedb.crawl.json;
 
 import java.io.File;
 import java.io.IOException;

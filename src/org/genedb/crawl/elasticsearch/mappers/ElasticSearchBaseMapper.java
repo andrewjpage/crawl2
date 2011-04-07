@@ -12,7 +12,7 @@ import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.genedb.crawl.elasticsearch.Connection;
-import org.genedb.crawl.elasticsearch.json.JsonIzer;
+import org.genedb.crawl.json.JsonIzer;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.springframework.beans.factory.annotation.Autowired;

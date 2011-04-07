@@ -5,14 +5,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.elasticsearch.LocatedFeatureUtil;
+import org.genedb.crawl.mappers.FeatureMapper;
+import org.genedb.crawl.mappers.FeaturesMapper;
+import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.LocatedFeature;
-import org.gmod.cat.FeatureMapper;
-import org.gmod.cat.FeaturesMapper;
-import org.gmod.cat.TermsMapper;
 
 public class FeatureFiller {
 	

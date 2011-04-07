@@ -4,12 +4,12 @@ import java.util.List;
 
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
+import org.genedb.crawl.mappers.OrganismsMapper;
+import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.OrganismProp;
 import org.genedb.crawl.model.Results;
-import org.gmod.cat.OrganismsMapper;
-import org.gmod.cat.TermsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

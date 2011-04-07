@@ -6,14 +6,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
-import org.genedb.crawl.business.AlignmentStore;
-import org.genedb.crawl.business.Sam;
+import org.genedb.crawl.bam.AlignmentStore;
+import org.genedb.crawl.bam.Sam;
 
+import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.model.FileInfo;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.ResultsSAM;
 
-import org.gmod.cat.OrganismsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

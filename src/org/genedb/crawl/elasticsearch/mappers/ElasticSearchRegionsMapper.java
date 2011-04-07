@@ -4,7 +4,7 @@ package org.genedb.crawl.elasticsearch.mappers;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 
@@ -19,15 +19,16 @@ import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.elasticsearch.index.query.xcontent.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortBuilders;
+import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.Sequence;
-import org.gmod.cat.RegionsMapper;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -156,9 +157,9 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	
 	@Override
 	public LocationBoundaries locationsMinAndMaxBoundaries(String region,
-			int start, int end, List<Integer> types) {
+			int start, int end, List<String> types) {
 		
-		BoolQueryBuilder isOverlap = isOverlap(region, start, end, false, null);
+		BoolQueryBuilder isOverlap = isOverlap(region, start, end, false, types);
 		
 		SearchRequestBuilder builder = 
 			connection
@@ -406,7 +407,8 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		SearchRequestBuilder srb = connection.getClient()
 			.prepareSearch(connection.getIndex())
 			.setTypes(connection.getRegionType())
-			.setQuery(regionInOrganismQuery);
+			.setQuery(regionInOrganismQuery)
+			.addFields(new String[] {"organism_id", "type.name"});
 		
 		if (limit == null) {
 			limit = getTotalRegionsInOrganism(organismid); 
@@ -418,10 +420,7 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			srb.setFrom(offset);
 		}
 		
-		//srb.addFields ( new String[] {"uniqueName", "organism_id" } );
-		
 		logger.info(toString(srb.internalBuilder()));
-		
 		
 		SearchResponse response = srb.execute()
 			.actionGet();
@@ -436,24 +435,22 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			
 			logger.info(hit.id());
 			
-			// we want to avoid pulling in the sequence here, so we do a manual map to feature conversion
-			Map<String, Object> source = hit.getSource();
+			for (Entry<String, SearchHitField> fieldEntry : hit.getFields().entrySet()) {
+				logger.debug("-" + fieldEntry.getKey());
+				
+				SearchHitField field = fieldEntry.getValue();
+				logger.debug("---" + field.getValue());
+				
+			}
 			
 			Feature region = new Feature();
 			region.uniqueName = hit.getId();
 			region.type = new Cvterm();
-			region.type.name = (String) ((Map) source.get("type")).get("name"); 
-			region.organism_id = (Integer) source.get("organism_id");
+			region.type.name = (String) hit.field("type.name").getValue(); 
+			region.organism_id = (Integer) hit.field("organism_id").getValue();
 			
 			regions.add(region);
 			
-		}
-		
-		
-		//List<Feature> regions = this.getAllMatches(response, Feature.class);
-		
-		for (Feature region : regions) {
-			region.residues = null;
 		}
 		
 		return regions;

@@ -26,6 +26,11 @@ import org.genedb.crawl.elasticsearch.index.IndexBuilder;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchOrganismsMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
+import org.genedb.crawl.mappers.FeatureMapper;
+import org.genedb.crawl.mappers.FeaturesMapper;
+import org.genedb.crawl.mappers.OrganismsMapper;
+import org.genedb.crawl.mappers.RegionsMapper;
+import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
@@ -33,11 +38,6 @@ import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.OrganismProp;
 import org.genedb.crawl.model.Sequence;
-import org.gmod.cat.FeatureMapper;
-import org.gmod.cat.FeaturesMapper;
-import org.gmod.cat.OrganismsMapper;
-import org.gmod.cat.RegionsMapper;
-import org.gmod.cat.TermsMapper;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -64,6 +64,8 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	
 	@Option(name = "-r", aliases = {"--region"}, usage = "The region name", required = false)
 	public String region;
+	
+	
 	
 	@Option(name = "-pc", aliases = {"--properties_chado"}, usage = "A properties file specifying SQL connection details", required=true)
 	public File chadoPropertiesFile;
@@ -101,13 +103,17 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		
 		List<LocatedFeature> features = null;
 		
+		
+		
+		
+		
 		if (region != null) {
 			
 			makeRegion(region);
 			
 			int start = 0;
 			int end = regionsMapper.sequence(region).length;
-			features = regionsMapper.locations(region, start, end, null);
+			features = regionsMapper.locations(region, start, end, false, null);
 			
 			for (LocatedFeature f : features) {
 				f.region = region;
@@ -152,7 +158,25 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 			}
 			
 			
-		} 
+		} else {
+			
+			// only generate the organisms...
+			
+			if (organismCommonName != null) {
+				Organism o = organismMapper.getByCommonName(organismCommonName);
+				createOrganism(o);
+			} else {
+				
+				for (Organism o : organismMapper.list()) {
+					createOrganism(o);
+				}
+				
+			}
+			
+			return;
+			
+			
+		}
 		
 		
 		
@@ -240,26 +264,45 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		}
 		for (int id : ids) {
 			
-			
-			
 			Organism o = organismMapper.getByID(id);
 			
-			OrganismProp taxon = organismMapper.getOrganismProp(id, "genedb_misc", "taxonId");
-			OrganismProp translation_table = organismMapper.getOrganismProp(id, "genedb_misc", "translationTable");
+			createOrganism(o);
 			
-			logger.debug("Setting organism " + o.common_name);
-			
-			if (taxon != null) {
-				o.taxonID = Integer.parseInt(taxon.value);
-			}
-			
-			if (translation_table != null) {
-				logger.debug("Setting translation table " + translation_table.value);
-				o.translation_table = Integer.parseInt(translation_table.value);
-			} 
-			
-			esOrganismMapper.createOrUpdate(o);
+//			OrganismProp taxon = organismMapper.getOrganismProp(id, "genedb_misc", "taxonId");
+//			OrganismProp translation_table = organismMapper.getOrganismProp(id, "genedb_misc", "translationTable");
+//			
+//			logger.debug("Setting organism " + o.common_name);
+//			
+//			if (taxon != null) {
+//				o.taxonID = Integer.parseInt(taxon.value);
+//			}
+//			
+//			if (translation_table != null) {
+//				logger.debug("Setting translation table " + translation_table.value);
+//				o.translation_table = Integer.parseInt(translation_table.value);
+//			} 
+//			
+//			esOrganismMapper.createOrUpdate(o);
 		}
+	}
+	
+	void createOrganism(Organism o) {
+		
+		OrganismProp taxon = organismMapper.getOrganismProp(o.ID, "genedb_misc", "taxonId");
+		OrganismProp translation_table = organismMapper.getOrganismProp(o.ID, "genedb_misc", "translationTable");
+		
+		logger.debug("Setting organism " + o.common_name);
+		
+		if (taxon != null) {
+			o.taxonID = Integer.parseInt(taxon.value);
+		}
+		
+		if (translation_table != null) {
+			logger.debug("Setting translation table " + translation_table.value);
+			o.translation_table = Integer.parseInt(translation_table.value);
+		} 
+		
+		esOrganismMapper.createOrUpdate(o);
 	}
 	
 	Date getDate(String since) throws ParseException {

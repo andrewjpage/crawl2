@@ -1,4 +1,4 @@
-package org.genedb.crawl.business;
+package org.genedb.crawl.bam;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class Sam {
 	public MappedSAMHeader header(SAMFileReader file) throws Exception {
 		MappedSAMHeader model = new MappedSAMHeader();
 		
-		for (Map.Entry<String, Object> entry : file.getFileHeader().getAttributes()) {
+		for (Map.Entry<String, String> entry : file.getFileHeader().getAttributes()) {
 			model.attributes.put(entry.getKey(), entry.getValue().toString());
 		}
 		

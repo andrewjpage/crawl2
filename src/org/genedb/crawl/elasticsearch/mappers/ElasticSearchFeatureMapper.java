@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
+import org.genedb.crawl.mappers.FeatureMapper;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.FeatureProperty;
 import org.genedb.crawl.model.LocatedFeature;
-import org.gmod.cat.FeatureMapper;
 import org.springframework.stereotype.Component;
 
 @Component

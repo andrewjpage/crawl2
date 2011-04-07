@@ -2,7 +2,7 @@ package org.genedb.crawl.elasticsearch.mappers;
 
 import java.util.List;
 
-import org.gmod.cat.TermsMapper;
+import org.genedb.crawl.mappers.TermsMapper;
 import org.springframework.stereotype.Component;
 
 @Component

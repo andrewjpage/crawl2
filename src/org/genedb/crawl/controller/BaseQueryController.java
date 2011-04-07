@@ -17,6 +17,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
+import org.genedb.crawl.mappers.OrganismsMapper;
+import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Argument;
 import org.genedb.crawl.model.Cv;
 import org.genedb.crawl.model.Cvterm;
@@ -24,8 +26,6 @@ import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Resource;
 import org.genedb.crawl.model.Service;
 import org.genedb.crawl.annotations.ResourceDescription;
-import org.gmod.cat.OrganismsMapper;
-import org.gmod.cat.TermsMapper;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;

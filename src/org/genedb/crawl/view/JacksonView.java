@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.genedb.crawl.elasticsearch.json.JsonIzer;
+import org.genedb.crawl.json.JsonIzer;
 import org.genedb.crawl.model.XMLResponseWrapper;
 import org.springframework.web.servlet.View;
 

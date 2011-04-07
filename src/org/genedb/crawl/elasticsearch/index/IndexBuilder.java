@@ -2,24 +2,16 @@ package org.genedb.crawl.elasticsearch.index;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.Properties;
 
-
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.Requests;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import static org.elasticsearch.common.xcontent.XContentFactory.*;
-import static org.elasticsearch.node.NodeBuilder.*;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 
 import org.genedb.crawl.elasticsearch.Connection;
 import org.genedb.crawl.elasticsearch.LocalConnection;
 import org.genedb.crawl.elasticsearch.TransportConnection;
-import org.genedb.crawl.elasticsearch.json.JsonIzer;
+import org.genedb.crawl.json.JsonIzer;
 
 
 import org.kohsuke.args4j.Option;
@@ -32,6 +24,9 @@ public abstract class IndexBuilder {
 	@Option(name = "-pe", aliases = {"--properties_elasticsearch"}, usage = "A properties file specifying elastic search connection details", required=true)
 	public File elasticSearchPropertiesFile;
 	
+//	@Option(name = "-n", aliases = {"--no_features"}, usage = "Do not index features, just load organisms.", required = false)
+//	public boolean noFeatures = false;
+	
 	private Properties elasticSearchProperties;
 	
 	protected JsonIzer jsonIzer = JsonIzer.getJsonIzer();
@@ -39,14 +34,10 @@ public abstract class IndexBuilder {
 	protected Connection connection;
 	
 	
-	
-	
-	
 	protected void setupIndex() throws IOException {
 		
 		elasticSearchProperties = new Properties();
 		elasticSearchProperties.load(new FileInputStream(elasticSearchPropertiesFile));
-		
 		
 		// if transport connection
 		if (elasticSearchProperties.getProperty("resource.elasticsearch.address.host") != null) {

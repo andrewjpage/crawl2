@@ -1,8 +1,8 @@
 package org.genedb.crawl.elasticsearch.index.sql;
 
+import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Cv;
 import org.genedb.crawl.model.Cvterm;
-import org.gmod.cat.TermsMapper;
 
 public class CvtermUtil {
 	

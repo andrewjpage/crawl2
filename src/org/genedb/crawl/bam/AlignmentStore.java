@@ -1,4 +1,4 @@
-package org.genedb.crawl.business;
+package org.genedb.crawl.bam;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.type.TypeReference;
-import org.genedb.crawl.elasticsearch.json.JsonIzer;
+import org.genedb.crawl.json.JsonIzer;
 import org.genedb.crawl.model.Alignment;
 import org.springframework.util.StringUtils;
 
