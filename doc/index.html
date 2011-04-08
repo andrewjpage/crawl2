@@ -4,22 +4,32 @@
 <title>Crawl - The Java Edition</title>
 <link rel="stylesheet" href="http://www.genedb.org/includes/style/genedb/main.css" type="text/css" />
 
+ <script type="text/javascript" src="http://www.genedb.org/includes/scripts/jquery/jquery-genePage-combined-new.js"></script>
+<script src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.1.js"></script>
+
 <style>
 
 body {
     font-size: 1em;
-    padding-left:25%;
-    padding-right:25%;
+    width:900px;
+    margin:auto;
+}
+
+h3,h4,h5 {
+text-decoration:underline;
+}
+
+h1,h2,h3,h4,h5 {
+font-size:2em;
 }
 
 p {
-    font-size:0.8em;
     padding:15px;
 }
 
 pre {
     margin:10px;
-    padding-bottom:10px;
+    padding:10px;
 }
 
 pre {
@@ -39,17 +49,81 @@ td, th {
     padding:10px;
 }
 
+div#toc {
+    border: 1px dashed grey;
+    padding:10px;
+}
+
+div#toc ul {
+    list-style: none;
+}
+div#toc ul li ul {
+    margin-bottom: 0.75em;
+}
+div#toc ul li ul li ul {
+    margin-bottom: 0.25em;
+}
+
+a, a:visited {
+text-decoration:none;
+color:grey;
+}
+
+a:hover {
+color:black;
+}
+
 </style>
 </head>
 <body>
 
+
+
 <h1>Crawl - The Java Edition</h1>
 
-<h2>Building & deploying</h2>
+
+<div id="toc"></div>
+
+<h2 id="Data">Data sources</h2>
+
+<h3 id="Chado">Chado</h3>
+
+<P>Crawl will work directly off a Chado database. To do this the property file you use must be configured with </P>
+
+<pre><code>resource.type=chado-postgres</code></pre>
+
+<P>as well as db connection details. There are example property files with this kind of configuration. The "resource-chado-public.properties" resource can be used to test against the genedb public snapshot.</P>  
+
+<h3 id="ElasticSearch">ElasticSearch</h3>
+
+<P>Data can be indexed and stored using ElasticSearch, a distributed search enging that runs ontop of Lucene. There are two kinds of connections to ElasticSearch: local and transport. Local connections
+ are useful to get going with, as an ElasticSearch cluster is automatically created and managed in the same process as Crawl. To use this the property</P>
+
+<pre><code>resource.type=elasticsearch-local</code></pre>
+
+<P>must be used, as well as information about where to store the index files. If you want to run the services off standalone elasticsearch cluster, you will need to download, install, and start it separately. The property </P>
+
+<pre><code>resource.type=elasticsearch-remote</code></pre>
+
+<P>must be used, as well as information about the IP address and port of the remote cluster.</P> 
+
+<P>The indices can be populated from various data sources: GFF3, DAS and Chado. It might seem odd to want to index a Chado database when Crawl will run directly off of it, but this might be 
+useful in situations where you want to merge annotations from Chado with other sources (like DAS or GFF3).</P>
+
+
+<h3 id="align">Alignments</h3>
+
+<P>SAM or BAM alignments can be specified using the property :</P>
+
+<pre><code>alignments=/path/to/alignments.json</code></pre>
+
+<P>This file should contain a JSON detailing a list of files, and the organism common name they refer to. 
+
+<h2 id="build">Building</h2>
 
 <p>This is all done through the use of ant tasks. </p>
 
-<h3>Resolving dependencies</h3>
+<h3 id="dependencies">Resolving dependencies</h3>
 
 <p>Currently, this is managed with ivy, to do this use :</p>
 
@@ -57,66 +131,88 @@ td, th {
  ant resolve
 </code></pre>
 
-<h3>Packaging the jar </h3>
+<P>This step might take a while depending on internet connection, but you should only ever have to run it all once. After that any changes should be incremental.</P>
+
+<h3 id="test">Running the unit test harness</h3>
+
+<p>Here you must specify a config property file. The one described below should work from anywhere because it uses the public genedb snapshot.</p>
+
+<pre><code>
+ ant -Dconfig=resource-chado-public.properties test
+</code></pre>
+
+<h3 id="jar">Packaging the jar</h3>
 
 <pre><code>
  ant package-jar
 </code></pre>
 
 
-<h3>Packaging the war </h3>
 
-<p>Here you must specify a config property file. Several of examples are bundled in the top level folder. For example :</p>
-<pre><code>
- ant -Dconfig=resource-elasticsearch-remote.properties package-war
-</code></pre>
 
-<h3>Testing the war using Jetty-runner </h3>
 
-<P>This can be used to run crawler without having to configure a servlet container. This is not good for production use. Only use it for testing.</P>
 
-<pre><code>
- ant -Dconfig=resource-elasticsearch-remote.properties run-jetty
-</code></pre>
 
-<h3>Deploying the war using to a J2EE container  </h3>
+<h2 id="indexing">Indexing</h2>
 
-<P>For production, or even beta test sites, it should be deployed to a container as follows.</P>
+<p>These are done using shell scripts. If using a standalone ElasticSearch cluster, then it should have been started prior to running these steps.</p> 
+
+<h3 id="create organism">Creating an organism manually</h3>
+
+<P>An organism is created by supplying its json using the -o option : 
 
 <pre><code>
- ant -Dconfig=resource-elasticsearch-remote.properties deploy
-</code></pre>
-
-<h3>Cleaning up</h3>
-
-<P>To be run whenever method signatures change and you want to spot external references to them.</P> 
-
-<pre><code>
- ant clean
+./sh/gff2es.sh -pe resource-elasticsearch-remote.properties -o '{
+    "ID":27,
+    "common_name":"Pfalciparum",
+    "genus":"Plasmodium",
+    "species":"falciparum",
+    "translation_table":11,
+    "taxonID":5833
+}'
 </code></pre>
 
 
-<h2>Indexing</h2>
+<h3 id="copy organism">Copying organisms from a Chado instance</h3>
 
-<p>These are done using shell scripts.</p> 
-
-<h3>Indexing GFF files</h3>
-
-<p>GFF files do not mention what organism they belong to, so this must be supplied. This can be done as follows :</p>
+<P>As with all examples of copying data from Chado, two properties files are specified: one for Chado connection details, and the other for ElasticSearch. To just copy one organism entry, you can do :</P>
 
 <pre><code>
- ./sh/gff2es.sh -g /Users/gv1/Documents/Data/gffs/ \
-    -oc Pfalciparum -og Plasmodium -os falciparum -oid 27 -ott 1 \
-    -pe resource-elasticsearch-remote.properties
+./sh/chado2es.sh -pc resource-chado-gv1.properties \
+    -pe resource-elasticsearch-remote.properties \
+    -o Tcruzi
 </code></pre>
 
-<p>If the organism already exists, you should only have to supply the oc (organism_common_name) flag for the organism. </p>
+<P>To copy all of them :</P>
 
-<P>The g flag (gffs) is used to specify a path to a GFF file or a folder containing them. If they are gzipped, the files will automatically be unzipped by the parser.</P>
+<pre><code>
+./sh/chado2es.sh -pc resource-chado-gv1.properties \
+    -pe resource-elasticsearch-remote.properties 
+</code></pre>
 
-<h3>Incrementally indexing Chado</h3>
 
-<p>This relies on the use of the timelastmodified stamp. You can indexing everything that has changed since 2011-01-05, as follows :</p>
+
+<h3 id="gffs">Indexing GFF files</h3>
+
+<p>GFF files do not contain information about the organism, so this must be supplied. This can be done as follows :</p>
+
+<pre><code>
+ ./sh/gff2es.sh -g /path/to/gff/files \
+    -o '{"common_name":"Pfalciparum"}' \
+    -pe resource-elasticsearch-remote.properties 
+</code></pre>
+
+<p>You only need to supply a unique identifier for the organism at this stage, which is either its ID or common name.</p>
+
+<P>The -g flag (gffs) is used to specify a path to a GFF file or a folder containing them. If they are gzipped, the files will automatically be unzipped by the parser.</P>
+
+
+
+<h3 id="incrementals">Incrementally indexing Chado</h3>
+
+<P>As indexing from Chado to ElasticSearch requires both kinds of connection details, you will need to specify two property files.</P>
+
+<p>Incremental indexing relies on the use of the timelastmodified stamp. You can indexing everything that has changed since 2011-01-05, as follows :</p>
 
 <pre><code>
  ./sh/chado2es.sh -pc resource-chado-gv1.properties \
@@ -137,9 +233,109 @@ td, th {
     -pe resource-elasticsearch-remote.properties -o Lmajor -s 2001-01-01 
 </code></pre>
 
+<h3  id="indexing regions">Indexing regions from Chado</h3>
+
+<pre><code>
+./sh/chado2es.sh -pc resource-chado-gv1.properties \
+    -pe resource-elasticsearch-remote.properties \
+    -r Pf3D7_01
+</code></pre>
 
 
-<h2>Property files</h2>
+<h2  id="alignments">Alignments</h2>
+
+<P>Pointing to the alignments is fairly straightforward - an example configuration file is provided in etc/alignments.json. </P>
+
+<h3  id="renaming sequences">Renaming sequences</h3>
+
+<P>The only thing to be aware of is that sometimes 
+the FASTA sequence names in the alignments file may not correspond to the sequences in the annotation repository, in which case it's important to rename them, and reindex
+the BAM file. Crawl provides a utility for renaming sequences. In the example below, the Pfaciparum chromosomes are known ad MALX (where X is the chromosome number) in the BAM file, but the annotation
+repository knows them as Pf3D7_XX.</P>  
+
+<pre><code>
+# convert bam sequences to the chromosome names used in the repository, using the tool provided.
+./sh/bam2bam.sh -i /path/to/alignments/Tophat.MAL_Version3.dir.1788_1.bam \
+    -o ~/tmp/out.bam \
+    -m MAL1=Pf3D_01 -m MAL2=Pf3D7_02 -m MAL3=Pf3D7_03 \
+    -m MAL4=Pf3D7_04 -m MAL5=Pf3D7_05 
+
+# overwrite the original BAM
+cp /tmp/out.bam /path/to/alignments/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_1.bam
+
+# reindex the new BAM with samtools
+samtools index /path/to/alignments/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_1.bam
+
+</code></pre>  
+
+
+<h2  id="deploying">Deploying</h2>
+
+<h3  id="war" >Packaging the war </h3>
+
+<p>Here you must specify a config property file. Several of examples are bundled in the top level folder. For example :</p>
+<pre><code>
+ ant -Dconfig=resource-elasticsearch-remote.properties package-war
+</code></pre>
+
+<h3  id="jetty">Testing the war using Jetty-runner </h3>
+
+<P>This can be used to run crawler without having to configure a servlet container. This is not good for production use. Only use it for testing.</P>
+
+<pre><code>
+ ant -Dconfig=resource-elasticsearch-remote.properties run-jetty
+</code></pre>
+
+<h3 id="j2ee">Deploying the war using to a J2EE container  </h3>
+
+<P>For production, or even beta test sites, it should be deployed to a container as follows.</P>
+
+<pre><code>
+ ant -Dconfig=resource-elasticsearch-remote.properties deploy
+</code></pre>
+
+
+
+<h2  id="cleaning">Cleaning up</h2>
+
+<h3 id="clean build">Cleaning up builds</h3>
+
+<P>To be run whenever method signatures change and you want to spot external references to them.</P> 
+
+<pre><code>
+ ant clean
+</code></pre>
+
+
+<h3  id="clean es">Cleaning up a local elasticsearch data</h3>
+
+<pre><code>
+ ant clean-es
+</code></pre>
+
+
+<h3  id="clean ivy">Cleaning ivy-downloaded libs</h3>
+
+<P>Sometimes useful before committing...</P>
+
+<pre><code>
+ ant clean-ivy
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2  id="props">Property files</h2>
 
 
 
@@ -195,6 +391,24 @@ td, th {
 <td>the chado database mybatis XML files</td>
 <td>chado-postgres</td></tr>
 
+<tr><td>resource.elasticsearch.index</td>
+<td>The name of the index</td>
+<td>all ElasticSearch configurations</td></tr>
+
+<tr><td>resource.elasticsearch.regionType</td>
+<td>The name of the type representing regions</td>
+<td>all ElasticSearch configurations</td></tr>
+
+<tr><td>resource.elasticsearch.featureType</td>
+<td>The name of the type representing features</td>
+<td>all ElasticSearch configurations</td></tr>
+
+<tr><td>resource.elasticsearch.organismType</td>
+<td>The name of the type representing organisms</td>
+<td>all ElasticSearch configurations</td></tr>
+
+
+
 
 <tr><td>resource.elasticsearch.address.host</td>
 <td>the elastic search host </td>
@@ -211,10 +425,19 @@ td, th {
 
 
 
+
 </table>
 
 
 <p>Not all of these parameters are used in all property files, the third column specifies in what context they are applicable.</p>
+
+<script>
+
+$(document).ready(function() {
+    $('#toc').toc();
+});
+
+</script>
 
 </body>
 
