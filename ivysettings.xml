@@ -1,33 +1,70 @@
 <ivysettings>
-    <property name="ivy.checksums" value="" />
-    <settings defaultResolver="chain" />
-    <resolvers>
+	<property name="ivy.checksums" value="" />
+	<settings defaultResolver="chain" />
+	<resolvers>
 
-        <chain name="chain">
-            
-            <url name="com.springsource.repository.bundles.release">
-                <ivy
-                    pattern="http://repository.springsource.com/ivy/bundles/release/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-                <artifact
-                    pattern="http://repository.springsource.com/ivy/bundles/release/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-            </url>
-            <url name="com.springsource.repository.bundles.external">
-                <ivy
-                    pattern="http://repository.springsource.com/ivy/bundles/external/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-                <artifact
-                    pattern="http://repository.springsource.com/ivy/bundles/external/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-            </url>
+		<chain name="chain">
 
-            <ibiblio name="sonata" root="http://repository.sonatype.org/content/repositories/central" 
+			<ibiblio name="genedb-nexus-sonatype"
+				root="https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"
+				m2compatible="true" />
+
+			<ibiblio name="maven-nexus-central"
+				root="https://developer.genedb.org/nexus/content/repositories/central/"
+				m2compatible="true" />
+
+			<ibiblio name="genedb-nexus-jboss"
+				root="https://developer.genedb.org/nexus/content/repositories/jboss/"
+				m2compatible="true" />
+
+			<ibiblio name="genedb-nexus-jboss"
+				root="https://developer.genedb.org/nexus/content/repositories/java.net-m2/"
+				m2compatible="true" />
+				
+				
+			
+			<ibiblio name="sonata"
+                root="http://repository.sonatype.org/content/repositories/central"
                 m2compatible="true" />
-            <ibiblio name="sonata-releases" root="http://oss.sonatype.org/content/repositories/releases/" 
+            <ibiblio name="sonata-releases"
+                root="http://oss.sonatype.org/content/repositories/releases/"
                 m2compatible="true" />
-            <ibiblio name="java.net2" root="http://download.java.net/maven/2/" 
-                m2compatible="true"/>
-            <ibiblio name="jboss" root="http://repository.jboss.org/maven2" 
+            <ibiblio name="java.net2" root="http://download.java.net/maven/2/"
                 m2compatible="true" />
-            
-        </chain>
-    </resolvers>
-    
+            <ibiblio name="jboss" root="http://repository.jboss.org/maven2"
+                m2compatible="true" />	
+				
+				
+				
+				
+				
+				
+
+			<ibiblio name="genedb-nexus-spring-release"
+				root="https://developer.genedb.org/nexus/content/repositories/spring-release/"
+				m2compatible="true" />
+
+			<ibiblio name="genedb-nexus-spring-external"
+				root="https://developer.genedb.org/nexus/content/repositories/spring-external/"
+				m2compatible="true" />
+
+
+			<url name="com.springsource.repository.bundles.release">
+				<ivy
+					pattern="http://repository.springsource.com/ivy/bundles/release/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+				<artifact
+					pattern="http://repository.springsource.com/ivy/bundles/release/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+			</url>
+			<url name="com.springsource.repository.bundles.external">
+				<ivy
+					pattern="http://repository.springsource.com/ivy/bundles/external/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+				<artifact
+					pattern="http://repository.springsource.com/ivy/bundles/external/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+			</url>
+
+			
+
+		</chain>
+	</resolvers>
+
 </ivysettings>
