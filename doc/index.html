@@ -125,6 +125,8 @@ useful in situations where you want to merge annotations from Chado with other s
 
 <h3 id="dependencies">Resolving dependencies</h3>
 
+<P>This step might take a while depending on internet connection, but you should only ever have to run it all once. After that any changes should be incremental.</P>
+
 <p>Currently, this is managed with ivy, to do this use. </p>
 
 <pre><code>
@@ -133,7 +135,7 @@ useful in situations where you want to merge annotations from Chado with other s
 
 <P>Because of the unreliability of some external repositories, the dependencies are hosted on the genedb developer site as well. If you find the resolve step fails, you can try
 downloading the dependencies from this instead. To be able to download from this site, you 
-have to add the genedb developer https certificate. The certificate can be downloaded like this on a Mac : </P>
+have to add the genedb developer https certificate. The certificate can be downloaded like this on a Mac (in bash) : </P>
 
 <pre><code>openssl s_client -connect developer.genedb.org:443 2>&1 | \
     sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' \
@@ -149,7 +151,7 @@ have to add the genedb developer https certificate. The certificate can be downl
 
 <P>The keytool password is 'changeit'.</P>
 
-<P>This step might take a while depending on internet connection, but you should only ever have to run it all once. After that any changes should be incremental.</P>
+
 
 <h3 id="test">Running the unit test harness</h3>
 
