@@ -1,0 +1,133 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'jetty'
+apply plugin: 'eclipse'
+
+configurations.compile.transitive = true
+jar.enabled = true
+//version = '0.01'
+
+repositories {
+    
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/jboss/"] 
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/java.net-m2"]
+    
+    mavenRepo urls: ["http://repository.sonatype.org/content/repositories/central"]
+    mavenRepo urls: ["http://oss.sonatype.org/content/repositories/releases"]
+    mavenRepo urls: ["http://download.java.net/maven/2"]
+    mavenRepo urls: ["http://repository.jboss.org/maven2"]
+    
+    mavenRepo urls: ["http://repository.springsource.com/maven/bundles/release"]
+    mavenRepo urls: ["http://repository.springsource.com/maven/bundles/external"]
+    mavenRepo urls: ["http://repository.springsource.com/maven/bundles/milestone"]
+    //mavenRepo urls: ["http://repository.springsource.com/maven/bundles/snapshot"]
+    
+    mavenCentral()
+}
+
+
+dependencies {
+    
+    providedCompile group: 'javax.servlet', name: 'com.springsource.javax.servlet', version:'2.5.0'    
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    
+    compile group: 'log4j', name: 'log4j', version:'1.2.16'
+    
+    compile group: 'org.postgresql', name: 'com.springsource.org.postgresql.jdbc4', version:'8.3.604'
+    
+    compile group: 'org.mybatis', name: 'mybatis', version:'3.0.4'
+    compile group: 'org.mybatis', name: 'mybatis-hazelcast', version:'1.0.0'
+    
+    compile group: 'commons-lang', name: 'commons-lang', version:'2.5'
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version:'0.15.2'
+    
+    compile group: 'org.codehaus.jackson', name: 'jackson-xc', version:'1.7.5'
+    
+    
+    compile group: 'args4j', name: 'args4j', version:'2.0.12'
+    
+    compile group: "org.apache.commons", name:"com.springsource.org.apache.commons.dbcp", version:"1.2.2.osgi"
+    compile group: "org.springframework", name:"org.springframework.web.servlet", version:"3.0.5.RELEASE"
+    compile group: "org.springframework", name:"org.springframework.jdbc", version:"3.0.5.RELEASE"
+    
+    compile group: 'org.mybatis', name: 'mybatis-spring', version:'1.0.0'
+    
+    compile fileTree(dir: 'lib/local', includes: ['**.jar'])
+    
+}
+
+
+Properties props = new Properties()
+props.load(new FileInputStream(config))
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Crawl', 'Implementation-Version': '0.1'
+    }
+    from configurations.compile.collect {
+        it.isDirectory() ? it : zipTree(it).matching{exclude{it.name == 'META-INF'}}
+    }
+}
+
+test.doFirst {
+    // systemProperties = [  dbhost : props.dbhost, dbport : props.dbport, dbname : props.dbname, dbuser : props.dbuser, dbpassword : props.dbpassword, sqlPath : props.sqlPath ]
+    systemProperties.putAll( props )
+}
+
+war.doFirst{
+    resourceType = props["resource.type"]
+    ant.copy (
+        file:'etc/config/crawl-' + resourceType + '.xml', 
+        toFile:'tmp/WEB-INF/crawl-repository.xml',
+        overwrite:'true' )
+    ant.copy (
+        file: config, 
+        toFile:'tmp/WEB-INF/classes/project.properties',
+        overwrite:'true' ) 
+}
+
+war {
+    webInf { from 'tmp/WEB-INF' } 
+    baseName = props["deploy.name"]
+}
+
+//task copyRuntimeDependencies(dependsOn: configurations.runtime.buildArtifacts, type: Copy) {
+    //into('build/libs')
+    //from configurations.runtime
+    //from configurations.runtime.allArtifacts*.file
+//}
+
+task deploy (type : Copy) {
+    into(props["deploy.dir"])
+    from "build/libs/" + props["deploy.name"] + ".war"
+}
+
+task cleanes {
+    println "Deleting " + props["resource.elasticsearch.local.pathdata"]
+    ant.delete(dir:props["resource.elasticsearch.local.pathdata"])
+    println "Deleting " + props["resource.elasticsearch.local.pathlogs"]
+    ant.delete(dir:props["resource.elasticsearch.local.pathlogs"])
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.0-milestone-2'
+}
+
+
+
+
+
+//println configurations.compile.asPath
+//PrintWriter pw = new PrintWriter(new FileWriter(new File("build/classpath.txt")));
+//pw.println(configurations.compile.asPath);
+//pw.close()
+
+
+
+
+
+
+
+
+
