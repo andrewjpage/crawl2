@@ -171,13 +171,14 @@ public abstract class ElasticSearchBaseMapper {
 	
 	protected <T extends Object> T getFirstMatch(String indexName, String typeName, String fieldName, String value, Class<T> cls) {
 		
-		FieldQueryBuilder regionQuery = 
-		QueryBuilders.fieldQuery(fieldName, value);
+		logger.info(String.format("Fetching index %s, type %s, field %s, value %s, casting to %s.", indexName, typeName, fieldName, value, cls.getName()));
+		
+		FieldQueryBuilder fieldQuery = QueryBuilders.fieldQuery(fieldName, value);
 	
 		SearchResponse response = connection.getClient()
 			.prepareSearch(indexName)
 			.setTypes(typeName)
-			.setQuery(regionQuery)
+			.setQuery(fieldQuery)
 			.execute()
 			.actionGet();
 		
@@ -253,6 +254,8 @@ public abstract class ElasticSearchBaseMapper {
 			String json = jsonIzer.toJson(obj);
 			logger.debug("Source:");
 			logger.debug(json);
+			
+			logger.info(String.format("Storing %s in index %s and type %s", key, index, type));
 			
 			connection
 				.getClient()

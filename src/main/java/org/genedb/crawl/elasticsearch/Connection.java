@@ -5,6 +5,7 @@ import org.elasticsearch.client.Client;
 public interface Connection {
 	
 	public Client getClient();
+	public void close();
 	
 	public String getIndex();
 	public String getFeatureType();

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.count.CountResponse;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.genedb.crawl.mappers.OrganismsMapper;
@@ -32,7 +33,7 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 		return (int) count;
 	}
 	
-	@Override
+	
 	public List<Organism> list() {
 		
 		SearchResponse response = connection.getClient()
@@ -47,24 +48,24 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 		
 	}
 
-	@Override
+	
 	public Organism getByID(int ID) {
 		Organism o = (Organism) this.getFirstMatch(connection.getIndex(), connection.getOrganismType(), "ID", String.valueOf(ID), Organism.class);
 		logger.info(o);
 		return o;
 	}
 
-	@Override
+	
 	public Organism getByTaxonID(String taxonID) {
 		return (Organism) this.getFirstMatch(connection.getIndex(), connection.getOrganismType(), "taxonID", taxonID, Organism.class);
 	}
 
-	@Override
+	
 	public Organism getByCommonName(String commonName) {
 		return (Organism) this.getFirstMatch(connection.getIndex(), connection.getOrganismType(), "common_name", commonName, Organism.class);
 	}
 
-	@Override
+	
 	public OrganismProp getOrganismProp(int ID, String cv, String cvterm) {
 		// TODO Auto-generated method stub
 		return null;
@@ -75,7 +76,21 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 		try {
 			String source = jsonIzer.toJson(organism);
 			logger.info(source);
+			
+			logger.info(String.format("Storing organism as %s in index %s and type %s", connection.getIndex(), connection.getOrganismType(), organism.common_name));
+			
 			connection.getClient().prepareIndex(connection.getIndex(), connection.getOrganismType(), organism.common_name).setSource(source).execute().actionGet();
+			
+			
+			Organism retrievedOrganism = this.getByCommonName(organism.common_name);
+			logger.info("fetch check response :");
+			logger.info(jsonIzer.toJson(retrievedOrganism));
+			
+			
+//			GetResponse r = connection.getClient().prepareGet(connection.getIndex(), connection.getOrganismType(), organism.common_name).execute().actionGet();
+//			logger.info("fetch check response :");
+//			logger.info(r.sourceAsString());
+			
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

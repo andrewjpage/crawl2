@@ -63,26 +63,29 @@ public class GFFIndexBuilder extends IndexBuilder {
 	
 	private Organism getAndPossiblyStoreOrganism() throws JsonParseException, JsonMappingException, IOException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		
-		Organism userSuppliedOrganism = (Organism) jsonIzer.fromJson(organism, Organism.class);
+Organism userSuppliedOrganism = (Organism) jsonIzer.fromJson(organism, Organism.class);
 		
 		Organism organism = null;
 		
 		if (userSuppliedOrganism.ID != null) {
-			logger.info("Getting by ID");
+			logger.info("Getting by ID " + userSuppliedOrganism.ID );
 			try {
 				organism = organismsMapper.getByID(userSuppliedOrganism.ID);
 				logger.info("found!");
 			} catch (Exception e) {
+				logger.warn(e.getMessage());
+				e.printStackTrace();
 				logger.warn("Could not find an organism with this ID");
 			}
 		} 
 		
 		if (userSuppliedOrganism.common_name != null) {
-			logger.info("Getting by common_name");
+			logger.info("Getting by common_name: " + userSuppliedOrganism.common_name);
 			try {
 				organism = organismsMapper.getByCommonName(userSuppliedOrganism.common_name);
 				logger.info("found!");
 			} catch (Exception e) {
+				logger.warn(e.getMessage());
 				logger.warn("Could not find an organism with this common_name.");
 			}
 		} 

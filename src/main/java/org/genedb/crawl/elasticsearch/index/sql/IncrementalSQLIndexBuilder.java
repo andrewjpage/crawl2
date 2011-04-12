@@ -72,7 +72,7 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	
 	private Properties chadoProperties;
 	
-	private static final String resource = "sql/test.xml";
+	private static final String resource = "ibatis-datasourced.xml";
 	private SqlSessionFactory sqlMapper = null;
 	private SqlSession session ;
 	

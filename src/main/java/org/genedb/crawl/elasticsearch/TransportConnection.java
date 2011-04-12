@@ -27,9 +27,14 @@ public class TransportConnection extends BaseConnection implements Connection {
 		client.addTransportAddress(new InetSocketTransportAddress(host, port));
 	}
 	
-	@Override
 	public Client getClient() {
-		return client;
+		return (Client) client;
+	}
+
+	public void close() {
+		if (client != null) {
+			client.close();
+		}
 	}
 	
 }

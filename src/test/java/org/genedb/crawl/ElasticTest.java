@@ -118,7 +118,8 @@ public class ElasticTest extends TestCase {
 			assertTrue(hit.field("sequence") != null);
 		}
 		
-		client.close();
+		connection.close();
+		
 		
 	}
 	

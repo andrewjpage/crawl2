@@ -18,31 +18,23 @@ public class DatabaseTest extends TestCase {
 	
 	private static SqlSessionFactory sqlMapper = null;
 	
-	public void test1() throws CrawlException {
+	public void test1() throws CrawlException, IOException {
 		
-		String resource = "sql/test.xml";
+		String resource = "test.xml";
 		Reader reader = null;
 
-		try {
-			reader = Resources.getResourceAsReader(resource);
-			sqlMapper = new SqlSessionFactoryBuilder().build(reader, System.getProperties());
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		reader = Resources.getResourceAsReader(resource);
+
+		sqlMapper = new SqlSessionFactoryBuilder().build(reader,
+				System.getProperties());
 
 		SqlSession session = sqlMapper.openSession();
-		
-		try {
-			OrganismsMapper mapper = session.getMapper(OrganismsMapper.class);
-			List<Organism> organisms = mapper.list();
-			
-			for (Organism organism : organisms) {
-				System.out.println(organism.common_name);
-			}
-			
-		} finally {
-			session.close();
+
+		OrganismsMapper mapper = session.getMapper(OrganismsMapper.class);
+		List<Organism> organisms = mapper.list();
+
+		for (Organism organism : organisms) {
+			System.out.println(organism.common_name);
 		}
 		
 	}
