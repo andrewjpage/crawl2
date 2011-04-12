@@ -15,12 +15,12 @@ body {
     margin:auto;
 }
 
-h3,h4,h5 {
-text-decoration:underline;
-}
+
 
 h1,h2,h3,h4,h5 {
-font-size:2em;
+font-size:1.2em;
+font-weight:bold;
+text-transform: uppercase;
 }
 
 p {
@@ -56,6 +56,8 @@ div#toc {
 
 div#toc ul {
     list-style: none;
+    text-transform: uppercase;
+    font-size:small;
 }
 div#toc ul li ul {
     margin-bottom: 0.75em;
@@ -119,23 +121,23 @@ useful in situations where you want to merge annotations from Chado with other s
 
 <P>This file should contain a JSON detailing a list of files, and the organism common name they refer to. 
 
-<h2 id="build">Building</h2>
+<h2 id="build">Setup, build and test</h2>
 
 <p>This is all done through the use of ant tasks. </p>
 
-<h3 id="dependencies">Resolving dependencies</h3>
+<h3 id="setup">Setup.</h3>
 
-<P>This step might take a while depending on internet connection, but you should only ever have to run it all once. After that any changes should be incremental.</P>
+<P>The initial build setup might take a while because it will download dependencies, but you should only ever have to run it 
+all once. After that any updates to dependencies should be incremental.To setup the build, run : </P>
 
-<p>Currently, this is managed with ivy, to do this use. </p>
+<pre><code>./gradlew</code></pre>
 
-<pre><code>
- ant resolve
-</code></pre>
+<P>in the crawl checkout root folder.</P>
+
+<h3 id="dependencies">Fetching dependencies from GeneDB (optional)</h3>
 
 <P>Because of the unreliability of some external repositories, the dependencies are hosted on the genedb developer site as well. If you find the resolve step fails, you can try
-downloading the dependencies from this instead. To be able to download from this site, you 
-have to add the genedb developer https certificate. The certificate can be downloaded like this on a Mac (in bash) : </P>
+you can enable download from this site by adding the genedb developer https certificate. This certificate can be downloaded like this on a Mac (in bash) : </P>
 
 <pre><code>openssl s_client -connect developer.genedb.org:443 2>&1 | \
     sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' \
@@ -151,64 +153,50 @@ have to add the genedb developer https certificate. The certificate can be downl
 
 <P>The keytool password is 'changeit'.</P>
 
+<h3 id="buildandtest">Build and test</h3>
+
+<P>Now to build, run :</P>
+
+<pre><code>./gradlew build</code></pre>
 
 
-<h3 id="test">Running the unit test harness</h3>
-
-<p>Here you must specify a config property file. The one described below should work from anywhere because it uses the public genedb snapshot.</p>
-
-<pre><code>
- ant -Dconfig=resource-chado-public.properties test
-</code></pre>
-
-<h3 id="jar">Packaging the jar</h3>
-
-<pre><code>
- ant package-jar
-</code></pre>
-
-
-
-
-
+<P>This will perform all the build steps, as well as run a test harness. You shouldn't worry about configurations for the test harness, because the default configurations
+should just work out of the box. The reason for that will be explained later, but the gist of it is that it connects to the GeneDB public snapshot for its database tests,
+and creates a local ElasticSearch cluster for its indexing tests.</P>
 
 
 <h2 id="indexing">Indexing</h2>
 
-<p>These are done using shell scripts. If using a standalone ElasticSearch cluster, then it should have been started prior to running these steps.</p> 
+<p>These are done using shell scripts. If using a stand-alone ElasticSearch cluster, then it should have been started prior to running these steps. The examples 
+here use a local cluster, which is instantiated by crawl itself. All examples here use bash.</p> 
 
 <h3 id="create organism">Creating an organism manually</h3>
 
 <P>An organism is created by supplying its json using the -o option : 
 
-<pre><code>
-./sh/gff2es.sh -pe resource-elasticsearch-remote.properties -o '{
+<pre><code>./sh/gff2es.sh -pe resource-elasticsearch-local.properties -o '{
     "ID":27,
     "common_name":"Pfalciparum",
     "genus":"Plasmodium",
     "species":"falciparum",
     "translation_table":11,
     "taxonID":5833
-}'
-</code></pre>
+}'</code></pre>
 
 
 <h3 id="copy organism">Copying organisms from a Chado instance</h3>
 
-<P>As with all examples of copying data from Chado, two properties files are specified: one for Chado connection details, and the other for ElasticSearch. To just copy one organism entry, you can do :</P>
+<P>As with all examples of copying data from Chado, two properties files are specified: one for Chado connection details, and the other for ElasticSearch.
+This example connects to the GeneDB public Chado snapshot. To just copy one organism entry, you can do :</P>
 
-<pre><code>
-./sh/chado2es.sh -pc resource-chado-gv1.properties \
-    -pe resource-elasticsearch-remote.properties \
-    -o Tcruzi
-</code></pre>
+<pre><code>./sh/chado2es.sh -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties \
+    -o Tcruzi</code></pre>
 
 <P>To copy all of them :</P>
 
-<pre><code>
-./sh/chado2es.sh -pc resource-chado-gv1.properties \
-    -pe resource-elasticsearch-remote.properties 
-</code></pre>
+<pre><code>./sh/chado2es.sh -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties </code></pre>
 
 
 
@@ -216,11 +204,9 @@ have to add the genedb developer https certificate. The certificate can be downl
 
 <p>GFF files do not contain information about the organism, so this must be supplied. This can be done as follows :</p>
 
-<pre><code>
- ./sh/gff2es.sh -g /path/to/gff/files \
+<pre><code>./sh/gff2es.sh -g /path/to/gff/files \
     -o '{"common_name":"Pfalciparum"}' \
-    -pe resource-elasticsearch-remote.properties 
-</code></pre>
+    -pe resource-elasticsearch-local.properties </code></pre>
 
 <p>You only need to supply a unique identifier for the organism at this stage, which is either its ID or common name.</p>
 
@@ -234,32 +220,24 @@ have to add the genedb developer https certificate. The certificate can be downl
 
 <p>Incremental indexing relies on the use of the timelastmodified stamp. You can indexing everything that has changed since 2011-01-05, as follows :</p>
 
-<pre><code>
- ./sh/chado2es.sh -pc resource-chado-gv1.properties \
-    -pe resource-elasticsearch-remote.properties -s 2011-01-05
-</code></pre>
+<pre><code>./sh/chado2es.sh -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties -s 2011-01-05</code></pre>
 
 <p>You can filter on organism:</p>
 
-<pre><code>
- ./sh/chado2es.sh -pc resource-chado-gv1.properties \
-    -pe resource-elasticsearch-remote.properties -o Lmajor -s 2011-01-05 
-</code></pre>
+<pre><code>./sh/chado2es.sh -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties -o Lmajor -s 2011-01-05 </code></pre>
 
 <p>And if you want to index the entire organism, currently the way to do it is to choose a suitably distant since date, for example :</p>
 
-<pre><code>
- ./sh/chado2es.sh -pc resource-chado-gv1.properties \
-    -pe resource-elasticsearch-remote.properties -o Lmajor -s 2001-01-01 
-</code></pre>
+<pre><code>./sh/chado2es.sh -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties -o Lmajor -s 2001-01-01 </code></pre>
 
 <h3  id="indexing regions">Indexing regions from Chado</h3>
 
-<pre><code>
-./sh/chado2es.sh -pc resource-chado-gv1.properties \
-    -pe resource-elasticsearch-remote.properties \
-    -r Pf3D7_01
-</code></pre>
+<pre><code>./sh/chado2es.sh -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties \
+    -r Pf3D7_01</code></pre>
 
 
 <h2  id="alignments">Alignments</h2>
@@ -273,8 +251,7 @@ the FASTA sequence names in the alignments file may not correspond to the sequen
 the BAM file. Crawl provides a utility for renaming sequences. In the example below, the Pfaciparum chromosomes are known ad MALX (where X is the chromosome number) in the BAM file, but the annotation
 repository knows them as Pf3D7_XX.</P>  
 
-<pre><code>
-# convert bam sequences to the chromosome names used in the repository, using the tool provided.
+<pre><code># convert bam sequences to the chromosome names used in the repository, using the tool provided.
 ./sh/bam2bam.sh -i /path/to/alignments/Tophat.MAL_Version3.dir.1788_1.bam \
     -o ~/tmp/out.bam \
     -m MAL1=Pf3D_01 -m MAL2=Pf3D7_02 -m MAL3=Pf3D7_03 \
@@ -284,9 +261,7 @@ repository knows them as Pf3D7_XX.</P>
 cp /tmp/out.bam /path/to/alignments/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_1.bam
 
 # reindex the new BAM with samtools
-samtools index /path/to/alignments/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_1.bam
-
-</code></pre>  
+samtools index /path/to/alignments/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_1.bam</code></pre>  
 
 
 <h2  id="deploying">Deploying</h2>
@@ -294,25 +269,19 @@ samtools index /path/to/alignments/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version
 <h3  id="war" >Packaging the war </h3>
 
 <p>Here you must specify a config property file. Several of examples are bundled in the top level folder. For example :</p>
-<pre><code>
- ant -Dconfig=resource-elasticsearch-remote.properties package-war
-</code></pre>
+<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties war</code></pre>
 
 <h3  id="jetty">Testing the war using Jetty-runner </h3>
 
 <P>This can be used to run crawler without having to configure a servlet container. This is not good for production use. Only use it for testing.</P>
 
-<pre><code>
- ant -Dconfig=resource-elasticsearch-remote.properties run-jetty
-</code></pre>
+<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties jettyRunWar</code></pre>
 
 <h3 id="j2ee">Deploying the war using to a J2EE container  </h3>
 
 <P>For production, or even beta test sites, it should be deployed to a container as follows.</P>
 
-<pre><code>
- ant -Dconfig=resource-elasticsearch-remote.properties deploy
-</code></pre>
+<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties deploy</code></pre>
 
 
 
@@ -322,25 +291,19 @@ samtools index /path/to/alignments/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version
 
 <P>To be run whenever method signatures change and you want to spot external references to them.</P> 
 
-<pre><code>
- ant clean
-</code></pre>
+<pre><code>./gradlew clean</code></pre>
 
 
 <h3  id="clean es">Cleaning up a local elasticsearch data</h3>
 
-<pre><code>
- ant clean-es
-</code></pre>
+<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties cleanes</code></pre>
 
 
 <h3  id="clean ivy">Cleaning ivy-downloaded libs</h3>
 
 <P>Sometimes useful before committing...</P>
 
-<pre><code>
- ant clean-ivy
-</code></pre>
+<pre><code>./ant clean-ivy</code></pre>
 
 
 
@@ -407,9 +370,6 @@ samtools index /path/to/alignments/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version
 <td>the chado database password</td>
 <td>chado-postgres</td></tr>
 
-<tr><td>sqlPath</td>
-<td>the chado database mybatis XML files</td>
-<td>chado-postgres</td></tr>
 
 <tr><td>resource.elasticsearch.index</td>
 <td>The name of the index</td>
