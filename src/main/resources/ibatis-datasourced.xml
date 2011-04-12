@@ -1,0 +1,33 @@
+<?xml version="1.1" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://www.mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--  note here the www has been removed from the PUBLIC uri in doctype at the top, this is to prevent mybatis scanning the internets. -->
+    
+    <settings>
+        <setting name="cacheEnabled" value="false"/>
+    </settings>
+    
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC" />
+            <dataSource type="POOLED">
+                <property name="driver" value="org.postgresql.Driver" />
+                <property name="url" value="jdbc:postgresql://${dbhost}:${dbport}/${dbname}" />
+                <property name="username" value="${dbuser}" />
+                <property name="password" value="${dbpassword}" />
+            </dataSource>
+        </environment>
+    </environments>
+  <mappers>
+    <mapper resource="org/genedb/crawl/mappers/FeatureCvtermMapper.xml"/>
+    <mapper resource="org/genedb/crawl/mappers/OrganismsMapper.xml"/>
+    <mapper resource="org/genedb/crawl/mappers/FeaturesMapper.xml"/>
+    <mapper resource="org/genedb/crawl/mappers/FeatureMapper.xml"/>
+    <mapper resource="org/genedb/crawl/mappers/RegionsMapper.xml"/>
+    <mapper resource="org/genedb/crawl/mappers/TermsMapper.xml"/>
+  </mappers>
+   
+  
+</configuration>
