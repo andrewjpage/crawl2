@@ -5,8 +5,12 @@ apply plugin: 'eclipse'
 
 configurations.compile.transitive = true
 jar.enabled = true
-sourceCompatibility = 1.6
 //version = '0.01'
+
+allprojects {
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+}
 
 repositories {
     
