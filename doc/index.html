@@ -15,25 +15,26 @@ body {
     margin:auto;
 }
 
-
+h1 { font-size:2em; }
+h2 { font-size:1.8em; }
+h3 { font-size:1.6em; }
+h4 { font-size:1.4em; }
+h5 { font-size:1.2em; }
 
 h1,h2,h3,h4,h5 {
-font-size:1.2em;
-font-weight:bold;
-text-transform: uppercase;
+    font-weight:bold;
+    text-transform: uppercase;
 }
 
 p {
     padding:15px;
+    text-align: justify;
 }
 
 pre {
     margin:10px;
     padding:10px;
-}
-
-pre {
-     border: 1px dashed grey;
+    border: 1px dashed grey;
 }
 
 table {
@@ -52,6 +53,8 @@ td, th {
 div#toc {
     border: 1px dashed grey;
     padding:10px;
+    width:400px;
+    margin:auto;
 }
 
 div#toc ul {
@@ -85,56 +88,65 @@ color:black;
 
 
 <div id="toc"></div>
+<P>
+<center>
+    <em>
+        Note: Generated using <a href="http://jquery.org/">Jquery</a> and a <a href="http://code.google.com/p/samaxesjs/wiki/TableOfContentsPlugin">TOC plugin</a>.
+    </em>
+</center>
+</P>
 
-<h2 id="Data">Data sources</h2>
+
+<h2 id="Intro">Introduction</h2>
+
+<P>Crawl provides a standardised API, in the form of web services, for displaying genomic data. It can work directly off 
+a <a href="http://gmod.org/wiki/Chado">Chado</a> database, 
+or instead off an <a href="http://www.elasticsearch.org">ElasticSearch</a> cluster, which 
+uses <a href="http://lucene.apache.org/">Lucene</a> as a back end, and can be indexed off a combination of data sources.</P>
+
+<P>It is currently used by <a href="https://github.com/sanger-pathogens/Web-Artemis">Web-Artemis</a> as an AJAX back end.</P>
 
 <h3 id="Chado">Chado</h3>
 
-<P>Crawl will work directly off a Chado database. To do this the property file you use must be configured with </P>
+<P>Chado is a standard relational database, typically deployed on <a href="http://www.postgresql.org">postgres</a> database. It has a very flexible schema, allowing all sorts of genomic
+features to be modelled. It is the underlying data store for <a href="http://www.genedb.org">GeneDB</a>, <a href="http://flybase.org/">FlyBase</a>, 
+<a href="http://paramecium.cgm.cnrs-gif.fr/">ParameciumDB</a>, <a href="http://www.vectorbase.org/">VectorBase</a>, and <a href="http://www.gnpannot.org/">GNPAnnot</a>. 
+</P>
 
-<pre><code>resource.type=chado-postgres</code></pre>
-
-<P>as well as db connection details. There are example property files with this kind of configuration. The "resource-chado-public.properties" resource can be used to test against the genedb public snapshot.</P>  
+<P>The Crawl API exposes the contents of these databases via SQL queries.</P>
 
 <h3 id="ElasticSearch">ElasticSearch</h3>
 
 <P>Data can be indexed and stored using ElasticSearch, a distributed search enging that runs ontop of Lucene. There are two kinds of connections to ElasticSearch: local and transport. Local connections
- are useful to get going with, as an ElasticSearch cluster is automatically created and managed in the same process as Crawl. To use this the property</P>
-
-<pre><code>resource.type=elasticsearch-local</code></pre>
-
-<P>must be used, as well as information about where to store the index files. If you want to run the services off standalone elasticsearch cluster, you will need to download, install, and start it separately. The property </P>
-
-<pre><code>resource.type=elasticsearch-remote</code></pre>
-
-<P>must be used, as well as information about the IP address and port of the remote cluster.</P> 
-
+ are useful to get going with, as an ElasticSearch cluster is automatically created and managed in the same process as Crawl. The only configuration needed for this is usually the location of the 
+ indices. Transport connections connect to a separately instantiated ElasticSearch cluster, which can be on the same or remote machines, and the configuration needed for this is host and port.</P> 
+ 
 <P>The indices can be populated from various data sources: GFF3, DAS and Chado. It might seem odd to want to index a Chado database when Crawl will run directly off of it, but this might be 
 useful in situations where you want to merge annotations from Chado with other sources (like DAS or GFF3).</P>
 
 
+<P>The Crawl API exposes the contents of these indices via ElasticSearch (Lucene) queries.</P>
+
 <h3 id="align">Alignments</h3>
 
-<P>SAM or BAM alignments can be specified using the property :</P>
+<P>Crawl can retrieve segments from Next-Generation sequencing alignments stored in BAM files, for overlaying ontop of genomic features.</P>
 
-<pre><code>alignments=/path/to/alignments.json</code></pre>
-
-<P>This file should contain a JSON detailing a list of files, and the organism common name they refer to. 
 
 <h2 id="build">Setup, build and test</h2>
 
-<p>This is all done through the use of ant tasks. </p>
+<p>This is all done through the use of <a href="http://gradle.org/">Gradle</a>. You don't need to install it, though, because there will be an executable in the root folder of the checkout
+('gradlew').</p>
 
-<h3 id="setup">Setup.</h3>
+<h3 id="setup">Setup</h3>
 
 <P>The initial build setup might take a while because it will download dependencies, but you should only ever have to run it 
 all once. After that any updates to dependencies should be incremental.To setup the build, run : </P>
 
 <pre><code>./gradlew</code></pre>
 
-<P>in the crawl checkout root folder.</P>
+<P>in the crawl checkout root folder. This can take 5-10 minutes depending on your internet connection.</P>
 
-<h3 id="dependencies">Fetching dependencies from GeneDB (optional)</h3>
+<h3 id="dependencies">Fetching dependencies from the GeneDB repository (optional)</h3>
 
 <P>Because of the unreliability of some external repositories, the dependencies are hosted on the genedb developer site as well. If you find the resolve step fails, you can try
 you can enable download from this site by adding the genedb developer https certificate. This certificate can be downloaded like this on a Mac (in bash) : </P>
@@ -153,6 +165,10 @@ you can enable download from this site by adding the genedb developer https cert
 
 <P>The keytool password is 'changeit'.</P>
 
+<P>Finally, you will have to uncomment the repositories in the build.gradle file that have a url that starts with :</P>
+
+<pre><code>https://developer.genedb.org/nexus/content/repositories/</code></pre>
+
 <h3 id="buildandtest">Build and test</h3>
 
 <P>Now to build, run :</P>
@@ -164,6 +180,19 @@ you can enable download from this site by adding the genedb developer https cert
 should just work out of the box. The reason for that will be explained later, but the gist of it is that it connects to the GeneDB public snapshot for its database tests,
 and creates a local ElasticSearch cluster for its indexing tests.</P>
 
+
+<h3 id="eclipse">Customizing eclipse</h3>
+
+<P>If you want to be able to edit the code inside eclipse, you can do. However, you need to comment out this line in the build.gradle file :</P>
+
+<pre><code>compile fileTree(dir: 'lib/local', includes: ['**.jar'])</code></pre>
+
+<P>before running</P>
+
+<pre><code>./gradlew eclipse</code></pre>
+
+<P><strong>Remember to then uncomment that line again before running any other gradle tasks. </strong>This is due to a currently open issue with 
+gradle <a href="http://issues.gradle.org/browse/GRADLE-1415">GRADLE-1415</a>.</P>
 
 <h2 id="indexing">Indexing</h2>
 
@@ -221,12 +250,12 @@ This example connects to the GeneDB public Chado snapshot. To just copy one orga
 <p>Incremental indexing relies on the use of the timelastmodified stamp. You can indexing everything that has changed since 2011-01-05, as follows :</p>
 
 <pre><code>./sh/chado2es.sh -pc resource-chado-public.properties \
-    -pe resource-elasticsearch-local.properties -s 2011-01-05</code></pre>
+    -pe resource-elasticsearch-local.properties -s 2011-04-01</code></pre>
 
 <p>You can filter on organism:</p>
 
 <pre><code>./sh/chado2es.sh -pc resource-chado-public.properties \
-    -pe resource-elasticsearch-local.properties -o Lmajor -s 2011-01-05 </code></pre>
+    -pe resource-elasticsearch-local.properties -o Lmajor -s 2011-04-01 </code></pre>
 
 <p>And if you want to index the entire organism, currently the way to do it is to choose a suitably distant since date, for example :</p>
 
@@ -294,16 +323,12 @@ samtools index /path/to/alignments/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version
 <pre><code>./gradlew clean</code></pre>
 
 
-<h3  id="clean es">Cleaning up a local elasticsearch data</h3>
+<h3  id="clean es">Cleaning up a local ElasticSearch data</h3>
+
+<P>This task is only useful for non-trasnsport, i.e. local, clusters, and requires the correct config : </P> 
 
 <pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties cleanes</code></pre>
 
-
-<h3  id="clean ivy">Cleaning ivy-downloaded libs</h3>
-
-<P>Sometimes useful before committing...</P>
-
-<pre><code>./ant clean-ivy</code></pre>
 
 
 

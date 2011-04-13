@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
@@ -266,6 +269,33 @@ public abstract class ElasticSearchBaseMapper {
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public void waitForYellowOrGreenStatus() {
+		ClusterHealthRequest clusterHealth = new ClusterHealthRequest();
+		ClusterHealthResponse response;
+		
+		boolean ok = false;
+		logger.info("Waiting...");
+		
+		while (! ok) {
+			response = connection.getClient().admin().cluster().health(clusterHealth).actionGet();
+			ClusterHealthStatus status = response.getStatus();
+			
+			if (status.equals(ClusterHealthStatus.GREEN) || status.equals(ClusterHealthStatus.YELLOW)) {
+				logger.info(status);
+				
+				ok = true;
+			}
+			
+			logger.info(status);
+			
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

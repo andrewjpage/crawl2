@@ -8,8 +8,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticSearchException;
 
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.action.search.SearchRequestBuilder;
@@ -23,6 +25,10 @@ import org.genedb.crawl.elasticsearch.LocalConnection;
 
 
 public class ElasticTest extends TestCase {
+	
+	
+	
+	private Logger logger = Logger.getLogger(ElasticTest.class);
 	
 	Client client;
 	LocalConnection connection;
@@ -92,15 +98,21 @@ public class ElasticTest extends TestCase {
 	}
 	
 	
-	
-	public void test1() throws InterruptedException, ElasticSearchException, IOException {
-		
+	public void setUp() {
 		connection = new LocalConnection();
 		connection.setPathData("/tmp/es/data");
 		connection.setPathLogs("/tmp/es/logs");
 		connection.configure();
 		
 		client = connection.getClient();
+	}
+	
+	public void tearDown() {
+		connection.close();
+	}
+
+	
+	public void test1() throws InterruptedException, ElasticSearchException, IOException {
 		
 		regions.add(new RegionMap("region1", organismID, "atgc"));
 		regions.add(new RegionMap("region2", organismID, "atgcatgc"));
@@ -110,15 +122,20 @@ public class ElasticTest extends TestCase {
 			index(regionMap.region, regionMap.organismID, regionMap.sequence);
 		}
 		
+		logger.info("Waiting for green");
+		ClusterHealthRequest health = new ClusterHealthRequest();
+		health.waitForGreenStatus();
+		logger.info(client.admin().cluster().health(health).actionGet().getStatus());
+		
 		SearchHits search = search(organismID, new String[] {"sequence"} );
 		
 		assertEquals(regions.size(), search.getTotalHits());
 		
 		for (SearchHit hit : search) {
+			logger.info(hit.id());
 			assertTrue(hit.field("sequence") != null);
 		}
 		
-		connection.close();
 		
 		
 	}

@@ -9,9 +9,9 @@ jar.enabled = true
 
 repositories {
     
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/jboss/"] 
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"]
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/java.net-m2"]
+    // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/jboss/"] 
+    // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"]
+    // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/java.net-m2"]
     
     mavenRepo urls: ["http://repository.sonatype.org/content/repositories/central"]
     mavenRepo urls: ["http://oss.sonatype.org/content/repositories/releases"]
@@ -92,18 +92,22 @@ war {
     baseName = props["deploy.name"]
 }
 
-//task copyRuntimeDependencies(dependsOn: configurations.runtime.buildArtifacts, type: Copy) {
+//task copyRuntimeDependencies(dependsOn: configurations.runtime.buildArtifacts, type: Copy) << {
     //into('build/libs')
     //from configurations.runtime
     //from configurations.runtime.allArtifacts*.file
 //}
 
-task deploy (type : Copy) {
-    into(props["deploy.dir"])
-    from "build/libs/" + props["deploy.name"] + ".war"
+
+task deploy(dependsOn: 'war') << {
+    copy {
+        from war.archivePath
+        into props["deploy.dir"] 
+    }
 }
 
-task cleanes {
+
+task cleanes << {
     println "Deleting " + props["resource.elasticsearch.local.pathdata"]
     ant.delete(dir:props["resource.elasticsearch.local.pathdata"])
     println "Deleting " + props["resource.elasticsearch.local.pathlogs"]

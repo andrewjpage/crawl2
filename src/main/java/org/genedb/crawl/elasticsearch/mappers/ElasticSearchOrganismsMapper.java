@@ -81,11 +81,17 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 			
 			connection.getClient().prepareIndex(connection.getIndex(), connection.getOrganismType(), organism.common_name).setSource(source).execute().actionGet();
 			
-			
-			Organism retrievedOrganism = this.getByCommonName(organism.common_name);
-			logger.info("fetch check response :");
-			logger.info(jsonIzer.toJson(retrievedOrganism));
-			
+//			try {
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//			Organism retrievedOrganism = getByCommonName(organism.common_name);
+//			logger.info("fetch check response :");
+//			logger.info(jsonIzer.toJson(retrievedOrganism));
+//			
 			
 //			GetResponse r = connection.getClient().prepareGet(connection.getIndex(), connection.getOrganismType(), organism.common_name).execute().actionGet();
 //			logger.info("fetch check response :");

@@ -63,7 +63,7 @@ public class GFFIndexBuilder extends IndexBuilder {
 	
 	private Organism getAndPossiblyStoreOrganism() throws JsonParseException, JsonMappingException, IOException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		
-Organism userSuppliedOrganism = (Organism) jsonIzer.fromJson(organism, Organism.class);
+		Organism userSuppliedOrganism = (Organism) jsonIzer.fromJson(organism, Organism.class);
 		
 		Organism organism = null;
 		
@@ -74,7 +74,7 @@ Organism userSuppliedOrganism = (Organism) jsonIzer.fromJson(organism, Organism.
 				logger.info("found!");
 			} catch (Exception e) {
 				logger.warn(e.getMessage());
-				e.printStackTrace();
+				//e.printStackTrace();
 				logger.warn("Could not find an organism with this ID");
 			}
 		} 
