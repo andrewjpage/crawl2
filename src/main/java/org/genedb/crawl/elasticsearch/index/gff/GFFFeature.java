@@ -24,7 +24,7 @@ public class GFFFeature {
 	public int end;
 	public String score;
 	public Strand strand;
-	public Integer phase;
+	public Phase phase;
 	
 	public GFFAttributeMap attributes = new GFFAttributeMap(this);
 	
@@ -68,6 +68,51 @@ public class GFFFeature {
 		
 	};
 	
+	
+	public enum Phase {
+		ZERO ("0"),
+		ONE ("1"),
+		TWO ("2"),
+		NULL (".");
+		
+		private String text;
+		
+		Phase(String text) {
+			this.text = text;
+		}
+		
+		public String getPhase() {
+			return text;
+		}
+		
+		public Integer getPhaseInt() {
+			
+			if (text.equals(ZERO)) {
+				return 0;
+			}
+			if (text.equals(ONE)) {
+				return 1;
+			}
+			if (text.equals(TWO)) {
+				return 2;
+			}
+			
+			return null;
+			
+		}
+		
+		public static Phase fromText(String text) {
+			if (text != null) {
+				for (Phase b : Phase.values()) {
+					if (text.equalsIgnoreCase(b.text)) {
+						return b;
+					}
+				}
+			}
+			return null;
+		}
+	}
+	
 	public GFFFeature(String line) {
 		this(line, true);
 	}
@@ -82,21 +127,22 @@ public class GFFFeature {
 		seqid = columns[0];
 		source = columns[1];
 		type = columns[2];
-		start = new Integer (columns[3]);
+		start = new Integer (columns[3]) - 1;
 		end = new Integer (columns[4]);
 		score = columns[5];
 		
 		strand = Strand.fromText(columns[6]);
+		phase = Phase.fromText(columns[7]);
 		
 		//logger.info(columns[7]);
 		
-		try {
-			phase = Integer.parseInt( columns[7] );
-		} catch (NumberFormatException nfe) {
-			if (type.equals("exon") || type.equals("CDS")) {
-				logger.warn(String.format("%s features should have phase : \n\t %s", type, line));
-			}
-		}
+//		try {
+//			phase = Integer.parseInt( columns[7] );
+//		} catch (NumberFormatException nfe) {
+//			if (type.equals("exon") || type.equals("CDS")) {
+//				logger.warn(String.format("%s features should have phase : \n\t %s", type, line));
+//			}
+//		}
 		
 		//logger.info(seqid);
 		

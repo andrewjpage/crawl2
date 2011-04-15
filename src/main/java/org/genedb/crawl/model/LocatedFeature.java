@@ -20,7 +20,7 @@ public class LocatedFeature extends Feature {
 	public String parentRelationshipType;
 	
 	@XmlAttribute(required=true)
-	public Integer phase;
+	public String phase = ".";
 	
 	@XmlAttribute(required=true)
 	public int strand;

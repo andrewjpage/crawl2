@@ -121,7 +121,7 @@ features to be modelled. It is the underlying data store for <a href="http://www
  are useful to get going with, as an ElasticSearch cluster is automatically created and managed in the same process as Crawl. The only configuration needed for this is usually the location of the 
  indices. Transport connections connect to a separately instantiated ElasticSearch cluster, which can be on the same or remote machines, and the configuration needed for this is host and port.</P> 
  
-<P>The indices can be populated from various data sources: GFF3, DAS and Chado. It might seem odd to want to index a Chado database when Crawl will run directly off of it, but this might be 
+<P>The indices can be populated from various data sources: <strong><a href="http://www.sequenceontology.org/gff3.shtml">valid GFF3</a></strong>, Chado, and we are working on adding DAS. It might seem odd to want to index a Chado database when Crawl will run directly off of it, but this might be 
 useful in situations where you want to merge annotations from Chado with other sources (like DAS or GFF3).</P>
 
 
@@ -233,7 +233,7 @@ This example connects to the GeneDB public Chado snapshot. To just copy one orga
 
 <p>GFF files do not contain information about the organism, so this must be supplied. This can be done as follows :</p>
 
-<pre><code>./sh/gff2es.sh -g /path/to/gff/files \
+<pre><code>./sh/gff2es.sh -g data/Pf3D7_01.gff.gz  \
     -o '{"common_name":"Pfalciparum"}' \
     -pe resource-elasticsearch-local.properties </code></pre>
 

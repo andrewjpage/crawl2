@@ -1,10 +1,6 @@
 package org.genedb.crawl;
 
-import java.io.IOException;
-
-import org.genedb.crawl.business.TabixReader;
 import org.genedb.crawl.elasticsearch.index.gff.GFFFeature;
-
 import junit.framework.TestCase;
 
 public class GFFFeatureTest extends TestCase {
@@ -17,14 +13,14 @@ public class GFFFeatureTest extends TestCase {
 		GFFFeature f = new GFFFeature(s); 
 		
 		
-		assertEquals(f.start, 1);
+		assertEquals(f.start, 0);
 		assertEquals(f.end, 583);
 		assertEquals(f.attributes.map.get("comment"), "telomeric repeat");
 		
 		
 		GFFFeature f2 = new GFFFeature(s2); 
 		
-		assertEquals(f2.start, 134587);
+		assertEquals(f2.start, 134586);
 		assertEquals(f2.end, 139491);
 		
 		

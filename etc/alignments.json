@@ -1,14 +1,25 @@
 [
     {
-        "file" : "/Users/gv1/Documents/Data/heirarchy/4415_2-Staph_aureus_MRSA252_small/test.bam",
-        "organism" : "test"
+        "file" : "/Users/gv1/Documents/Data/heirarchy/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_1.bam",
+        "organism" : "Pfalciparum"
     },
     {
-        "file" : "/Users/gv1/Documents/Data/heirarchy/4415_2_11-Staph_aureus_MRSA252/maq/raw.bam",
-        "organism" : "Saureus_MRSA252"
+        "file" : "/Users/gv1/Documents/Data/heirarchy/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_2.bam",
+        "organism" : "Pfalciparum"
     },
     {
-        "file" : "/Users/gv1/Documents/Data/heirarchy/4415_2_12-Staph_aureus_MRSA252/maq/raw.bam",
-        "organism" : "Saureus_MRSA252"
+        "file" : "/Users/gv1/Documents/Data/heirarchy/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_3.bam",
+        "organism" : "Pfalciparum"
+    },
+    {
+        "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Module_1_Mapping_sequence_data/malaria/all.bam",
+        "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Module_1_Mapping_sequence_data/malaria/all.bam.bai",
+        "organism" : "Pfalciparum",
+        "sequences" : [
+            {
+                "name" : "MAL11",
+                "alias" : "Pf3D7_11"
+            }
+        ]
     }
 ]

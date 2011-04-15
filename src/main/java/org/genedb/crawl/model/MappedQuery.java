@@ -34,6 +34,15 @@ public class MappedQuery {
 	//public List<MappedQueryRecordElementList> records;
 	public Hashtable<String, ArrayList<Object>> records = new Hashtable<String, ArrayList<Object>>();
 	
+	
+//	public class RecordStore {
+//		@XmlElement
+//		public List<Integer> alignmentEnd;
+//		public List<Integer> alignmentStart;
+//		public List<Integer> flags;
+//		public List<String> readName;
+//	}
+	
 //	public Records records;
 //	
 //	public static class Records {

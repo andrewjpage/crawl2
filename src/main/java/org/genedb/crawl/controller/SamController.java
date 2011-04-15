@@ -74,7 +74,7 @@ public class SamController extends BaseQueryController {
 			@RequestParam("start") int start,
 			@RequestParam("end") int end,
 			@RequestParam(value="contained", defaultValue="true", required=false) Boolean contained,
-			@RequestParam(value="filter", defaultValue="0", required=false) Integer filter) throws Exception {
+			@RequestParam(value="filter", defaultValue="0") int filter) throws Exception {
 		results.query = sam.query(fileID, sequence, start, end, contained, filter);
 		return results;
 	}

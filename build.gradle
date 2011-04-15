@@ -61,6 +61,24 @@ dependencies {
     
 }
 
+//task print_configs(dependsOn: assemble) << {
+//    configurations.each { config ->
+ //       println config
+        
+        //config.files.each { file -> 
+            //println "--" + file
+        //}
+        
+   // }
+    
+    //dependencies.each { dependency ->
+      //  println dependency
+    //}
+    
+//}
+
+
+
 
 Properties props = new Properties()
 props.load(new FileInputStream(config))

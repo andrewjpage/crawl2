@@ -48,7 +48,7 @@ public class FeatureBeanFactory {
 		feature.fmin = gffFeature.start;
 		feature.fmax = gffFeature.end;
 		feature.region = gffFeature.seqid;
-		feature.phase = gffFeature.phase;
+		feature.phase = gffFeature.phase.getPhase();
 		feature.strand = gffFeature.strand.getStrandInt();
 		
 		// but for web service display we are also storing a coordinates array
@@ -57,7 +57,7 @@ public class FeatureBeanFactory {
 		feature.coordinates.add(coordinates);
 		coordinates.region = gffFeature.seqid;
 		if (gffFeature.phase != null) {
-			coordinates.phase = gffFeature.phase;
+			coordinates.phase = gffFeature.phase.getPhase();
 			coordinates.strand = gffFeature.strand.getStrandInt();
 		}
 		coordinates.fmin = gffFeature.start;

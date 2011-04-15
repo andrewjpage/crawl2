@@ -19,6 +19,7 @@ import net.sf.samtools.SAMSequenceRecord;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.model.Alignment;
+import org.genedb.crawl.model.AlignmentSequenceAlias;
 import org.genedb.crawl.model.FileInfo;
 import org.genedb.crawl.model.MappedCoverage;
 import org.genedb.crawl.model.MappedQuery;
@@ -85,8 +86,8 @@ public class Sam {
 		List<FileInfo> files = new ArrayList<FileInfo>();
 		
 		for (Alignment alignment : alignments) {
-			FileInfo file = new FileInfo(alignment.fileID, alignment.file.getAbsolutePath(), alignment.meta, alignment.organism);
-			logger.info(alignment.file.getName());
+			FileInfo file = new FileInfo(alignment.fileID, alignment.file, alignment.meta, alignment.organism);
+			logger.info(alignment.file);
 			logger.info(alignment.meta);
 			files.add(file);
 			
@@ -111,6 +112,40 @@ public class Sam {
 		return list(alignments);
 	}
 	
+	public String getActualSequenceName(int fileID, String sequenceName) throws Exception {
+		
+		Alignment alignment = alignmentStore.getAlignment(fileID);
+		SAMFileReader file = alignment.getReader();
+		
+		for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
+			String currentName = ssr.getSequenceName();
+			
+			logger.info(String.format("%s = %s", currentName, sequenceName));
+			
+			if (currentName.equals(sequenceName)) {
+				return currentName;
+			}
+			
+			
+			if (alignment.sequences == null) {
+				continue;
+			}
+			
+			for (AlignmentSequenceAlias sequenceAlias : alignment.sequences ) {
+				
+				logger.info(String.format("-- %s = %s", sequenceAlias.alias, sequenceName));
+				
+				if (sequenceAlias.alias.equals(sequenceName)) {
+					return sequenceAlias.name;
+				}
+			}
+			
+		}
+		
+		throw new RuntimeException (String.format("Could not find the sequence %s in %s", fileID, sequenceName));
+		
+	}
+	
 	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, int filter) throws Exception {
 		return query(fileID, sequence, start, end, contained, defaultProperties, filter);		
 	}
@@ -118,10 +153,12 @@ public class Sam {
 	
 	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
 		logger.debug("FileID : " + fileID);
+		sequence = getActualSequenceName(fileID, sequence);
 		return this.query(getSamOrBam(fileID), sequence, start, end, contained, properties, filter);
 	}
 	
-	public synchronized MappedQuery query(SAMFileReader file, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
+	private synchronized MappedQuery query(SAMFileReader file, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
+		
 		
 		logger.debug(String.format("file: %s\tlocation: '%s:%d-%d'\tcontained?%s\tfilter: %d(%s)", file, sequence, start, end, contained, filter, padLeft(Integer.toBinaryString(filter), 8)));
 		
@@ -196,8 +233,10 @@ public class Sam {
 			while ( i.hasNext() )  {
 				SAMRecord record = i.next();
 				
+				
+				
 				/*
-				int toFilter = record.getFlags() & filter;
+				 * int toFilter = record.getFlags() & filter;
 				logger.debug(String.format("Read: %s, Filter: %s, Flags: %s, Result: %s", record.getReadName(), filter, record.getFlags(), toFilter ));
 				logger.debug(padLeft(Integer.toBinaryString(filter), 8));
 				logger.debug(padLeft(Integer.toBinaryString(record.getFlags()), 8));
@@ -253,6 +292,7 @@ public class Sam {
 	
 	
 	public synchronized MappedCoverage coverage(int fileID, String sequence, int start, int end, int window, int filter) throws Exception {
+		sequence = getActualSequenceName(fileID, sequence);
 		return this.coverage(getSamOrBam(fileID), sequence, start, end, window, filter);
 	}
 	

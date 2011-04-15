@@ -29,7 +29,7 @@ public class AlignmentStore {
 	
 	private JsonIzer jsonIzer = JsonIzer.getJsonIzer();
 	
-	public SAMFileReader getReader(int fileID) {
+	public SAMFileReader getReader(int fileID) throws IOException {
 		if (fileID < alignments.size()) {
 			return alignments.get(fileID).getReader();
 		}
@@ -38,6 +38,13 @@ public class AlignmentStore {
 	
 	public List<Alignment> getAlignments() {
 		return alignments;
+	}
+	
+	public Alignment getAlignment(int fileID) {
+		if (fileID < alignments.size()) {
+			return alignments.get(fileID);
+		}
+		return null;
 	}
 	
 	
@@ -54,6 +61,8 @@ public class AlignmentStore {
 			return;
 		}
 		
+		logger.info("making jsons");
+		
 		alignments = (List<Alignment>) jsonIzer.fromJson(alignmentFile,  new TypeReference<List<Alignment>>() {} );
 		
 		generateMetaFields();
@@ -67,7 +76,7 @@ public class AlignmentStore {
 		
 		for (Alignment alignment : alignments) {
 			
-			String[] metas = alignment.file.getAbsolutePath().split("/");
+			String[] metas = alignment.file.split("/");
 			
 			for (String meta : metas) {
 				if (found.contains(meta)) {
@@ -88,7 +97,7 @@ public class AlignmentStore {
 		
 		for (Alignment alignment : alignments) {
 			
-			String[] metas = alignment.file.getAbsolutePath().split("/");
+			String[] metas = alignment.file.split("/");
 			
 			List<String> path_elements = new ArrayList<String>();
 			

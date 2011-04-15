@@ -16,7 +16,7 @@ public class Coordinates implements Serializable {
 	public int fmax;
 	
 	@XmlAttribute(required=true)
-	public Integer phase;
+	public String phase;
 	
 	@XmlAttribute(required=true)
 	public int strand;

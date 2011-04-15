@@ -92,6 +92,7 @@
     <result property="organism_id" column="organism_id"/>
     <result property="isObsolete" column="is_obsolete"/>
     <result property="strand" column="strand"/>
+    <result property="phase" column="phase"/>
     <result property="fmin" column="fmin"/>
     <result property="fmax" column="fmax"/>
     <result property="parent" column="parent"/>
