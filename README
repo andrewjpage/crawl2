@@ -19,13 +19,27 @@ c:::::::cccccc:::::c r:::::r          a::::a    a:::::a      w:::::::w       w::
     cccccccccccccccc rrrrrrr            aaaaaaaaaa  aaaa        www             www          llllllll
 
                                                                                            Version 0.01
+
+
+
                                                                                            
-Documentation can be found in doc/index.html.
+More detailed documentation can be found in doc/index.html.
+
+
+##############################################
+# RUNNING OFF A CHADO DATABASE
+##############################################
 
 For a quick test run off the GeneDB public Chado database, try :
 
-$ gradlew build
-$ gradlew -Pconfig=resource-chado-public.properties jettyRunWar
+$ ./gradlew build
+$ ./gradlew -Pconfig=resource-chado-public.properties jettyRunWar
+
+
+
+##############################################
+# RUNNING OFF AN INDEXED GFF3 FILE
+##############################################
 
 If instead you want to try indexing a GFF file, try (assumes you're in bash) :
 
@@ -38,7 +52,10 @@ $ ./sh/gff2es.sh -pe resource-elasticsearch-local.properties -o '{
     "translation_table":11,
     "taxonID":5833
 }'
-$ ./sh/gff2es.sh -g /path/to/gff/files \
-    -o '{"common_name":"Pfalciparum"}' \
-    -pe resource-elasticsearch-local.properties 
-$ gradlew -Pconfig=resource-elasticsearch-local.properties jettyRunWar
+$ ./sh/chado2es.sh -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties \
+    -r Pf3D7_01 
+$ ./gradlew -Pconfig=resource-elasticsearch-local.properties jettyRunWar
+$ ./gradlew -Pconfig=resource-elasticsearch-local.properties jettyRunWar
+
+
