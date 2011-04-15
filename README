@@ -44,13 +44,13 @@ $ ./gradlew -Pconfig=resource-chado-public.properties jettyRunWar
 If instead you want to try indexing a GFF file, try (assumes you're in bash) :
 
 $ gradlew build
-$ ./sh/gff2es.sh -pe resource-elasticsearch-local.properties -o '{
-    "ID":27,
-    "common_name":"Pfalciparum",
-    "genus":"Plasmodium",
-    "species":"falciparum",
-    "translation_table":11,
-    "taxonID":5833
+$ ./sh/gff2es.sh -pe resource-elasticsearch-local.properties -o '{ \
+    "ID":27, \
+    "common_name":"Pfalciparum", \
+    "genus":"Plasmodium", \
+    "species":"falciparum", \
+    "translation_table":11, \
+    "taxonID":5833 \
 }'
 $ ./sh/chado2es.sh -pc resource-chado-public.properties \
     -pe resource-elasticsearch-local.properties \
