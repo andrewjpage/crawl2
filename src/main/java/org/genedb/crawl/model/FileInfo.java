@@ -4,8 +4,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 public class FileInfo  {
 	
-	@XmlAttribute
-	public int fileID;
+	@XmlAttribute(required=true)
+	public Integer fileID;
 	@XmlAttribute
 	public String file;
 	@XmlAttribute

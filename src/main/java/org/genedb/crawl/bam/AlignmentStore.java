@@ -115,7 +115,8 @@ public class AlignmentStore {
 
 	void assignFileIDs() {
 		for (Alignment alignment : alignments) {
-			alignment.fileID = fileID++;
+			alignment.fileID = fileID;
+			fileID++;
 		}
 	}
 

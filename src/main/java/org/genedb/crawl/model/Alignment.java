@@ -23,7 +23,8 @@ public class Alignment {
 	
 	private static Logger logger = Logger.getLogger(Alignment.class);
 	
-	public Integer fileID;
+	@XmlAttribute(required=true)
+	public Integer fileID = 0;
 	
 	@XmlAttribute(required=false)
 	public String file;

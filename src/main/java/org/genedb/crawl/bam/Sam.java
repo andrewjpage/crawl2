@@ -1,5 +1,6 @@
 package org.genedb.crawl.bam;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,6 +82,34 @@ public class Sam {
 		return model;
 	}
 	
+	public List<FileInfo> listwithsequence(String sequence) throws Exception {
+		
+		
+		Map<Integer, Alignment> map = new HashMap<Integer, Alignment>();
+		
+		for (Alignment alignment : alignmentStore.getAlignments()) {
+			SAMFileReader file = alignment.getReader();
+			Integer fileID = alignment.fileID;
+			
+			if (map.containsKey(fileID)) {
+				continue;
+			}
+			
+			for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
+				
+				if (ssr.getSequenceName().equals(sequence) 
+						||  this.getActualSequenceName(fileID, sequence) != null) {
+					
+					map.put(fileID, alignment);
+					continue;
+					
+				} 
+			}
+		}
+		
+		return list(new ArrayList<Alignment>(map.values()));
+	}
+	
 	private List<FileInfo> list(List<Alignment> alignments) {
 		
 		List<FileInfo> files = new ArrayList<FileInfo>();
@@ -141,8 +170,7 @@ public class Sam {
 			}
 			
 		}
-		
-		throw new RuntimeException (String.format("Could not find the sequence %s in %s", fileID, sequenceName));
+		return null;
 		
 	}
 	

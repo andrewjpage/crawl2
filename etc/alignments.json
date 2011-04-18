@@ -1,15 +1,360 @@
 [
     {
-        "file" : "/Users/gv1/Documents/Data/heirarchy/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_1.bam",
-        "organism" : "Pfalciparum"
+        "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_0h.bam",
+        "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_0h.bam.bai",
+        "organism" : "Pfalciparum",
+        "sequences" : [
+            {
+                "name" : "MAL1",
+                "alias" : "Pf3D7_01"
+            },
+            {
+                "name" : "MAL2",
+                "alias" : "Pf3D7_02"
+            },
+            {
+                "name" : "MAL3",
+                "alias" : "Pf3D7_03"
+            },
+            {
+                "name" : "MAL4",
+                "alias" : "Pf3D7_04"
+            },
+            {
+                "name" : "MAL5",
+                "alias" : "Pf3D7_05"
+            },
+            {
+                "name" : "MAL6",
+                "alias" : "Pf3D7_06"
+            },
+            {
+                "name" : "MAL7",
+                "alias" : "Pf3D7_07"
+            },
+            {
+                "name" : "MAL8",
+                "alias" : "Pf3D7_08"
+            },
+            {
+                "name" : "MAL9",
+                "alias" : "Pf3D7_09"
+            },
+            {
+                "name" : "MAL10",
+                "alias" : "Pf3D7_10"
+            },
+            {
+                "name" : "MAL11",
+                "alias" : "Pf3D7_11"
+            }
+        ]
     },
     {
-        "file" : "/Users/gv1/Documents/Data/heirarchy/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_2.bam",
-        "organism" : "Pfalciparum"
+        "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_16h.bam",
+        "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_16h.bam.bai",
+        "organism" : "Pfalciparum",
+        "sequences" : [
+            {
+                "name" : "MAL1",
+                "alias" : "Pf3D7_01"
+            },
+            {
+                "name" : "MAL2",
+                "alias" : "Pf3D7_02"
+            },
+            {
+                "name" : "MAL3",
+                "alias" : "Pf3D7_03"
+            },
+            {
+                "name" : "MAL4",
+                "alias" : "Pf3D7_04"
+            },
+            {
+                "name" : "MAL5",
+                "alias" : "Pf3D7_05"
+            },
+            {
+                "name" : "MAL6",
+                "alias" : "Pf3D7_06"
+            },
+            {
+                "name" : "MAL7",
+                "alias" : "Pf3D7_07"
+            },
+            {
+                "name" : "MAL8",
+                "alias" : "Pf3D7_08"
+            },
+            {
+                "name" : "MAL9",
+                "alias" : "Pf3D7_09"
+            },
+            {
+                "name" : "MAL10",
+                "alias" : "Pf3D7_10"
+            },
+            {
+                "name" : "MAL11",
+                "alias" : "Pf3D7_11"
+            }
+        ]
     },
     {
-        "file" : "/Users/gv1/Documents/Data/heirarchy/3D7_Version7_Tophat_RNASeq/Tophat.MAL_Version3.dir.1788_3.bam",
-        "organism" : "Pfalciparum"
+        "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_24h.bam",
+        "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_24h.bam.bai",
+        "organism" : "Pfalciparum",
+        "sequences" : [
+            {
+                "name" : "MAL1",
+                "alias" : "Pf3D7_01"
+            },
+            {
+                "name" : "MAL2",
+                "alias" : "Pf3D7_02"
+            },
+            {
+                "name" : "MAL3",
+                "alias" : "Pf3D7_03"
+            },
+            {
+                "name" : "MAL4",
+                "alias" : "Pf3D7_04"
+            },
+            {
+                "name" : "MAL5",
+                "alias" : "Pf3D7_05"
+            },
+            {
+                "name" : "MAL6",
+                "alias" : "Pf3D7_06"
+            },
+            {
+                "name" : "MAL7",
+                "alias" : "Pf3D7_07"
+            },
+            {
+                "name" : "MAL8",
+                "alias" : "Pf3D7_08"
+            },
+            {
+                "name" : "MAL9",
+                "alias" : "Pf3D7_09"
+            },
+            {
+                "name" : "MAL10",
+                "alias" : "Pf3D7_10"
+            },
+            {
+                "name" : "MAL11",
+                "alias" : "Pf3D7_11"
+            }
+        ]
+    },
+    {
+        "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_32h.bam",
+        "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_32h.bam.bai",
+        "organism" : "Pfalciparum",
+        "sequences" : [
+            {
+                "name" : "MAL1",
+                "alias" : "Pf3D7_01"
+            },
+            {
+                "name" : "MAL2",
+                "alias" : "Pf3D7_02"
+            },
+            {
+                "name" : "MAL3",
+                "alias" : "Pf3D7_03"
+            },
+            {
+                "name" : "MAL4",
+                "alias" : "Pf3D7_04"
+            },
+            {
+                "name" : "MAL5",
+                "alias" : "Pf3D7_05"
+            },
+            {
+                "name" : "MAL6",
+                "alias" : "Pf3D7_06"
+            },
+            {
+                "name" : "MAL7",
+                "alias" : "Pf3D7_07"
+            },
+            {
+                "name" : "MAL8",
+                "alias" : "Pf3D7_08"
+            },
+            {
+                "name" : "MAL9",
+                "alias" : "Pf3D7_09"
+            },
+            {
+                "name" : "MAL10",
+                "alias" : "Pf3D7_10"
+            },
+            {
+                "name" : "MAL11",
+                "alias" : "Pf3D7_11"
+            }
+        ]
+    },
+    {
+        "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_48h.bam",
+        "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_48h.bam.bai",
+        "organism" : "Pfalciparum",
+        "sequences" : [
+            {
+                "name" : "MAL1",
+                "alias" : "Pf3D7_01"
+            },
+            {
+                "name" : "MAL2",
+                "alias" : "Pf3D7_02"
+            },
+            {
+                "name" : "MAL3",
+                "alias" : "Pf3D7_03"
+            },
+            {
+                "name" : "MAL4",
+                "alias" : "Pf3D7_04"
+            },
+            {
+                "name" : "MAL5",
+                "alias" : "Pf3D7_05"
+            },
+            {
+                "name" : "MAL6",
+                "alias" : "Pf3D7_06"
+            },
+            {
+                "name" : "MAL7",
+                "alias" : "Pf3D7_07"
+            },
+            {
+                "name" : "MAL8",
+                "alias" : "Pf3D7_08"
+            },
+            {
+                "name" : "MAL9",
+                "alias" : "Pf3D7_09"
+            },
+            {
+                "name" : "MAL10",
+                "alias" : "Pf3D7_10"
+            },
+            {
+                "name" : "MAL11",
+                "alias" : "Pf3D7_11"
+            }
+        ]
+    },
+    {
+        "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_48hB.bam",
+        "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_48hB.bam.bai",
+        "organism" : "Pfalciparum",
+        "sequences" : [
+            {
+                "name" : "MAL1",
+                "alias" : "Pf3D7_01"
+            },
+            {
+                "name" : "MAL2",
+                "alias" : "Pf3D7_02"
+            },
+            {
+                "name" : "MAL3",
+                "alias" : "Pf3D7_03"
+            },
+            {
+                "name" : "MAL4",
+                "alias" : "Pf3D7_04"
+            },
+            {
+                "name" : "MAL5",
+                "alias" : "Pf3D7_05"
+            },
+            {
+                "name" : "MAL6",
+                "alias" : "Pf3D7_06"
+            },
+            {
+                "name" : "MAL7",
+                "alias" : "Pf3D7_07"
+            },
+            {
+                "name" : "MAL8",
+                "alias" : "Pf3D7_08"
+            },
+            {
+                "name" : "MAL9",
+                "alias" : "Pf3D7_09"
+            },
+            {
+                "name" : "MAL10",
+                "alias" : "Pf3D7_10"
+            },
+            {
+                "name" : "MAL11",
+                "alias" : "Pf3D7_11"
+            }
+        ]
+    },
+    {
+        "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_8h.bam",
+        "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_8h.bam.bai",
+        "organism" : "Pfalciparum",
+        "sequences" : [
+            {
+                "name" : "MAL1",
+                "alias" : "Pf3D7_01"
+            },
+            {
+                "name" : "MAL2",
+                "alias" : "Pf3D7_02"
+            },
+            {
+                "name" : "MAL3",
+                "alias" : "Pf3D7_03"
+            },
+            {
+                "name" : "MAL4",
+                "alias" : "Pf3D7_04"
+            },
+            {
+                "name" : "MAL5",
+                "alias" : "Pf3D7_05"
+            },
+            {
+                "name" : "MAL6",
+                "alias" : "Pf3D7_06"
+            },
+            {
+                "name" : "MAL7",
+                "alias" : "Pf3D7_07"
+            },
+            {
+                "name" : "MAL8",
+                "alias" : "Pf3D7_08"
+            },
+            {
+                "name" : "MAL9",
+                "alias" : "Pf3D7_09"
+            },
+            {
+                "name" : "MAL10",
+                "alias" : "Pf3D7_10"
+            },
+            {
+                "name" : "MAL11",
+                "alias" : "Pf3D7_11"
+            }
+        ]
     },
     {
         "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Module_1_Mapping_sequence_data/malaria/all.bam",
