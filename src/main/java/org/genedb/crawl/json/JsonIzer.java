@@ -48,6 +48,16 @@ public class JsonIzer {
 		return obj;
 	}
 	
+	public Object fromJson(File file, @SuppressWarnings("rawtypes") Class cls) throws JsonParseException, JsonMappingException, IOException {
+		@SuppressWarnings("unchecked")
+		Object obj =  mapper.readValue(file, cls);
+		return obj;
+	}
+	
+	/*
+	 * This method can be used to load up files that are plain lists. It has been used like this :
+	 * 		List<Alignment> alignments = (List<Alignment>) jsonIzer.fromJson(alignmentFile,  new TypeReference<List<Alignment>>() {} );
+	 */
 	public Object fromJson(File file, @SuppressWarnings("rawtypes") TypeReference type) throws JsonParseException, JsonMappingException, IOException {
 		Object obj = mapper.readValue(file, type);
 		return obj;

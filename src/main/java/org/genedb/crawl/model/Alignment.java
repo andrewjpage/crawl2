@@ -36,15 +36,12 @@ public class Alignment {
 	public List<String> chromosomes = new ArrayList<String>();
 	public String meta;
 	
-	@XmlElement(required=false)
-	public List<AlignmentSequenceAlias> sequences;
+	
 	
 	private SAMFileReader reader;
 	private File bamFile;
 	private File indexFile;
 	private URL bamFileURL;
-	
-	
 	
 	public SAMFileReader getReader() throws IOException {
 		if (reader == null) {
@@ -102,11 +99,11 @@ public class Alignment {
 		OutputStream out = new FileOutputStream(f);
 		
 		InputStream in = url.openStream();
-	    byte[] buf = new byte[4 * 1024]; // 4K buffer
+	    byte[] buf = new byte[4 * 1024]; 
 	    int bytesRead;
 	    while ((bytesRead = in.read(buf)) != -1) {
 	      out.write(buf, 0, bytesRead);
-	      logger.info("reading");
+	      //logger.info("reading");
 	    }
 	    
 	    out.close();

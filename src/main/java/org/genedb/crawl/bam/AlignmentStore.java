@@ -13,21 +13,30 @@ import net.sf.samtools.SAMFileReader;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.type.TypeReference;
+//import org.codehaus.jackson.type.TypeReference;
 import org.genedb.crawl.json.JsonIzer;
 import org.genedb.crawl.model.Alignment;
+import org.genedb.crawl.model.AlignmentSequenceAlias;
+import org.genedb.crawl.model.Alignments;
 import org.springframework.util.StringUtils;
 
 
 public class AlignmentStore {
 	
-	private static Logger logger = Logger.getLogger(AlignmentStore.class);
-	
-	Integer fileID = 0;
 	
 	List<Alignment> alignments = new ArrayList<Alignment>();
 	
+	
+	public List<AlignmentSequenceAlias> sequences;
+	
+	private Integer fileID = 0;
+	
+	private static Logger logger = Logger.getLogger(AlignmentStore.class);
 	private JsonIzer jsonIzer = JsonIzer.getJsonIzer();
+	
+	public List<AlignmentSequenceAlias> getSequences() {
+		return sequences;
+	}
 	
 	public SAMFileReader getReader(int fileID) throws IOException {
 		if (fileID < alignments.size()) {
@@ -47,8 +56,6 @@ public class AlignmentStore {
 		return null;
 	}
 	
-	
-	
 	public void setAlignmentFiles(File alignmentFile) throws JsonParseException, JsonMappingException, IOException {
 		
 		logger.info(String.format("Alignment file : %s" , alignmentFile));
@@ -63,7 +70,10 @@ public class AlignmentStore {
 		
 		logger.info("making jsons");
 		
-		alignments = (List<Alignment>) jsonIzer.fromJson(alignmentFile,  new TypeReference<List<Alignment>>() {} );
+		//alignments = (List<Alignment>) jsonIzer.fromJson(alignmentFile,  new TypeReference<List<Alignment>>() {} );
+		Alignments store = (Alignments) jsonIzer.fromJson(alignmentFile, Alignments.class);
+		alignments = store.alignments;
+		sequences = store.sequences;
 		
 		generateMetaFields();
 		assignFileIDs();
@@ -115,8 +125,7 @@ public class AlignmentStore {
 
 	void assignFileIDs() {
 		for (Alignment alignment : alignments) {
-			alignment.fileID = fileID;
-			fileID++;
+			alignment.fileID = fileID++;
 		}
 	}
 

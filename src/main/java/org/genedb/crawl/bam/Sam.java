@@ -1,6 +1,5 @@
 package org.genedb.crawl.bam;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -146,6 +145,8 @@ public class Sam {
 		Alignment alignment = alignmentStore.getAlignment(fileID);
 		SAMFileReader file = alignment.getReader();
 		
+		List<AlignmentSequenceAlias> sequences = alignmentStore.getSequences();
+		
 		for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
 			String currentName = ssr.getSequenceName();
 			
@@ -155,12 +156,7 @@ public class Sam {
 				return currentName;
 			}
 			
-			
-			if (alignment.sequences == null) {
-				continue;
-			}
-			
-			for (AlignmentSequenceAlias sequenceAlias : alignment.sequences ) {
+			for (AlignmentSequenceAlias sequenceAlias : sequences ) {
 				
 				logger.info(String.format("-- %s = %s", sequenceAlias.alias, sequenceName));
 				
@@ -187,6 +183,9 @@ public class Sam {
 	
 	private synchronized MappedQuery query(SAMFileReader file, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
 		
+		if (sequence == null) {
+			throw new Exception ("Supplied sequence does not exist.");
+		}
 		
 		logger.debug(String.format("file: %s\tlocation: '%s:%d-%d'\tcontained?%s\tfilter: %d(%s)", file, sequence, start, end, contained, filter, padLeft(Integer.toBinaryString(filter), 8)));
 		
@@ -325,6 +324,10 @@ public class Sam {
 	}
 	
 	public synchronized MappedCoverage coverage(SAMFileReader file, String sequence, int start, int end, int window, int filter) throws Exception {
+		
+		if (sequence == null) {
+			throw new Exception ("Supplied sequence does not exist.");
+		}
 		
 		long startTime = System.currentTimeMillis();
 		
