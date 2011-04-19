@@ -3,8 +3,10 @@ package org.genedb.crawl.bam;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -27,14 +29,14 @@ public class AlignmentStore {
 	List<Alignment> alignments = new ArrayList<Alignment>();
 	
 	
-	public List<AlignmentSequenceAlias> sequences;
+	public Map<String, String> sequences;
 	
 	private Integer fileID = 0;
 	
 	private static Logger logger = Logger.getLogger(AlignmentStore.class);
 	private JsonIzer jsonIzer = JsonIzer.getJsonIzer();
 	
-	public List<AlignmentSequenceAlias> getSequences() {
+	public Map<String, String> getSequences() {
 		return sequences;
 	}
 	
@@ -73,7 +75,17 @@ public class AlignmentStore {
 		//alignments = (List<Alignment>) jsonIzer.fromJson(alignmentFile,  new TypeReference<List<Alignment>>() {} );
 		Alignments store = (Alignments) jsonIzer.fromJson(alignmentFile, Alignments.class);
 		alignments = store.alignments;
-		sequences = store.sequences;
+		
+		sequences = new HashMap<String,String>();
+		
+		if (store.sequences != null) {
+			for (AlignmentSequenceAlias alias : store.sequences) {
+				sequences.put(alias.reference, alias.alignment);
+			}
+		}
+		
+		
+		
 		
 		generateMetaFields();
 		assignFileIDs();

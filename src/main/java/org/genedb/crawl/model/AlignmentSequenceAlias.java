@@ -5,8 +5,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 public class AlignmentSequenceAlias {
 	
 	@XmlAttribute
-	public String name;
+	public String alignment;
 	
 	@XmlAttribute
-	public String alias;
+	public String reference;
 }

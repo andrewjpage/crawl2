@@ -147,7 +147,8 @@ public class Sam {
 		Alignment alignment = alignmentStore.getAlignment(fileID);
 		SAMFileReader file = alignment.getReader();
 		
-		List<AlignmentSequenceAlias> sequences = alignmentStore.getSequences();
+		//List<AlignmentSequenceAlias> sequences = alignmentStore.getSequences();
+		Map<String,String> sequences = alignmentStore.getSequences();
 		
 		for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
 			String currentName = ssr.getSequenceName();
@@ -158,14 +159,17 @@ public class Sam {
 				return currentName;
 			}
 			
-			for (AlignmentSequenceAlias sequenceAlias : sequences ) {
-				
-				//logger.info(String.format("-- %s = %s", sequenceAlias.alias, sequenceName));
-				
-				if (sequenceAlias.alias.equals(sequenceName)) {
-					return sequenceAlias.name;
-				}
-			}
+			if (sequences.containsKey(sequenceName)) {
+				return sequences.get(sequenceName);			}
+			
+//			for (AlignmentSequenceAlias sequenceAlias : sequences ) {
+//				
+//				//logger.info(String.format("-- %s = %s", sequenceAlias.alias, sequenceName));
+//				
+//				if (sequenceAlias.alias.equals(sequenceName)) {
+//					return sequenceAlias.name;
+//				}
+//			}
 			
 		}
 		return null;

@@ -92,7 +92,7 @@ public class Alignment {
 		
 		String fileName = "/tmp/" + fileID;
 		
-		logger.info(fileName);
+		//logger.info(fileName);
 		
 		File f = new File(fileName);
 		
