@@ -94,14 +94,16 @@ public class Sam {
 				continue;
 			}
 			
+			String actualSequenceName = getActualSequenceName(fileID, sequence);
+			
 			for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
 				
-				if (ssr.getSequenceName().equals(sequence) 
-						||  this.getActualSequenceName(fileID, sequence) != null) {
-					
-					map.put(fileID, alignment);
+				if (actualSequenceName == null) {
 					continue;
-					
+				}
+				
+				if (actualSequenceName.equals(ssr.getSequenceName())) {
+					map.put(fileID, alignment);
 				} 
 			}
 		}
@@ -150,7 +152,7 @@ public class Sam {
 		for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
 			String currentName = ssr.getSequenceName();
 			
-			logger.info(String.format("%s = %s", currentName, sequenceName));
+			//logger.info(String.format("%s = %s", currentName, sequenceName));
 			
 			if (currentName.equals(sequenceName)) {
 				return currentName;
@@ -158,7 +160,7 @@ public class Sam {
 			
 			for (AlignmentSequenceAlias sequenceAlias : sequences ) {
 				
-				logger.info(String.format("-- %s = %s", sequenceAlias.alias, sequenceName));
+				//logger.info(String.format("-- %s = %s", sequenceAlias.alias, sequenceName));
 				
 				if (sequenceAlias.alias.equals(sequenceName)) {
 					return sequenceAlias.name;
