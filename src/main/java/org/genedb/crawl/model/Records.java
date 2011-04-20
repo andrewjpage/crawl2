@@ -2,17 +2,49 @@ package org.genedb.crawl.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.genedb.crawl.model.adapter.AlignmentBlockAdapter;
+import org.genedb.crawl.model.adapter.AlignmentBlockAdapterList;
 
 public class Records {
 	
+//	public static class AlignmentBlockAdapterListAdapter extends XmlAdapter<AlignmentBlockAdapterList, ArrayList<Map<String,Integer>>> {
+//
+//		@Override
+//		public AlignmentBlockAdapterList marshal(
+//				ArrayList<Map<String, Integer>> list) throws Exception {
+//			
+//			for (AlignmentBlockAdapter block : list) {
+//				
+//			}
+//			
+//			return null;
+//		}
+//
+//		@Override
+//		public ArrayList<Map<String, Integer>> unmarshal(
+//				AlignmentBlockAdapterList v) throws Exception {
+//			// TODO Auto-generated method stub
+//			return null;
+//		}
+//
+//	
+//		
+//
+//		
+//	}
 	
+	//@XmlJavaTypeAdapter(AlignmentBlockAdapterListAdapter.class)
 	
-	@XmlElement()
-	public List<ArrayList<AlignmentBlockAdapter>> alignmentBlocks;
+	//@XmlElement(type=AlignmentBlockAdapterList.class)
+	
+	@XmlElement
+	public AlignmentBlockAdapter[][] alignmentBlocks;
 	
 	@XmlElement
 	public List<Integer> alignmentEnd;

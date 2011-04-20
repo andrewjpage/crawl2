@@ -27,6 +27,7 @@ import org.genedb.crawl.model.MappedSAMHeader;
 import org.genedb.crawl.model.MappedSAMSequence;
 import org.genedb.crawl.model.Records;
 import org.genedb.crawl.model.adapter.AlignmentBlockAdapter;
+import org.genedb.crawl.model.adapter.AlignmentBlockAdapterList;
 
 
 
@@ -258,7 +259,12 @@ public class Sam {
 				continue;
 			}
 			Field f = beanFields.get(propertyName);
-			f.set(model.records, new ArrayList());
+			
+			// currently the only field that is not a list
+			if (! f.getName().equals("alignmentBlocks")) {
+				f.set(model.records, new ArrayList());
+			}
+			
 			props.add(propertyName);
 		}
 		
@@ -270,6 +276,10 @@ public class Sam {
 		model.count = 0;
 		
 		
+		
+		// we're going to store any alignment blocks we find in there
+		List<List<AlignmentBlockAdapter>> alignmentBlocks = new ArrayList<List<AlignmentBlockAdapter>>();
+		int maxAlignmentBlocksInRead = 0;
 		
 		SAMRecordIterator i = null;
 		try {
@@ -319,19 +329,24 @@ public class Sam {
 						
 						@SuppressWarnings("unchecked")
 						List<AlignmentBlock> blocks = (List<AlignmentBlock>) result; 
-						ArrayList<AlignmentBlockAdapter> blockAdapters = new ArrayList<AlignmentBlockAdapter>();
+						AlignmentBlockAdapterList blockAdapters = new AlignmentBlockAdapterList();
 						for (AlignmentBlock block : blocks) {
-							logger.info(String.format("Adding block %s to read %s", block, record.getReadName()));
+							//logger.info(String.format("Adding block %s to read %s", block, record.getReadName()));
 							blockAdapters.add(new AlignmentBlockAdapter(block));
 						}
 						
 //						AlignmentBlockAdapterList l = new AlignmentBlockAdapterList();
 //						l.alignmentBlocks = blockAdapters;
 						
-						logger.debug("length " + blockAdapters.size());
+						//logger.debug("length " + blockAdapters.size());
 						
-						model.records.alignmentBlocks.add(blockAdapters);
+						alignmentBlocks.add(blockAdapters);
 						
+						int size = blockAdapters.size();
+						
+						if (size > maxAlignmentBlocksInRead) {
+							maxAlignmentBlocksInRead = size;
+						}
 						
 					} else {
 						Method method = samRecordMethodMap.get(propertyName);
@@ -356,6 +371,28 @@ public class Sam {
 				i.close();
 			}
 		}
+		
+		if (props.contains("alignmentBlocks") && alignmentBlocks.size() > 0) {
+			
+			AlignmentBlockAdapter[][] blockArray = new AlignmentBlockAdapter[alignmentBlocks.size()][maxAlignmentBlocksInRead];
+			
+			int b = 0;
+			for (List<AlignmentBlockAdapter> list : alignmentBlocks) {
+				
+				int bb = 0;
+				for (AlignmentBlockAdapter block : list) {
+					blockArray[b][bb] = block;
+					bb++;
+				}
+				b++;
+			}
+			
+			model.records.alignmentBlocks = blockArray;
+			
+		}
+		
+		alignmentBlocks = null;
+		
 		
 		long endTime = System.currentTimeMillis() ;
 		float time = (endTime - startTime) / (float) 1000 ;
