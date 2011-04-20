@@ -1,5 +1,6 @@
 package org.genedb.crawl.bam;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,12 +20,13 @@ import net.sf.samtools.SAMSequenceRecord;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.model.Alignment;
-import org.genedb.crawl.model.AlignmentSequenceAlias;
 import org.genedb.crawl.model.FileInfo;
 import org.genedb.crawl.model.MappedCoverage;
 import org.genedb.crawl.model.MappedQuery;
 import org.genedb.crawl.model.MappedSAMHeader;
 import org.genedb.crawl.model.MappedSAMSequence;
+import org.genedb.crawl.model.Records;
+import org.genedb.crawl.model.adapter.AlignmentBlockAdapter;
 
 
 
@@ -36,8 +38,40 @@ public class Sam {
 	
 	private final String[] defaultProperties = {"alignmentStart", "alignmentEnd", "flags", "readName"};
 	private final Method[] methods = SAMRecord.class.getDeclaredMethods();
+	private final Field[] fields = Records.class.getDeclaredFields();
 	
 	//private final Field[] recordFields = Records.class.getFields();
+	
+	private Map<String, Field> beanFields = new HashMap<String, Field>();;
+	Map<String,Method> samRecordMethodMap = new HashMap<String,Method>();
+	
+	public Sam() {
+		
+		for (Field f : fields) {
+			beanFields.put(f.getName(), f);
+			logger.debug(String.format("field %s %s", f.getName(), f));
+		}
+		
+		
+		
+		for (Method method : methods) {
+			String methodName = method.getName();
+			if (methodName.startsWith("get")) {
+				String propertyName = methodName.substring(3);
+				propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
+				
+				if (! beanFields.containsKey(propertyName)) {
+					continue;
+				}
+				
+				
+				samRecordMethodMap.put(propertyName, method);
+				logger.debug(String.format("method %s %s", propertyName, method));
+			}
+		}
+		
+		
+	}
 	
 	private SAMFileReader getSamOrBam(int fileID) throws Exception {
 		final SAMFileReader inputSam = alignmentStore.getReader(fileID); 
@@ -176,9 +210,9 @@ public class Sam {
 		
 	}
 	
-	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, int filter) throws Exception {
-		return query(fileID, sequence, start, end, contained, defaultProperties, filter);		
-	}
+//	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, int filter) throws Exception {
+//		return query(fileID, sequence, start, end, contained, defaultProperties, filter);		
+//	}
 	
 	
 	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
@@ -193,14 +227,20 @@ public class Sam {
 			throw new Exception ("Supplied sequence does not exist.");
 		}
 		
+		if (properties == null) {
+			properties = defaultProperties;
+		}
+		
 		logger.debug(String.format("file: %s\tlocation: '%s:%d-%d'\tcontained?%s\tfilter: %d(%s)", file, sequence, start, end, contained, filter, padLeft(Integer.toBinaryString(filter), 8)));
 		
 		long startTime = System.currentTimeMillis();
 		
 		MappedQuery model = new MappedQuery();
+		model.records = new Records()
+		;		
+		//Set<String> propertySet = new HashSet<String>(Arrays.asList(properties));
+		//Map<Method,String> methods2properties = new HashMap<Method,String>();
 		
-		Set<String> propertySet = new HashSet<String>(Arrays.asList(properties));
-		Map<Method,String> methods2properties = new HashMap<Method,String>();
 		
 //		Hashtable<String, Field> recordFieldSet = new Hashtable<String, Field>();
 //		for (Field f : recordFields) {
@@ -209,32 +249,21 @@ public class Sam {
 //		
 		//Map<String, MappedQueryRecordElementList> map = new Hashtable<String, MappedQueryRecordElementList>();
 		
-		List<String> props = new ArrayList<String>();
-		for (Method method : methods) {
-			String methodName = method.getName();
-			if (methodName.startsWith("get")) {
-				String propertyName = methodName.substring(3);
-				propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
-				// logger.info(methodName + " " + propertyName);
-				props.add(propertyName);
-				
-				if (propertySet.contains(propertyName)) {
-					// logger.info("added!");
-					
-//					MappedQueryRecordElementList mqrle = new MappedQueryRecordElementList();
-//					mqrle.name = propertyName;
-//					mqrle.fields = new ArrayList();
-					
-					//map.put(propertyName, mqrle);
-					methods2properties.put(method, propertyName);
-					
-					
-					
-					model.records.put(propertyName, new ArrayList());
-				}
-				
+		
+		Set<String> props = new HashSet<String>();
+		
+		// initialise the relevant props 
+		for (String propertyName : properties) {
+			if (! beanFields.containsKey(propertyName)) {
+				continue;
 			}
+			Field f = beanFields.get(propertyName);
+			f.set(model.records, new ArrayList());
+			props.add(propertyName);
 		}
+		
+		
+		
 		
 		logger.info(props);
 		
@@ -281,16 +310,38 @@ public class Sam {
 					continue;
 				}
 				
-				for (Entry<Method, String> entry : methods2properties.entrySet()) {
-					Method method = entry.getKey();
-					String propertyName = entry.getValue();
-					Object result = method.invoke(record, new Object[]{});
-					//List list = map.get(propertyName).fields;
-					//list.add(result);
+				for (String propertyName : props) {
 					
-					model.records.get(propertyName).add(result);
 					
+					if (propertyName.endsWith("alignmentBlocks")) {
+						
+						List<AlignmentBlock> result = record.getAlignmentBlocks();
+						
+						@SuppressWarnings("unchecked")
+						List<AlignmentBlock> blocks = (List<AlignmentBlock>) result; 
+						ArrayList<AlignmentBlockAdapter> blockAdapters = new ArrayList<AlignmentBlockAdapter>();
+						for (AlignmentBlock block : blocks) {
+							logger.info(String.format("Adding block %s to read %s", block, record.getReadName()));
+							blockAdapters.add(new AlignmentBlockAdapter(block));
+						}
+						
+//						AlignmentBlockAdapterList l = new AlignmentBlockAdapterList();
+//						l.alignmentBlocks = blockAdapters;
+						
+						logger.debug("length " + blockAdapters.size());
+						
+						model.records.alignmentBlocks.add(blockAdapters);
+						
+						
+					} else {
+						Method method = samRecordMethodMap.get(propertyName);
+						Object result = method.invoke(record);
+						Field f = beanFields.get(propertyName);
+						ArrayList list = (ArrayList) f.get(model.records);
+						list.add(result);
+					}
 				}
+				
 				
 				model.count++;
 				

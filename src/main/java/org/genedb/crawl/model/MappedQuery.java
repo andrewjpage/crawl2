@@ -1,11 +1,7 @@
 package org.genedb.crawl.model;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+
 
 public class MappedQuery {
 	
@@ -32,16 +28,12 @@ public class MappedQuery {
 	
 	//@XmlElement(name="records")
 	//public List<MappedQueryRecordElementList> records;
-	public Hashtable<String, ArrayList<Object>> records = new Hashtable<String, ArrayList<Object>>();
+	//public Hashtable<String, ArrayList<Object>> records = new Hashtable<String, ArrayList<Object>>();
+	
+	public Records records;
 	
 	
-//	public class RecordStore {
-//		@XmlElement
-//		public List<Integer> alignmentEnd;
-//		public List<Integer> alignmentStart;
-//		public List<Integer> flags;
-//		public List<String> readName;
-//	}
+	
 	
 //	public Records records;
 //	
