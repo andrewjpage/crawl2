@@ -12,7 +12,7 @@ public class MappedSAMRecords {
 	 * We are using a mutlidimensional array here because JAXB is unable to deal with lists of lists (i.e., List<List<AlignmentBlockAdapter>>). 
 	 */
 	@XmlElement
-	public AlignmentBlockAdapter[][] alignmentBlocks;
+	public List<AlignmentBlockAdapter[]> alignmentBlocks;
 	
 	@XmlElement
 	public List<Integer> alignmentEnd;

@@ -256,11 +256,10 @@ public class Sam {
 		
 		model.count = 0;
 		
+		if (props.contains("alignmentBlocks")) {
+			model.records.alignmentBlocks = new ArrayList<AlignmentBlockAdapter[]>();
+		}
 		
-		
-		// we're going to store any alignment blocks we find in here
-		List<List<AlignmentBlockAdapter>> alignmentBlocks = new ArrayList<List<AlignmentBlockAdapter>>();
-		int maxAlignmentBlocksInRead = 0;
 		
 		SAMRecordIterator i = null;
 		try {
@@ -316,13 +315,14 @@ public class Sam {
 						}
 						
 						
-						alignmentBlocks.add(blockAdapters);
-						
-						int size = blockAdapters.size();
-						
-						if (size > maxAlignmentBlocksInRead) {
-							maxAlignmentBlocksInRead = size;
+						AlignmentBlockAdapter[] blockArray = new AlignmentBlockAdapter[blockAdapters.size()];
+						int b = 0;
+						for (AlignmentBlockAdapter block : blockAdapters) {
+							blockArray[b] = block;
+							b++;
 						}
+						
+						model.records.alignmentBlocks.add(blockArray);
 						
 					} else {
 						Method method = samRecordMethodMap.get(propertyName);
@@ -347,29 +347,6 @@ public class Sam {
 				i.close();
 			}
 		}
-		
-		if (props.contains("alignmentBlocks") && alignmentBlocks.size() > 0) {
-			
-			// bad because we are walking through the data twice
-			// this is essentially creating a sparse array, because if one set of alignment blocks is larger than the others, then its that set's size that we need to use
-			AlignmentBlockAdapter[][] blockArray = new AlignmentBlockAdapter[alignmentBlocks.size()][maxAlignmentBlocksInRead];
-			
-			int b = 0;
-			for (List<AlignmentBlockAdapter> list : alignmentBlocks) {
-				
-				int bb = 0;
-				for (AlignmentBlockAdapter block : list) {
-					blockArray[b][bb] = block;
-					bb++;
-				}
-				b++;
-			}
-			
-			model.records.alignmentBlocks = blockArray;
-			
-		}
-		
-		alignmentBlocks = null;
 		
 		
 		long endTime = System.currentTimeMillis() ;
