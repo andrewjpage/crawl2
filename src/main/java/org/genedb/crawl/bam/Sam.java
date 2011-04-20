@@ -3,13 +3,11 @@ package org.genedb.crawl.bam;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import net.sf.samtools.AlignmentBlock;
 import net.sf.samtools.SAMFileReader;
@@ -27,7 +25,6 @@ import org.genedb.crawl.model.MappedSAMHeader;
 import org.genedb.crawl.model.MappedSAMSequence;
 import org.genedb.crawl.model.Records;
 import org.genedb.crawl.model.adapter.AlignmentBlockAdapter;
-import org.genedb.crawl.model.adapter.AlignmentBlockAdapterList;
 
 
 
