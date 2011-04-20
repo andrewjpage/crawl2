@@ -30,29 +30,9 @@ public class MappedQuery {
 	//public List<MappedQueryRecordElementList> records;
 	//public Hashtable<String, ArrayList<Object>> records = new Hashtable<String, ArrayList<Object>>();
 	
-	public Records records;
+	public MappedSAMRecords records;
 	
 	
 	
-	
-//	public Records records;
-//	
-//	public static class Records {
-//		public List<Integer> alignmentEnd;
-//		public List<Integer> alignmentStart;
-//		public List<Integer> flags;
-//		public List<String> readName;
-//		
-//		private Hashtable<String, List> atts = new Hashtable<String, List>();
-//		
-//		{
-//			atts.put("alignmentEnd", alignmentEnd);
-//		}
-//		
-//		List get(String name) {
-//			return atts.get(name);
-//		}
-//		
-//	}
 	
 }

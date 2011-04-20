@@ -23,52 +23,57 @@ import org.genedb.crawl.model.MappedCoverage;
 import org.genedb.crawl.model.MappedQuery;
 import org.genedb.crawl.model.MappedSAMHeader;
 import org.genedb.crawl.model.MappedSAMSequence;
-import org.genedb.crawl.model.Records;
+import org.genedb.crawl.model.MappedSAMRecords;
 import org.genedb.crawl.model.adapter.AlignmentBlockAdapter;
 
 
 
 public class Sam {
 	
-	private Logger logger = Logger.getLogger(Sam.class);
-	
 	public AlignmentStore alignmentStore;
 	
-	private final String[] defaultProperties = {"alignmentStart", "alignmentEnd", "flags", "readName"};
-	private final Method[] methods = SAMRecord.class.getDeclaredMethods();
-	private final Field[] fields = Records.class.getDeclaredFields();
+	private static Logger logger = Logger.getLogger(Sam.class);
 	
-	//private final Field[] recordFields = Records.class.getFields();
+	/*
+	 * If no properties are supplied for the query method, this is the default set.
+	 */
+	private final static String[] defaultProperties = {"alignmentStart", "alignmentEnd", "flags", "readName"};
 	
-	private Map<String, Field> beanFields = new HashMap<String, Field>();;
-	Map<String,Method> samRecordMethodMap = new HashMap<String,Method>();
 	
-	public Sam() {
+	/*
+	 * A map of field names in the MappedSAMRecords class
+	 */
+	private static Map<String, Field> recordsBeanFields = new HashMap<String, Field>();;
+	
+	/*
+	 * a map of getters in the SAMRecord class whose names equate to (via bean camel case convention) to fields in the Records class. 
+	 */
+	private static Map<String,Method> samRecordMethodMap = new HashMap<String,Method>();
+	
+	// no point in doing this more than once
+	static {
 		
-		for (Field f : fields) {
-			beanFields.put(f.getName(), f);
+		// generate a map of fields in the MappedSAMRecords bean
+		for (Field f : MappedSAMRecords.class.getDeclaredFields()) {
+			recordsBeanFields.put(f.getName(), f);
 			logger.debug(String.format("field %s %s", f.getName(), f));
 		}
 		
-		
-		
-		for (Method method : methods) {
+		// find equivalent methods in the SAMRecord class 
+		for (Method method : SAMRecord.class.getDeclaredMethods()) {
 			String methodName = method.getName();
 			if (methodName.startsWith("get")) {
 				String propertyName = methodName.substring(3);
 				propertyName = propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
 				
-				if (! beanFields.containsKey(propertyName)) {
+				if (! recordsBeanFields.containsKey(propertyName)) {
 					continue;
 				}
-				
 				
 				samRecordMethodMap.put(propertyName, method);
 				logger.debug(String.format("method %s %s", propertyName, method));
 			}
 		}
-		
-		
 	}
 	
 	private SAMFileReader getSamOrBam(int fileID) throws Exception {
@@ -192,25 +197,14 @@ public class Sam {
 			}
 			
 			if (sequences.containsKey(sequenceName)) {
-				return sequences.get(sequenceName);			}
-			
-//			for (AlignmentSequenceAlias sequenceAlias : sequences ) {
-//				
-//				//logger.info(String.format("-- %s = %s", sequenceAlias.alias, sequenceName));
-//				
-//				if (sequenceAlias.alias.equals(sequenceName)) {
-//					return sequenceAlias.name;
-//				}
-//			}
+				return sequences.get(sequenceName);			
+			}
 			
 		}
 		return null;
 		
 	}
 	
-//	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, int filter) throws Exception {
-//		return query(fileID, sequence, start, end, contained, defaultProperties, filter);		
-//	}
 	
 	
 	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
@@ -234,30 +228,23 @@ public class Sam {
 		long startTime = System.currentTimeMillis();
 		
 		MappedQuery model = new MappedQuery();
-		model.records = new Records()
-		;		
-		//Set<String> propertySet = new HashSet<String>(Arrays.asList(properties));
-		//Map<Method,String> methods2properties = new HashMap<Method,String>();
+		model.records = new MappedSAMRecords();		
 		
-		
-//		Hashtable<String, Field> recordFieldSet = new Hashtable<String, Field>();
-//		for (Field f : recordFields) {
-//			recordFieldSet.put(f.getName(), f);
-//		}
-//		
-		//Map<String, MappedQueryRecordElementList> map = new Hashtable<String, MappedQueryRecordElementList>();
-		
-		
+		// we certainly don't want duplicates here, as this was cause unnecessary method calls and data to be written out multiple times
+		// so we use a set
 		Set<String> props = new HashSet<String>();
 		
-		// initialise the relevant props 
+		// filter the properties, and initialise the relevant property fields in the bean 
 		for (String propertyName : properties) {
-			if (! beanFields.containsKey(propertyName)) {
+			
+			// only add fields that we have bean properties for
+			if (! recordsBeanFields.containsKey(propertyName)) {
 				continue;
 			}
-			Field f = beanFields.get(propertyName);
 			
-			// currently the only field that is not a list
+			Field f = recordsBeanFields.get(propertyName);
+			
+			// currently the only records field that is not a list
 			if (! f.getName().equals("alignmentBlocks")) {
 				f.set(model.records, new ArrayList());
 			}
@@ -265,16 +252,13 @@ public class Sam {
 			props.add(propertyName);
 		}
 		
-		
-		
-		
 		logger.info(props);
 		
 		model.count = 0;
 		
 		
 		
-		// we're going to store any alignment blocks we find in there
+		// we're going to store any alignment blocks we find in here
 		List<List<AlignmentBlockAdapter>> alignmentBlocks = new ArrayList<List<AlignmentBlockAdapter>>();
 		int maxAlignmentBlocksInRead = 0;
 		
@@ -326,16 +310,11 @@ public class Sam {
 						
 						@SuppressWarnings("unchecked")
 						List<AlignmentBlock> blocks = (List<AlignmentBlock>) result; 
-						AlignmentBlockAdapterList blockAdapters = new AlignmentBlockAdapterList();
+						List<AlignmentBlockAdapter> blockAdapters = new ArrayList<AlignmentBlockAdapter>();
 						for (AlignmentBlock block : blocks) {
-							//logger.info(String.format("Adding block %s to read %s", block, record.getReadName()));
 							blockAdapters.add(new AlignmentBlockAdapter(block));
 						}
 						
-//						AlignmentBlockAdapterList l = new AlignmentBlockAdapterList();
-//						l.alignmentBlocks = blockAdapters;
-						
-						//logger.debug("length " + blockAdapters.size());
 						
 						alignmentBlocks.add(blockAdapters);
 						
@@ -348,7 +327,7 @@ public class Sam {
 					} else {
 						Method method = samRecordMethodMap.get(propertyName);
 						Object result = method.invoke(record);
-						Field f = beanFields.get(propertyName);
+						Field f = recordsBeanFields.get(propertyName);
 						ArrayList list = (ArrayList) f.get(model.records);
 						list.add(result);
 					}
@@ -371,6 +350,8 @@ public class Sam {
 		
 		if (props.contains("alignmentBlocks") && alignmentBlocks.size() > 0) {
 			
+			// bad because we are walking through the data twice
+			// this is essentially creating a sparse array, because if one set of alignment blocks is larger than the others, then its that set's size that we need to use
 			AlignmentBlockAdapter[][] blockArray = new AlignmentBlockAdapter[alignmentBlocks.size()][maxAlignmentBlocksInRead];
 			
 			int b = 0;
@@ -400,10 +381,6 @@ public class Sam {
 		model.sequence = sequence;
 		model.time = Float.toString(time);
 		model.filter = filter;
-		
-		//model.records;// = new Records(); //new ArrayList(map.values());
-		
-		
 		
 		return model;
 	}
