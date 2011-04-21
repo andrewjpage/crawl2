@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.genedb.crawl.elasticsearch.index.RegionFeatureBuilder;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
-import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
@@ -16,28 +16,6 @@ import org.genedb.crawl.model.Organism;
 public class GFFAnnotatationAndFastaExtractor {
 	
 	private static Logger logger = Logger.getLogger(GFFAnnotatationAndFastaExtractor.class);
-	
-	class RegionFeatureBuilder {
-		private StringBuilder buffer = new StringBuilder();
-		private Feature region = new Feature();
-		
-		public RegionFeatureBuilder(String uniquename, int organism_id) {
-			region.uniqueName = uniquename;
-			region.organism_id = organism_id;
-			region.type = new Cvterm();
-			region.type.name = "region";
-			//region.topLevel = true;
-		}
-		
-		public void addSequence(String line) {
-			buffer.append(line);
-		}
-		
-		public Feature getRegion() {
-			region.residues = buffer.toString();
-			return region;
-		}
-	}
 	
 	public GFFAnnotatationAndFastaExtractor(BufferedReader buf, Organism organism, ElasticSearchFeatureMapper featureMapper, ElasticSearchRegionsMapper regionsMapper) throws IOException {
 		

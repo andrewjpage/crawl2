@@ -62,20 +62,26 @@ div#toc ul {
     text-transform: uppercase;
     font-size:small;
 }
+
 div#toc ul li ul {
     margin-bottom: 0.75em;
 }
+
 div#toc ul li ul li ul {
     margin-bottom: 0.25em;
 }
 
 a, a:visited {
-text-decoration:none;
-color:grey;
+    text-decoration:none;
+    color:grey;
 }
 
 a:hover {
-color:black;
+    color:black;
+}
+
+li {
+    margin-left:4em;
 }
 
 </style>
@@ -259,7 +265,42 @@ This example connects to the GeneDB public Chado snapshot. To just copy one orga
 
 <P>The -g flag (gffs) is used to specify a path to a GFF file or a folder containing them. If they are gzipped, the files will automatically be unzipped by the parser.</P>
 
+<h3 id="das">Indexing DAS sources</h3>
 
+<P>For this example, we are going to overlay features available from an external DAS source onto the reference sequence and annotations provided in a GFF files.</P>
+
+<pre><code>./sh/gff2es.sh -pe resource-elasticsearch-local.properties -o '{
+    "ID":29,
+    "common_name":"Pberghei",
+    "genus":"Plasmodium",
+    "species":"berghei",
+    "translation_table":11,
+    "taxonID":5821
+}' -g src/test/resources/data/berg01.gff.gz
+
+./sh/das2es.sh -pe resource-elasticsearch-local.properties \
+    -u http://das.sanger.ac.uk/das \
+    -s pjazz_berghei \
+    -r berg01 \
+    -o '{"common_name":"Pberghei"}' </code></pre>
+
+<P>In this example the features overlayed are of type 'clone_genomic_insert'
+
+<P>The first step should be familiar to you by now, it's indexing GFF files as before - just with the organism creation/update step also done in the same run. The next step
+uses a das2es script to query a remote DAS server and populate the indices.</P>
+
+<P>Please note that currently the DAS support is quite minimal, only features, locations (on segments / regions) and their types are put in.</P>
+
+<h4 id="das-capabilities">DAS capability requirements</h4>
+
+<P>DAS allows quite a bit of flexibility - a DAS source does not have to implement the full specification. Crawl, however, has a few minimum requirements for it to be able
+to find what it's looking for : </P>
+
+<ul>
+<li>entry_points - needed to know what chromosomes to query</li>
+<li>sequence - only needed if you want pull in regions from the DAS source (-c option)</li>
+<li>features - needed to get the features</li>
+</ul>
 
 <h3 id="incrementals">Incrementally indexing from Chado</h3>
 
