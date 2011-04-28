@@ -76,15 +76,19 @@
 		
 	]]>
 	
-	<if test="types != null"> AND type.name <if test="exclude == true"> NOT </if> IN 
-        <foreach item="item" index="index" collection="types" open="(" separator="," close=")"> 
-            #{item} 
-        </foreach> 
-    </if>
+	<include refid="types_exclude_filter"/>
 	    
 	ORDER BY fl.fmin, fl.fmax
 	
   </select>
+  
+  <sql id="types_exclude_filter">
+    <if test="types != null"> AND type.name <if test="exclude == true"> NOT </if> IN 
+        <foreach item="item" index="index" collection="types" open="(" separator="," close=")"> 
+            #{item} 
+        </foreach> 
+    </if>
+  </sql>
   
   <resultMap type="org.genedb.crawl.model.LocatedFeature" id="locations">
     <result property="uniqueName" column="uniqueName"/>

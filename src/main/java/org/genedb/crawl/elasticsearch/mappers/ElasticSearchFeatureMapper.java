@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
 import org.genedb.crawl.mappers.FeatureMapper;
 import org.genedb.crawl.model.Coordinates;
@@ -113,6 +114,23 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void delete(Feature feature) {
+		logger.debug("Deleting " + feature.uniqueName);
+		DeleteResponse response = connection
+			.getClient()
+			.prepareDelete()
+			.setIndex(connection.getIndex())
+			.setType(connection.getFeatureType())
+			.setId(feature.uniqueName)
+			.execute()
+			.actionGet();
+		
+		if (response.isNotFound()) {
+			logger.warn(feature.uniqueName + " not found");
 		}
 	}
 

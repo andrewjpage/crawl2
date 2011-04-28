@@ -27,6 +27,7 @@
     <mapper resource="org/genedb/crawl/mappers/FeatureMapper.xml"/>
     <mapper resource="org/genedb/crawl/mappers/RegionsMapper.xml"/>
     <mapper resource="org/genedb/crawl/mappers/TermsMapper.xml"/>
+    <mapper resource="org/genedb/crawl/mappers/AuditMapper.xml"/>
   </mappers>
    
   

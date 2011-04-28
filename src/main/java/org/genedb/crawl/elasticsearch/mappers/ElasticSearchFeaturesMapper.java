@@ -289,7 +289,7 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 	}
 
 	@Override
-	public List<Feature> timelastmodified(Date date, Integer organism_id) {
+	public List<Feature> timelastmodified(Date date, Integer organism_id, List<String> types, boolean exlude) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -314,24 +314,4 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	
-//	public static String getIndex() {
-//		return "features";
-//	}
-//
-//	
-//	public static String getType() {
-//		return "Feature";
-//	}
-//	
-//	
-	
-	
-	
-	
-	
-	
-	
-	
 }

@@ -7,12 +7,11 @@ import java.io.Reader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -20,22 +19,18 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
-import org.genedb.crawl.elasticsearch.LocatedFeatureUtil;
 import org.genedb.crawl.elasticsearch.index.IndexBuilder;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchOrganismsMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
+import org.genedb.crawl.mappers.AuditMapper;
 import org.genedb.crawl.mappers.FeatureMapper;
 import org.genedb.crawl.mappers.FeaturesMapper;
 import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.mappers.TermsMapper;
-import org.genedb.crawl.model.Coordinates;
-import org.genedb.crawl.model.Feature;
-import org.genedb.crawl.model.LocatedFeature;
+import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.OrganismProp;
-import org.genedb.crawl.model.Sequence;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -53,6 +48,7 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	protected FeatureMapper featureMapper;
 	protected RegionsMapper regionsMapper;
 	protected TermsMapper termsMapper;
+	protected AuditMapper auditMapper;
 	
 	@Option(name = "-s", aliases = {"--since"}, usage = "The date formatted as yyyy-MM-dd", required = false)
 	public String since;
@@ -63,10 +59,23 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	@Option(name = "-r", aliases = {"--region"}, usage = "The region name", required = false)
 	public String region;
 	
-	
+	@Option(name = "-f", aliases = {"--features"}, usage = "Index the i.e. features of the supplied organism or region", required = false)
+	public boolean features = false;
 	
 	@Option(name = "-pc", aliases = {"--properties_chado"}, usage = "A properties file specifying SQL connection details", required=true)
 	public File chadoPropertiesFile;
+	
+	@Option(name = "-e", aliases = {"--exclude"}, usage = "Whether to exclude or include the supplied types", required=false)
+	public boolean exclude = true;
+	
+	@Option(name = "-t", aliases = {"--types"}, usage = "The types to include or exclude", required=false)
+	public List<String> types = Arrays.asList(new String[] {
+			"gene", "pseudogene", "match_part", "repeat_region", 
+			"repeat_unit", "direct_repeat", "EST_match", "region", 
+			"polypeptide", "mRNA", "pseudogenic_transcript", "nucleotide_match", "exon", 
+			"pseudogenic_exon", "gap", "contig", "ncRNA", 
+			"tRNA", "five_prime_UTR", "three_prime_UTR", "polypeptide_motif"
+	});
 	
 	private Properties chadoProperties;
 	
@@ -78,17 +87,25 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	private ElasticSearchFeatureMapper esFeatureMapper;
 	private ElasticSearchRegionsMapper esRegionsMapper;
 	
+	private List<Cvterm> relationships = new ArrayList<Cvterm>(); 
+	
 	void run() throws CrawlException, ParseException, IOException {
 		
 		setupIndex();
 		setupSession();
 		
+		// SQL mappers
 		organismMapper = session.getMapper(OrganismsMapper.class);
 		featuresMapper = session.getMapper(FeaturesMapper.class);
 		featureMapper = session.getMapper(FeatureMapper.class);
 		regionsMapper = session.getMapper(RegionsMapper.class);
 		termsMapper = session.getMapper(TermsMapper.class);
+		auditMapper= session.getMapper(AuditMapper.class);
 		
+		relationships.add(CvtermUtil.makeTerm(termsMapper, "derives_from", "sequence"));
+		relationships.add(CvtermUtil.makeTerm(termsMapper, "part_of", "relationship"));
+		
+		// ES mappers
 		
 		esOrganismMapper = new ElasticSearchOrganismsMapper();
 		esOrganismMapper.setConnection(connection);
@@ -99,97 +116,51 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		esRegionsMapper = new ElasticSearchRegionsMapper();
 		esRegionsMapper.setConnection(connection);
 		
-		List<LocatedFeature> features = null;
+		SQLIndexer indexer = new SQLIndexer();
+		indexer.featureMapper = featureMapper;
+		indexer.featuresMapper = featuresMapper;
+		indexer.regionsMapper = regionsMapper;
+		indexer.organismMapper = organismMapper;
+		indexer.termsMapper = termsMapper;
+		indexer.esFeatureMapper = esFeatureMapper;
+		indexer.esOrganismMapper = esOrganismMapper;
+		indexer.esRegionsMapper = esRegionsMapper;
+		indexer.relationships = relationships;
+		indexer.auditMapper = auditMapper;
+		indexer.types = types;
+		indexer.exclude = exclude;
 		
+		logger.info(String.format("Exclude? %s, Types: %s", indexer.exclude, indexer.types));
 		
-		
-		
-		
-		if (region != null) {
-			
-			makeRegion(region);
-			
-			int start = 0;
-			int end = regionsMapper.sequence(region).length;
-			features = regionsMapper.locations(region, start, end, false, null);
-			
-			for (LocatedFeature f : features) {
-				f.region = region;
-			}
-			
-			
-		} else if (since != null) {
-			
-			List<Feature> modifiedFeatures = null;
-			
-			if (organismCommonName != null) {
-				Organism o = organismMapper.getByCommonName(organismCommonName);
-				modifiedFeatures = featuresMapper.timelastmodified(getDate(since), o.ID);
-			} else {
-				modifiedFeatures = featuresMapper.timelastmodified(getDate(since), null);
-			}
-			
-			List<String> modifiedFeatureNames = new ArrayList<String>(); 
-			for (Feature f : modifiedFeatures) {
-				modifiedFeatureNames.add(f.uniqueName);
-			}
-			
-			int chunk = 20;
-			features = new ArrayList<LocatedFeature>();
-			
-			for (int i = 0; i <= modifiedFeatureNames.size(); i += chunk) {
-				
-				int ii = i + chunk;
-				if (ii > modifiedFeatureNames.size()) {
-					ii = modifiedFeatureNames.size();
-				}
-				
-				List<String> sublist = modifiedFeatureNames.subList(i, ii);
-				
-				List<Feature> featuresWithCoordinates = featuresMapper.coordinates(sublist, null);
-				
-				for (Feature f : featuresWithCoordinates) {
-					LocatedFeature lf = LocatedFeatureUtil.fromFeature(f);
-					features.add(lf);
-				}
-				
-			}
-			
-			
-		} else {
-			
-			// only generate the organisms...
-			
-			if (organismCommonName != null) {
-				Organism o = organismMapper.getByCommonName(organismCommonName);
-				createOrganism(o);
-			} else {
-				
-				for (Organism o : organismMapper.list()) {
-					createOrganism(o);
-				}
-				
-			}
-			
-			return;
-			
-			
+		Organism o = null;
+		if (organismCommonName != null) {
+			o = organismMapper.getByCommonName(organismCommonName);
 		}
 		
-		
-		
-		
-		FeatureFiller filler = new FeatureFiller(featureMapper, featuresMapper, termsMapper, features);
-		filler.fill();
-		
-		
-		//List<LocatedFeature> locatedFeatures = filler.getLocatedFeatures();
-		
-		generateAllOrganisms(features);
-		generateAllSequences(features);
-		
-		for (Feature f : features) {
-			esFeatureMapper.createOrUpdate(f);
+		if (region != null) {
+			if (features) {
+				indexer.indexRegionContents(region);
+			} else {
+				indexer.indexRegion(region);
+			}
+			
+		} else if (since != null) {
+			indexer.indexFeaturesSince(getDate(since), o);
+		} else {
+			// only generate the organisms...
+			if (o == null) {
+				if (features) {
+					throw new RuntimeException("Will not index the contents of all the organisms at once.");
+				} else {
+					indexer.indexOrganisms();
+				}
+			} else {
+				if (features) {
+					indexer.indexOrganismContents(o);
+				} else {
+					indexer.indexOrganism(o);
+				}
+			}
 		}
 		
 	}
@@ -213,95 +184,6 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		}
 	}
 	
-	void generateAllSequences(List<LocatedFeature> features) {
-		Set<String> regions = new HashSet<String>(); 
-		
-		for (Feature f : features) {
-			if (f.coordinates != null) {
-				if (f.coordinates.size() > 0) {
-					
-					logger.info(f.uniqueName + " has coordinates on " + f.coordinates.get(0).region + ", top level:: " + f.coordinates.get(0).toplevel );
-					
-					if (f.coordinates.get(0).toplevel == null) {
-						continue;
-					}
-					
-					Coordinates c = f.coordinates.get(0);
-					regions.add(c.region);
-				}
-			}
-		}
-		for (String region : regions) {
-			makeRegion(region);
-		}
-	}
-	
-	void makeRegion(String region) {
-		Feature f = featureMapper.get(region, null, null);
-		
-		if (f != null) {
-			
-			logger.info("Generating region : " + f.uniqueName);
-
-			Sequence s = regionsMapper.sequence(region);
-			
-			f.residues = s.dna;
-
-			esRegionsMapper.createOrUpdate(
-					connection.getIndex(), 
-					connection.getRegionType(), 
-					f.uniqueName, 
-					f);
-		}
-	}
-	
-	void generateAllOrganisms(List<LocatedFeature> features) throws CrawlException {
-		Set<Integer> ids = new HashSet<Integer>(); 
-		for (Feature f : features) {
-			ids.add(f.organism_id);
-		}
-		for (int id : ids) {
-			
-			Organism o = organismMapper.getByID(id);
-			
-			createOrganism(o);
-			
-//			OrganismProp taxon = organismMapper.getOrganismProp(id, "genedb_misc", "taxonId");
-//			OrganismProp translation_table = organismMapper.getOrganismProp(id, "genedb_misc", "translationTable");
-//			
-//			logger.debug("Setting organism " + o.common_name);
-//			
-//			if (taxon != null) {
-//				o.taxonID = Integer.parseInt(taxon.value);
-//			}
-//			
-//			if (translation_table != null) {
-//				logger.debug("Setting translation table " + translation_table.value);
-//				o.translation_table = Integer.parseInt(translation_table.value);
-//			} 
-//			
-//			esOrganismMapper.createOrUpdate(o);
-		}
-	}
-	
-	void createOrganism(Organism o) {
-		
-		OrganismProp taxon = organismMapper.getOrganismProp(o.ID, "genedb_misc", "taxonId");
-		OrganismProp translation_table = organismMapper.getOrganismProp(o.ID, "genedb_misc", "translationTable");
-		
-		logger.debug("Setting organism " + o.common_name);
-		
-		if (taxon != null) {
-			o.taxonID = Integer.parseInt(taxon.value);
-		}
-		
-		if (translation_table != null) {
-			logger.debug("Setting translation table " + translation_table.value);
-			o.translation_table = Integer.parseInt(translation_table.value);
-		} 
-		
-		esOrganismMapper.createOrUpdate(o);
-	}
 	
 	Date getDate(String since) throws ParseException {
 		

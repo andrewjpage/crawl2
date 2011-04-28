@@ -84,11 +84,34 @@
          <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" select="org.gmod.cat.FeatureCvtermMapper.featureCvTermDbxrefs" column="feature_cvterm_id"  /> --> 
     </resultMap>
     
-    
+    <sql id="coordinateSelector">
+        SELECT 
+            sf.uniquename AS region, 
+            f.uniquename AS uniqueName, 
+            f.name as name, 
+            f.organism_id, 
+            fl.fmin as fmin, 
+            fl.fmax as fmax, 
+            fl.phase as phase, 
+            fl.strand as strand,
+            
+            exists(
+                select type_id from featureprop sfp 
+                where sfp.feature_id = sf.feature_id 
+                    and sfp.type_id = 
+                        (<include refid="org.genedb.crawl.mappers.FeatureMapper.topleveltype"/>)
+            ) as toplevel
+            
+          FROM feature f
+          JOIN featureloc fl ON f.feature_id = fl.feature_id 
+          JOIN feature sf ON fl.srcfeature_id = sf.feature_id
+          JOIN cvterm c on sf.type_id = c.cvterm_id 
+    </sql>
     
     <select id="coordinates" resultMap="coordinates" >
-  
-        SELECT 
+        <include refid="coordinateSelector" /> WHERE <include refid="featureSelector"/>  
+        
+       <!--  SELECT 
             sf.uniquename AS region, 
             f.uniquename AS uniqueName, 
             f.name as name, 
@@ -104,7 +127,7 @@
               (select cvterm_id from cvterm join cv using (cv_id) where cv.name = 'genedb_misc' and cvterm.name = 'top_level_seq')
           
         WHERE <include refid="featureSelector"/> 
-       
+        -->
   
   </select>
   
@@ -134,6 +157,10 @@
         
     </sql>
     
+    
+    <delete id="delete">
+        delete from feature where <include refid="featureSelector"/> 
+    </delete>
     
 
 </mapper>
