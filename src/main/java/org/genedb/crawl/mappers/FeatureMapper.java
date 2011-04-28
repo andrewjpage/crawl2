@@ -21,4 +21,6 @@ public interface FeatureMapper {
 	
 	List<Coordinates> coordinates(Feature feature);
 	
+	void delete(Feature feature);
+	
 }

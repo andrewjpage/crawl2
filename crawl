@@ -1,0 +1,75 @@
+#!/bin/bash
+
+start_time=$(date +%s)
+SCRIPT_DIRECTORY=`dirname $0`
+
+hput() {
+    eval "$1""$2"='$3'
+}
+
+hget() {
+    eval echo '${'"$1$2"'#hash}'
+}
+
+
+hput COMMANDS chado2es org.genedb.crawl.elasticsearch.index.sql.IncrementalSQLIndexBuilder
+hput COMMANDS das2es org.genedb.crawl.elasticsearch.index.das.DASIndexBuilder
+hput COMMANDS gff2es org.genedb.crawl.elasticsearch.index.gff.GFFIndexBuilder
+hput COMMANDS org2es org.genedb.crawl.elasticsearch.index.gff.GFFIndexBuilder
+
+
+usage() {
+	usage_string="crawl ["
+	sep=""
+	for i in $(compgen -A variable COMMANDS); 
+	do 
+		key=${i/COMMANDS/}
+		usage_string=$usage_string$sep$key
+		sep="|" 
+	done 
+	usage_string=$usage_string"] [OPTIONS]"
+	echo $usage_string
+	exit 1
+}
+
+
+# this is the classpath location in the project folder
+CP1="$SCRIPT_DIRECTORY/build/libs/"
+# this is the expected classpath location in an installed folder
+CP2="$SCRIPT_DIRECTORY/../lib/"
+
+if [[ -z $CRAWL_CLASSPATH ]]
+then
+	if [ -d $CP1 ]; then
+		export CRAWL_CLASSPATH="$CP1/*"
+	elif [ -d "$CP2" ]; then
+		export CRAWL_CLASSPATH="$CP2/*"
+	else
+		echo "Could not find a crawl library in $CP1 or $CP1, and no $CRAWL_CLASSPATH has been set. Aborting." 
+	fi
+fi
+
+if [[ -z $CRAWL_JAVA_SETTINGS ]]
+then
+    export CRAWL_JAVA_SETTINGS="-Xmx1500m"
+fi
+
+if [ $# -lt 1 ]; then
+	usage
+fi
+
+COMMAND=$1
+shift
+
+JAVA_ENTRY_POINT=`hget COMMANDS $COMMAND`
+
+if [[ ${#JAVA_ENTRY_POINT} -lt 1 ]]
+then
+	usage
+fi
+
+
+java $CRAWL_JAVA_SETTINGS -cp "$CRAWL_CLASSPATH" $JAVA_ENTRY_POINT "$@"
+
+finish_time=$(date +%s)
+echo "Time duration: $((finish_time - start_time)) secs."  

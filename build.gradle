@@ -5,14 +5,20 @@ apply plugin: 'eclipse'
 
 configurations.compile.transitive = true
 jar.enabled = true
-//version = '0.01'
+
+// currently not using the version as it appends it to the jar and war, which would break scripts
+// version = '0.01'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
+// load properties from the specified config file
+Properties props = new Properties()
+props.load(new FileInputStream(config))
 
 repositories {
-    
+	
+	// commented out - let's see if we can get away without having to maintain this.
     // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/jboss/"] 
     // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"]
     // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/java.net-m2"]
@@ -29,6 +35,9 @@ repositories {
     mavenRepo urls: ["http://repository.springsource.com/maven/bundles/milestone"]
     //mavenRepo urls: ["http://repository.springsource.com/maven/bundles/snapshot"]
     
+	// a local repository for jars that are not available from online ones
+	flatDir name: 'localRepository', dirs: 'lib/local'
+	
     mavenCentral()
 }
 
@@ -59,46 +68,65 @@ dependencies {
     compile group: 'org.mybatis', name: 'mybatis-spring', version:'1.0.0'
     
     compile group: 'uk.ac.ebi.das', name:'jdas', version: '1.0.1'
-    
-    compile fileTree(dir: 'lib/local', includes: ['**.jar'])
+	
+	// note that this information is matched up to jars in the local repository by the use of naming convention assumptions
+	// as well as some trial and error by ivy
+	compile group: 'net.sf', name: 'sam', version: '1.42', ext: 'jar'
+	compile group: 'org.sanger', name: 'artemis', version: 'v13.0.15', ext:'jar'
+	
+	// does not currently work with eclipse target
+    // compile fileTree(dir: 'lib/local', includes: ['**.jar'])
     
 }
 
-//task print_configs(dependsOn: assemble) << {
-//    configurations.each { config ->
- //       println config
-        
-        //config.files.each { file -> 
-            //println "--" + file
-        //}
-        
-   // }
-    
-    //dependencies.each { dependency ->
-      //  println dependency
-    //}
-    
-//}
 
-
-
-
-Properties props = new Properties()
-props.load(new FileInputStream(config))
-
-jar {
+jar << {
     manifest {
         attributes 'Implementation-Title': 'Crawl', 'Implementation-Version': '0.1'
     }
-    from configurations.compile.collect {
-        it.isDirectory() ? it : zipTree(it).matching{exclude{it.name == 'META-INF'}}
-    }
+	
+	// the default set in the gradle.properties file is currently false as it should take less time
+	if (fat == "true") {
+	    from configurations.compile.collect {
+	        it.isDirectory() ? it : zipTree(it).matching{exclude{it.name == 'META-INF'}}
+	    }
+	} else {
+		copy {
+			from configurations.runtime
+			from configurations.runtime.allArtifacts*.file
+			into('build/libs')
+		}
+	}
 }
 
 test.doFirst {
-    // systemProperties = [  dbhost : props.dbhost, dbport : props.dbport, dbname : props.dbname, dbuser : props.dbuser, dbpassword : props.dbpassword, sqlPath : props.sqlPath ]
     systemProperties.putAll( props )
 }
+
+
+/*
+* Currently using a custom install task because the gradle application plugin only supports one main class.
+*/
+task install(dependsOn: 'jar') << {
+   
+   copy {
+	   from tree = fileTree(project.buildDir.getPath() + "/libs").include('**/*.jar')
+	   into dir + "/lib"
+   }
+   
+   copy {
+	   from "./crawl"
+	   into dir + "/bin"
+   }
+   
+   ant.chmod(perm: "+x", dir: new File(dir + "/bin"), includes: '*')
+}
+
+
+
+/*
+ * WAR building and deployment.
+ */
 
 war.doFirst{
     resourceType = props["resource.type"]
@@ -117,13 +145,6 @@ war {
     baseName = props["deploy.name"]
 }
 
-//task copyRuntimeDependencies(dependsOn: configurations.runtime.buildArtifacts, type: Copy) << {
-    //into('build/libs')
-    //from configurations.runtime
-    //from configurations.runtime.allArtifacts*.file
-//}
-
-
 task deploy(dependsOn: 'war') << {
     copy {
         from war.archivePath
@@ -132,6 +153,9 @@ task deploy(dependsOn: 'war') << {
 }
 
 
+/*
+ * A custom task for wiping local ElasticSearch data
+ */
 task cleanes << {
     println "Deleting " + props["resource.elasticsearch.local.pathdata"]
     ant.delete(dir:props["resource.elasticsearch.local.pathdata"])
@@ -139,20 +163,26 @@ task cleanes << {
     ant.delete(dir:props["resource.elasticsearch.local.pathlogs"])
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-2'
+
+/*
+ * currently required for the eclipse plugin because currently eclipse classpath does 
+ * not fail gracefully if a sources jar is not available, which is the case for the 
+ * local jars, see :
+ * 		http://issues.gradle.org/browse/GRADLE-1157
+ * should be able to remove this once it is fixed
+ */
+eclipseClasspath {
+	downloadSources = false; // required for eclipseClasspath to work
 }
 
 
 
-
-
-//println configurations.compile.asPath
-//PrintWriter pw = new PrintWriter(new FileWriter(new File("build/classpath.txt")));
-//pw.println(configurations.compile.asPath);
-//pw.close()
-
-
+/*
+ * Generates the gradlew wrapper.
+ */
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.0-milestone-2'
+}
 
 
 

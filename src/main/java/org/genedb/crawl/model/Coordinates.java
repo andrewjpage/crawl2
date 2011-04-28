@@ -22,5 +22,5 @@ public class Coordinates implements Serializable {
 	public int strand;
 	
 	@XmlAttribute(required=false)
-	public String toplevel;
+	public Boolean toplevel;
 }

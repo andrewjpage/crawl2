@@ -55,9 +55,17 @@ public interface FeaturesMapper {
 			@Param("regex") Boolean regex, 
 			@Param("region") String region);
 	
-	List<Feature> timelastmodified(@Param("date") Date date, @Param("organism_id") Integer organism_id);
+	List<Feature> timelastmodified(
+			@Param("date") Date date, 
+			@Param("organism_id") Integer organism_id, 
+			@Param("types") List<String> types,
+			@Param("exclude") boolean exclude);
 	
-	List<Feature> annotationModified(@Param("date") Date date, @Param("organism_id") Integer organism_id, @Param("region") String region);
+	
+	List<Feature> annotationModified(
+			@Param("date") Date date, 
+			@Param("organism_id") Integer organism_id, 
+			@Param("region") String region);
 	
 	List<Statistic> annotationModifiedStatistics(@Param("date") Date date, @Param("organism_id") Integer organism_id, @Param("region") String region);
 	
