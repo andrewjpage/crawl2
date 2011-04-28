@@ -18,11 +18,13 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.type.TypeReference;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.elasticsearch.index.IndexBuilder;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchOrganismsMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
+import org.genedb.crawl.json.JsonIzer;
 import org.genedb.crawl.mappers.AuditMapper;
 import org.genedb.crawl.mappers.FeatureMapper;
 import org.genedb.crawl.mappers.FeaturesMapper;
@@ -66,16 +68,12 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	public File chadoPropertiesFile;
 	
 	@Option(name = "-e", aliases = {"--exclude"}, usage = "Whether to exclude or include the supplied types", required=false)
-	public boolean exclude = true;
+	public boolean exclude = false;
 	
-	@Option(name = "-t", aliases = {"--types"}, usage = "The types to include or exclude", required=false)
-	public List<String> types = Arrays.asList(new String[] {
-			"gene", "pseudogene", "match_part", "repeat_region", 
-			"repeat_unit", "direct_repeat", "EST_match", "region", 
-			"polypeptide", "mRNA", "pseudogenic_transcript", "nucleotide_match", "exon", 
-			"pseudogenic_exon", "gap", "contig", "ncRNA", 
-			"tRNA", "five_prime_UTR", "three_prime_UTR", "polypeptide_motif"
-	});
+	@Option(name = "-t", aliases = {"--types"}, usage = "The types to include or exclude, supplied as a JSON ['array', 'of', 'strings'].", required=false)
+	public String types = defaultTypes;
+		
+	private static final String defaultTypes = "[\"gene\", \"pseudogene\", \"match_part\", \"repeat_region\", \"repeat_unit\", \"direct_repeat\", \"EST_match\", \"region\", \"polypeptide\", \"mRNA\", \"pseudogenic_transcript\", \"nucleotide_match\", \"exon\", \"pseudogenic_exon\", \"gap\", \"contig\", \"ncRNA\", \"tRNA\", \"five_prime_UTR\", \"three_prime_UTR\", \"polypeptide_motif\"]";
 	
 	private Properties chadoProperties;
 	
@@ -88,6 +86,8 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	private ElasticSearchRegionsMapper esRegionsMapper;
 	
 	private List<Cvterm> relationships = new ArrayList<Cvterm>(); 
+	
+	private JsonIzer jsonIzer = JsonIzer.getJsonIzer();
 	
 	void run() throws CrawlException, ParseException, IOException {
 		
@@ -127,8 +127,11 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 		indexer.esRegionsMapper = esRegionsMapper;
 		indexer.relationships = relationships;
 		indexer.auditMapper = auditMapper;
-		indexer.types = types;
+		 
 		indexer.exclude = exclude;
+		
+		logger.debug("Setting types : " + types);
+		indexer.types = (List<String>) jsonIzer.fromJson(types,  new TypeReference<List<String>>() {} );
 		
 		logger.info(String.format("Exclude? %s, Types: %s", indexer.exclude, indexer.types));
 		

@@ -362,24 +362,32 @@ to find what it's looking for : </P>
 
 <h3 id="chadoindex">Indexing Chado</h3>
 
-<P>As indexing from Chado to ElasticSearch requires both kinds of connection details, you will need to specify two property files.</P>
+<P>Crawl can serve up information from Chado directly, but there are situations when one might want to merge data that is in Chado with other kinds of data sources. Also, certain searches are likely
+to benefit from a Lucene rather than a database approach. </P>
 
 <h4 id="chadoglobaloptions">Indexing options</h4>
+
+<P>As indexing from Chado to ElasticSearch requires both kinds of connection details, you will need to specify two property files.</P>
 
 <P>There are a few options applicable to all Chado indexing strategies : </P>
 
 <ul>
-    <li>types (-t) - a list of feature types that can be included or excluded from the index</li>
-    <li>exclude (-e) - whether to include or exclude the types supplied using the -t option</li>
+    <li>types (-t) - a list of feature types that can be included or excluded from the index, supplied as a JSON list</li>
+    <li>exclude (-e) - whether to include or exclude the types supplied using the -t option (default is false)</li>
 </ul>
 
-<P>There is a default types list, which currently is : "gene", "pseudogene", "match_part", "repeat_region", 
-            "repeat_unit", "direct_repeat", "EST_match", "region", 
-            "polypeptide", "mRNA", "pseudogenic_transcript", "nucleotide_match", "exon", 
-            "pseudogenic_exon", "gap", "contig", "ncRNA", 
-            "tRNA", "five_prime_UTR", "three_prime_UTR", "polypeptide_motif". </P>
+<P>There is a default types list, which currently is : </P>
 
-<h4 id="chadoindexorganism">Indexing by organism</h4>
+<pre><code>["gene", "pseudogene", "match_part", "repeat_region", "repeat_unit", "direct_repeat", 
+"EST_match", "region", "polypeptide", "mRNA", "pseudogenic_transcript", "nucleotide_match", 
+"exon", "pseudogenic_exon", "gap", "contig", "ncRNA", "tRNA", 
+"five_prime_UTR", "three_prime_UTR", "polypeptide_motif"]</code></pre>
+
+<P>To exclude a list of types means that Crawl will ignore those types for indexing. To include a list of types means, the opposite, Crawl will 
+ignore <em>all other types</em>. As the default is exclude=false, Crawl will by default ignore all other feature types other than the ones in 
+the types list for indexing.</P>
+
+<h4 id="chadobyorganism">Indexing by organism</h4>
 
 <P>As with all examples of copying data from Chado, two properties files are specified: one for Chado connection details, and the other for ElasticSearch.
 This example connects to the GeneDB public Chado snapshot. To just copy one organism entry (without its features), you can do :</P>
@@ -398,10 +406,11 @@ This example connects to the GeneDB public Chado snapshot. To just copy one orga
 
 <pre><code>./crawl chado2es -pc resource-chado-public.properties \
     -pe resource-elasticsearch-local.properties \
+    -t '["gene", "pseudogene", "mRNA", "exon", "polypeptide"]' \
     -o Tbruceibrucei927 -f
     </code></pre>
 
-<P>Please note that for scaleability reasons the -f option won't work if you try to index all the organisms at once.</P>
+<P>Please note that for scaleability reasons the -f option won't work if you try to index all the organisms at once. Also the -t option is used here to selectively index only certain types.</P>
 
 
 <h4  id="indexing regions">Indexing regions from Chado</h4>
