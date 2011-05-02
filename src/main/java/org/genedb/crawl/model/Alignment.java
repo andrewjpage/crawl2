@@ -1,6 +1,4 @@
-/**
- * 
- */
+
 package org.genedb.crawl.model;
 
 import java.io.File;
@@ -9,41 +7,34 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
 
 import net.sf.samtools.SAMFileReader;
 
-public class Alignment {
+/**
+ * Represents a BAM or SAM file. 
+ */
+public class Alignment extends BioDataFile {
 	
 	private static Logger logger = Logger.getLogger(Alignment.class);
 	
-	@XmlAttribute(required=true)
-	public Integer fileID = 0;
-	
-	@XmlAttribute(required=false)
-	public String file;
-	
 	@XmlAttribute(required=false)
 	public String index;
-	
-	public String organism;
-	public List<String> chromosomes = new ArrayList<String>();
-	public String meta;
-	
-	
 	
 	private SAMFileReader reader;
 	private File bamFile;
 	private File indexFile;
 	private URL bamFileURL;
 	
+	@XmlTransient
 	public SAMFileReader getReader() throws IOException {
+		
+		logger.debug(this);
+		
 		if (reader == null) {
 			
 			if (file == null) {

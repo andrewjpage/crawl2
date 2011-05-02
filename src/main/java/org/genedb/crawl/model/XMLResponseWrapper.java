@@ -31,7 +31,9 @@ public class XMLResponseWrapper {
 			
 			Object value = entry.getValue();
 			
-			if (value instanceof ResultsSAM) {
+			if (value instanceof ResultsVariants) {
+				response = new Response (name, (ResultsVariants) value);
+			} else if (value instanceof ResultsSAM) {
 				response = new Response (name, (ResultsSAM) value);
 			} else if (value instanceof ResultsRegions) {
 				response = new Response (name, (ResultsRegions) value);

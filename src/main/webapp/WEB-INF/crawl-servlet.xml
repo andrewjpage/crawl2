@@ -31,7 +31,7 @@
         <property name="showParameters"><value>${showParameters}</value></property>
     </bean>
     
-    <bean id="alignmentStore" class="org.genedb.crawl.bam.AlignmentStore">
+    <bean id="bioDataFileStoreInitializer" class="org.genedb.crawl.bam.BioDataFileStoreInitializer">
         <property name="alignmentFiles" ><value>${alignments}</value></property>
     </bean>
     
@@ -49,13 +49,13 @@
   </bean>
   
   
-    
+    <!-- 
     <bean id="internalResourceViewResolver" 
         class="org.springframework.web.servlet.view.InternalResourceViewResolver" 
         p:prefix="/WEB-INF/jsp/"
         p:suffix=".jsp" 
         p:order="3" />
-    
+ -->    
     
      
     

@@ -45,6 +45,16 @@
             "reference" : "Pf3D7_11"
         }
     ],
+    "variants" : [
+        {
+            "file" : "http://www.genedb.org/artemis/NAR/Spneumoniae/4882_6_10_variant.bcf",
+            "organism" : "Spneumoniae"
+        },
+        {
+            "file" : "http://www.genedb.org/artemis/NAR/Spneumoniae/4882_6_11_variant.bcf",
+            "organism" : "Spneumoniae"
+        }
+    ],
     "alignments" : [
         {
             "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_0h.bam",

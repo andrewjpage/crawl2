@@ -7,9 +7,9 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 
 public class ResultsSAM extends Results {
 	
-	@XmlElement(name="file", type=FileInfo.class)
+	@XmlElement(name="file", type=Alignment.class)
 	@XmlElementWrapper(name="files")
-	public List<FileInfo> files;
+	public List<Alignment> files;
 	
 	@XmlElement()
 	public MappedCoverage coverage;

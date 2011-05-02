@@ -14,11 +14,9 @@ import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFileReader.ValidationStringency;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
-import net.sf.samtools.SAMSequenceRecord;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.model.Alignment;
-import org.genedb.crawl.model.FileInfo;
 import org.genedb.crawl.model.MappedCoverage;
 import org.genedb.crawl.model.MappedQuery;
 import org.genedb.crawl.model.MappedSAMHeader;
@@ -30,7 +28,11 @@ import org.genedb.crawl.model.adapter.AlignmentBlockAdapter;
 
 public class Sam {
 	
-	public AlignmentStore alignmentStore;
+	public BioDataFileStore<Alignment> alignmentStore;
+	
+	public void setAlignmentStore (BioDataFileStore<Alignment> alignmentStore) {
+		this.alignmentStore = alignmentStore;
+	}
 	
 	private static Logger logger = Logger.getLogger(Sam.class);
 	
@@ -77,7 +79,7 @@ public class Sam {
 	}
 	
 	private SAMFileReader getSamOrBam(int fileID) throws Exception {
-		final SAMFileReader inputSam = alignmentStore.getReader(fileID); 
+		final SAMFileReader inputSam = alignmentStore.getFile(fileID).getReader(); 
 		if (inputSam == null) {
 			throw new Exception ("Could not find the file " + fileID);
 		}
@@ -100,116 +102,30 @@ public class Sam {
 	}
 	
 	public List<MappedSAMSequence> sequence(int fileID) throws Exception {
-		return this.sequence(getSamOrBam(fileID));
+		return alignmentStore.getSequences(fileID);
+		
 	}
 	
-	public List<MappedSAMSequence> sequence(SAMFileReader file) throws Exception {
-		List<MappedSAMSequence> model = new ArrayList<MappedSAMSequence>();
-		for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
-			MappedSAMSequence mss = new MappedSAMSequence();
-			mss.length = ssr.getSequenceLength();
-			mss.name = ssr.getSequenceName();
-			mss.index = ssr.getSequenceIndex();
-			
-			model.add(mss);
-			
-			
-		}
-		return model;
+	
+	
+	
+	public List<Alignment> listforsequence(String sequence) throws Exception {
+		return alignmentStore.listforsequence(sequence);
 	}
 	
-	public List<FileInfo> listwithsequence(String sequence) throws Exception {
-		
-		
-		Map<Integer, Alignment> map = new HashMap<Integer, Alignment>();
-		
-		for (Alignment alignment : alignmentStore.getAlignments()) {
-			SAMFileReader file = alignment.getReader();
-			Integer fileID = alignment.fileID;
-			
-			if (map.containsKey(fileID)) {
-				continue;
-			}
-			
-			String actualSequenceName = getActualSequenceName(fileID, sequence);
-			
-			for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
-				
-				if (actualSequenceName == null) {
-					continue;
-				}
-				
-				if (actualSequenceName.equals(ssr.getSequenceName())) {
-					map.put(fileID, alignment);
-				} 
-			}
-		}
-		
-		return list(new ArrayList<Alignment>(map.values()));
+	public List<Alignment> list() {
+		return alignmentStore.getFiles();
 	}
 	
-	private List<FileInfo> list(List<Alignment> alignments) {
-		
-		List<FileInfo> files = new ArrayList<FileInfo>();
-		
-		for (Alignment alignment : alignments) {
-			FileInfo file = new FileInfo(alignment.fileID, alignment.file, alignment.meta, alignment.organism);
-			logger.info(alignment.file);
-			logger.info(alignment.meta);
-			files.add(file);
-			
-		}
-		return files;
-	}
-	
-	public List<FileInfo> list() {
-		return list(alignmentStore.getAlignments());
-	}
-	
-	public List<FileInfo> listfororganism(String organism) {
-		
-		List<Alignment> alignments = new ArrayList<Alignment>();
-		
-		for (Alignment alignment : alignmentStore.getAlignments()) {
-			if (alignment.organism.equals(organism) || alignment.organism.equals("com:" + organism)) {
-				alignments.add(alignment);
-			}
-		}
-		
-		return list(alignments);
-	}
-	
-	public String getActualSequenceName(int fileID, String sequenceName) throws Exception {
-		
-		Alignment alignment = alignmentStore.getAlignment(fileID);
-		SAMFileReader file = alignment.getReader();
-		
-		//List<AlignmentSequenceAlias> sequences = alignmentStore.getSequences();
-		Map<String,String> sequences = alignmentStore.getSequences();
-		
-		for (SAMSequenceRecord ssr : file.getFileHeader().getSequenceDictionary().getSequences()) {
-			String currentName = ssr.getSequenceName();
-			
-			//logger.info(String.format("%s = %s", currentName, sequenceName));
-			
-			if (currentName.equals(sequenceName)) {
-				return currentName;
-			}
-			
-			if (sequences.containsKey(sequenceName)) {
-				return sequences.get(sequenceName);			
-			}
-			
-		}
-		return null;
-		
+	public List<Alignment> listfororganism(String organism) {
+		return alignmentStore.listfororganism(organism);
 	}
 	
 	
 	
 	public synchronized MappedQuery query(int fileID, String sequence, int start,  int end, boolean contained, String[] properties, int filter ) throws Exception {
 		logger.debug("FileID : " + fileID);
-		sequence = getActualSequenceName(fileID, sequence);
+		sequence = alignmentStore.getActualSequenceName(fileID, sequence);
 		return this.query(getSamOrBam(fileID), sequence, start, end, contained, properties, filter);
 	}
 	
@@ -364,7 +280,7 @@ public class Sam {
 	
 	
 	public synchronized MappedCoverage coverage(int fileID, String sequence, int start, int end, int window, int filter) throws Exception {
-		sequence = getActualSequenceName(fileID, sequence);
+		sequence = alignmentStore.getActualSequenceName(fileID, sequence);
 		return this.coverage(getSamOrBam(fileID), sequence, start, end, window, filter);
 	}
 	

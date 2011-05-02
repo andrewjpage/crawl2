@@ -1,32 +1,38 @@
 package org.genedb.crawl.controller;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.CrawlException;
-import org.genedb.crawl.mappers.OrganismsMapper;
+
+
+import org.genedb.crawl.model.Service;
+import org.genedb.crawl.model.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping("/test")
+@RequestMapping("/")
 public class TestingController {
 	
 	private Logger logger = Logger.getLogger(TestingController.class);
 	
-	private OrganismsMapper organisms;
+	private String[] resources = new String[] {
+		"features", "organisms", "regions", "sams", "variants"	
+	};
 	
-	public void setOrganisms(OrganismsMapper organisms) {
-		this.organisms = organisms;
-	}
-	
-	@RequestMapping(method=RequestMethod.GET, value={"/list", "/list.*"})
-	public ModelAndView list() throws CrawlException {
-		ModelAndView mav = new ModelAndView();
+	@RequestMapping(method=RequestMethod.GET, value="/")
+	public Service welcome() {
+		Service s = new Service ();
 		
-		logger.info(organisms.list());
+		s.name = "index";
 		
-		return mav;
+		for (String resource : resources) {
+			Resource r = new Resource();
+			r.name = resource;
+			s.resources.add(r);
+		}
+		
+		
+		return s;
 	}
 	
 }
