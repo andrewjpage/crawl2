@@ -134,10 +134,45 @@ war.doFirst{
         file:'etc/config/crawl-' + resourceType + '.xml', 
         toFile:'tmp/WEB-INF/crawl-repository.xml',
         overwrite:'true' )
-    ant.copy (
-        file: config, 
-        toFile:'tmp/WEB-INF/classes/project.properties',
-        overwrite:'true' ) 
+    
+	
+	
+	
+	/*
+	 * To simplify getting started, a default alignments.json is provided 
+	 * and used in the documentation examples, and it is specified as
+	 * a relative path (so they don't have to edit a property file to get 
+	 * going. This works fine for the jetty runner, but if a war is 
+	 * deployed it needs to know the absolute path of the file that was 
+	 * specified. Rather than copying the file into the war, its absolute 
+	 * path is determined at build time.  
+	 */
+	
+	
+	//	ant.copy (
+	//        file: config,
+	//        toFile:'tmp/WEB-INF/classes/project.properties',
+	//        overwrite:'true' )
+	
+	
+	File project_properties = new File("tmp/WEB-INF/classes/project.properties")
+	
+	props.each() { key, value ->
+		
+		if (key == "alignments") {
+			File alignmentsFile = new File(value)
+			
+			if (alignmentsFile != null && alignmentsFile.isFile()) {
+				value = alignmentsFile.getAbsolutePath()
+			} 
+		}
+		
+		def line = key + "=" + value + "\n"
+		// print line
+		project_properties.append(line)
+    }
+	
+	
 }
 
 war {
