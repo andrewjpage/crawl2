@@ -77,6 +77,12 @@ data or locally instantiated index clusters. The project is build with gradle, a
 take a while because it will download dependencies. OSX users please note that Java build tools like 
 gradle need a properly set JAVA_HOME environmental variable.
 
+Also, as the build step involves downloading dependencies, and if you're behind a proxy, you may 
+have to initially supply proxyHost and proxyPort Java settings, e.g. :
+
+-Dhttp.proxyHost=wwwcache.myinstitute.edu -Dhttp.proxyPort=3128 
+
+
 ##############################################
 # RUNNING OFF A CHADO DATABASE
 ##############################################
