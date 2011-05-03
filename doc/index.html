@@ -184,12 +184,12 @@ for overlaying variation data.</P>
 <p>This is all done through the use of <a href="http://gradle.org/">Gradle</a>. You don't need to install it, though, because there is an executable provided in the root folder of the checkout
 ('gradlew').</p>
 
-<h3 id="setup">Setup</h3>
+<h3 id="essential">The Essential build</h3>
 
 <P>The initial build setup might take a while because it will download dependencies, but you should only ever have to run it 
 all once. After that any updates to dependencies should be incremental.To setup the build, run : </P>
 
-<pre><code>./gradlew</code></pre>
+<pre><code>./gradlew build</code></pre>
 
 <P>in the crawl checkout root folder. This can take 5-10 minutes depending on your internet connection.</P>
 
@@ -197,12 +197,6 @@ all once. After that any updates to dependencies should be incremental.To setup 
 have to initially supply proxyHost and proxyPort Java settings, e.g. :</P>
 
 <pre><code>./gradlew build -Dhttp.proxyHost=wwwcache.sanger.ac.uk -Dhttp.proxyPort=3128</code></pre> 
-
-<h3 id="buildandtest">Build and test</h3>
-
-<P>Now to build, run :</P>
-
-<pre><code>./gradlew build</code></pre>
 
 <P>This will perform all the build steps, including dependency download and running the test harness. You shouldn't worry about configurations for the test harness, because the default configurations
 should just work out of the box. The reason for that will be explained later, but the gist of it is that it connects to the GeneDB public snapshot for its database tests,
