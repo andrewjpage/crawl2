@@ -170,7 +170,7 @@ war.doFirst{
 		}
 		
 		def line = key + "=" + value + "\n"
-		// print line
+		print line
 		project_properties.append(line)
     }
 	
