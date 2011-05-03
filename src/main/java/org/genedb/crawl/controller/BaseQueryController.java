@@ -123,7 +123,7 @@ public abstract class BaseQueryController {
 	}
 	
 	
-	@RequestMapping(method=RequestMethod.GET, value="/index")
+	@RequestMapping(method=RequestMethod.GET, value={"/", "/index"})
 	@ResourceDescription("lists the resources")
 	public Service index() {
 		
