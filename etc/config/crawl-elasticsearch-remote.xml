@@ -22,6 +22,7 @@
     <bean id="connection" class="org.genedb.crawl.elasticsearch.TransportConnection">
         <property name="host" value="${resource.elasticsearch.address.host}" />
         <property name="port" value="${resource.elasticsearch.address.port}" />
+        <property name="clusterName" value="${resource.elasticsearch.cluster.name}"></property>
         
         <property name="index" value="${resource.elasticsearch.index}" />
         <property name="featureType" value="${resource.elasticsearch.featureType}" />

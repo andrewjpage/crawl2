@@ -49,6 +49,8 @@ public abstract class IndexBuilder {
 				tc.setPort(Integer.parseInt(elasticSearchProperties.getProperty("resource.elasticsearch.address.port")));
 			}
 			
+			tc.setClusterName(elasticSearchProperties.getProperty("resource.elasticsearch.cluster.name"));
+			
 			tc.configure();
 			connection = tc;
 			
