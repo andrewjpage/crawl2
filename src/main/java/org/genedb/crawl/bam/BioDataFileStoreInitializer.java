@@ -22,9 +22,6 @@ public class BioDataFileStoreInitializer {
 	
 	private static Logger logger = Logger.getLogger(BioDataFileStoreInitializer.class);
 	
-	//private List<Alignment> alignments = new ArrayList<Alignment>();
-	//private List<Variant> variants = new ArrayList<Variant>();
-	//private Map<String, String> sequences;
 	private JsonIzer jsonIzer = JsonIzer.getJsonIzer();
 	
 	private BioDataFileStore<Alignment> alignmentStore = new BioDataFileStore<Alignment>();
@@ -52,7 +49,6 @@ public class BioDataFileStoreInitializer {
 		
 		logger.info("making jsons");
 		
-		//alignments = (List<Alignment>) jsonIzer.fromJson(alignmentFile,  new TypeReference<List<Alignment>>() {} );
 		Alignments store = (Alignments) jsonIzer.fromJson(alignmentFile, Alignments.class);
 		
 		
