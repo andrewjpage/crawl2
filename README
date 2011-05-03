@@ -86,7 +86,7 @@ For a quick test run off the GeneDB public Chado database, try :
 $ ./gradlew build
 $ ./gradlew -Pconfig=resource-chado-public.properties jettyRunWar
 
-
+and goto "http://localhost:8080/services/organisms/list".
 
 ##############################################
 # RUNNING OFF AN INDEXED GFF3 FILE
@@ -95,18 +95,17 @@ $ ./gradlew -Pconfig=resource-chado-public.properties jettyRunWar
 If instead you want to try indexing a GFF file, try (assumes you're in bash) :
 
 $ ./gradlew build
-$ ./sh/gff2es.sh -pe resource-elasticsearch-local.properties -o '{ 
+$ ./crawl gff2es -pe resource-elasticsearch-local.properties \
+    -g  src/test/resources/data/Pf3D7_01.gff.gz \
+    -o '{
     "ID":27, 
     "common_name":"Pfalciparum", 
     "genus":"Plasmodium", 
     "species":"falciparum", 
     "translation_table":11, 
     "taxonID":5833 
-}'
-$ ./sh/gff2es.sh -g src/test/resources/data/Pf3D7_01.gff.gz  \
-    -o '{"common_name":"Pfalciparum"}' \
-    -pe resource-elasticsearch-local.properties  
+}' 
 $ ./gradlew -Pconfig=resource-elasticsearch-local.properties jettyRunWar
 
-
+and goto "http://localhost:8080/services/organisms/list".
 
