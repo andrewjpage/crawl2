@@ -32,6 +32,14 @@ public class BioDataFileStore <T extends BioDataFile> {
 	private List<T> files;
 	private Map<String, String> sequences;
 	
+	/**
+	 * Setup empty arrays if nothing passed.
+	 */
+	BioDataFileStore () {
+		files = new ArrayList<T>();
+		sequences = new HashMap<String, String>();
+	}
+	
 	BioDataFileStore (List<T> files, Map<String, String> sequences) {
 		this.files = files;
 		this.sequences = sequences;

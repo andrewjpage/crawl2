@@ -18,9 +18,6 @@ import org.genedb.crawl.model.Alignments;
 
 import org.genedb.crawl.model.Variant;
 
-
-
-
 public class BioDataFileStoreInitializer {
 	
 	private static Logger logger = Logger.getLogger(BioDataFileStoreInitializer.class);
@@ -30,8 +27,8 @@ public class BioDataFileStoreInitializer {
 	//private Map<String, String> sequences;
 	private JsonIzer jsonIzer = JsonIzer.getJsonIzer();
 	
-	private BioDataFileStore<Alignment> alignmentStore;
-	private BioDataFileStore<Variant> variantStore;
+	private BioDataFileStore<Alignment> alignmentStore = new BioDataFileStore<Alignment>();
+	private BioDataFileStore<Variant> variantStore = new BioDataFileStore<Variant>();
 	
 	public BioDataFileStore<Alignment> getAlignments() {
 		return alignmentStore;
