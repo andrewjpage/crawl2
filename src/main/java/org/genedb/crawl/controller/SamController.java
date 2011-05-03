@@ -3,7 +3,6 @@ package org.genedb.crawl.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.bam.BioDataFileStoreInitializer;
@@ -23,11 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Controller
-@ResourceDescription("provides methods for SAM/BAM alignment display")
+@ResourceDescription("Provides methods for SAM/BAM alignment querying.")
 @RequestMapping("/sams")
 public class SamController extends BaseQueryController {
-	
-	private Logger logger = Logger.getLogger(SamController.class);
 	
 	private Sam sam = new Sam();
 	
@@ -36,7 +33,6 @@ public class SamController extends BaseQueryController {
 	
 	@Autowired
 	public void setBioDataFileStoreInitializer(BioDataFileStoreInitializer initializer) {
-		//this.alignmentStore = alignmentStore;
 		sam.setAlignmentStore(initializer.getAlignments());
 	}
 	
@@ -105,14 +101,10 @@ public class SamController extends BaseQueryController {
 			@RequestParam("organism") String organism) throws CrawlException {
 		
 		List<Alignment> matchedAlignments = new ArrayList<Alignment>();
-		
 		Organism mappedOrganism = getOrganism(organismsMapper, organism);
-		
 		if (mappedOrganism != null) {
-			logger.debug(mappedOrganism.common_name);
 			matchedAlignments = sam.listfororganism(mappedOrganism.common_name);
 		}
-		
 		results.files = matchedAlignments;
 		return results;
 	}
@@ -123,7 +115,6 @@ public class SamController extends BaseQueryController {
 	public ResultsSAM listforsequence( 
 			ResultsSAM results,
 			@RequestParam("sequence") String sequence) throws Exception {
-		
 		List<Alignment> matchedAlignments = sam.listforsequence(sequence);
 		results.files = matchedAlignments;
 		return results;

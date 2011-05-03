@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@ResourceDescription("provides methods for VCF/BCF variant display")
+@ResourceDescription("Provides methods for VCF/BCF variant querying.")
 @RequestMapping("/variants")
 public class VariantController extends BaseQueryController {
 	
@@ -33,15 +33,14 @@ public class VariantController extends BaseQueryController {
 		variantStore=initializer.getVariants();
 	}
 	
+	@ResourceDescription("Returns the complete list of variant files.")
 	@RequestMapping(method=RequestMethod.GET, value={"/list", "/list.*"})
 	public ResultsVariants list(ResultsVariants results) throws IOException {
 		results.files = variantStore.getFiles();
-		for (Variant v : results.files) {
-			logger.info(v);
-		}
 		return results;
 	}
 	
+	@ResourceDescription("Returns a list of sequences in a variant file.")
 	@RequestMapping(method=RequestMethod.GET, value={"/sequences", "/sequences.*"})
 	public ResultsVariants sequences(
 			ResultsVariants results, 
@@ -50,6 +49,7 @@ public class VariantController extends BaseQueryController {
 		return results;
 	}
 	
+	@ResourceDescription("Returns a list of variant files for a particular organism.")
 	@RequestMapping(method=RequestMethod.GET, value={"/listfororganism", "/listfororganism.*"})
 	public ResultsVariants listfororganism(
 			ResultsVariants results, 
@@ -71,6 +71,7 @@ public class VariantController extends BaseQueryController {
 		return results;
 	}
 	
+	@ResourceDescription("Queries a region of a variant file.")
 	@RequestMapping(method=RequestMethod.GET, value={"/query", "/query.*"})
 	public ResultsVariants query(
 			ResultsVariants results, 
@@ -78,7 +79,6 @@ public class VariantController extends BaseQueryController {
 			@RequestParam("sequence") String sequence, 
 			@RequestParam("start") int start, 
 			@RequestParam("end") int end) throws IOException {
-		
 		results.records = variantStore.getFile(fileID).getReader().query(sequence, start, end);
 		return results;
 	}
