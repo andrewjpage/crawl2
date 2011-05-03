@@ -75,12 +75,14 @@ Crawl should run "out of the box", if you use the config files below, as these a
 data or locally instantiated index clusters. The project is build with gradle, and includes a 
 "gradlew" executable so you don't have to download and install gradle yourself. The first build will
 take a while because it will download dependencies. OSX users please note that Java build tools like 
-gradle need a properly set JAVA_HOME environmental variable.
+gradle need a properly set JAVA_HOME environmental variable. To build, do :
+
+$ ./gradlew build
 
 Also, as the build step involves downloading dependencies, and if you're behind a proxy, you may 
 have to initially supply proxyHost and proxyPort Java settings, e.g. :
 
--Dhttp.proxyHost=wwwcache.myinstitute.edu -Dhttp.proxyPort=3128 
+./gradlew build -Dhttp.proxyHost=wwwcache.sanger.ac.uk -Dhttp.proxyPort=3128
 
 
 ##############################################
@@ -89,7 +91,6 @@ have to initially supply proxyHost and proxyPort Java settings, e.g. :
 
 For a quick test run off the GeneDB public Chado database, try :
 
-$ ./gradlew build
 $ ./gradlew -Pconfig=resource-chado-public.properties jettyRunWar
 
 and goto "http://localhost:8080/services/organisms/list".
@@ -100,7 +101,6 @@ and goto "http://localhost:8080/services/organisms/list".
 
 If instead you want to try indexing a GFF file, try (assumes you're in bash) :
 
-$ ./gradlew build
 $ ./crawl gff2es -pe resource-elasticsearch-local.properties \
     -g  src/test/resources/data/Pf3D7_01.gff.gz \
     -o '{

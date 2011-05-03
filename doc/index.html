@@ -193,6 +193,10 @@ all once. After that any updates to dependencies should be incremental.To setup 
 
 <P>in the crawl checkout root folder. This can take 5-10 minutes depending on your internet connection.</P>
 
+<P>Also, as the build step involves downloading dependencies, and if you're behind a proxy, you may 
+have to initially supply proxyHost and proxyPort Java settings, e.g. :</P>
+
+<pre><code>./gradlew -Dhttp.proxyHost=wwwcache.sanger.ac.uk -Dhttp.proxyPort=3128</code></pre> 
 
 <h3 id="buildandtest">Build and test</h3>
 
