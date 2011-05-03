@@ -2,6 +2,7 @@ package org.genedb.crawl.elasticsearch;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.log4j.Logger;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -9,6 +10,8 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 public class TransportConnection extends BaseConnection implements Connection {
+	
+	private Logger logger = Logger.getLogger(TransportConnection.class);
 	
 	TransportClient client;
 	private String host;
@@ -32,12 +35,13 @@ public class TransportConnection extends BaseConnection implements Connection {
 	public void configure () {
 		
 		Settings settings = ImmutableSettings.settingsBuilder()
-        	.put("cluser.name",clusterName)
+        	.put("cluster.name",clusterName)
         	.build();
 		
 		client = new TransportClient(settings);
 		client.addTransportAddress(new InetSocketTransportAddress(host, port));
 		
+		logger.info(String.format("Setup transport client %s : %d, cluster name %s", host, port, settings.get("cluster.name")));
 	}
 	
 	public Client getClient() {
