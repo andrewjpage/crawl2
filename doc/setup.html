@@ -1,0 +1,698 @@
+<html>
+
+<head>
+<title>Crawl2 - Setup Guide</title>
+<link rel="stylesheet" href="http://www.genedb.org/includes/style/genedb/main.css" type="text/css" />
+
+<script type="text/javascript" src="http://www.genedb.org/includes/scripts/jquery/jquery-genePage-combined-new.js"></script>
+<script src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.1.js"></script>
+
+<style>
+
+body {
+    font-size: 1em;
+    width:900px;
+    margin:auto;
+}
+
+h1 { font-size:2em; }
+h2 { font-size:1.8em; }
+h3 { font-size:1.6em; }
+h4 { font-size:1.4em; }
+h5 { font-size:1.2em; }
+
+h1,h2,h3,h4,h5 {
+    font-weight:bold;
+    text-transform: uppercase;
+}
+
+p {
+    padding:15px;
+    text-align: justify;
+}
+
+pre {
+    margin:10px;
+    padding:10px;
+    border: 1px dashed grey;
+}
+
+table {
+    margin:20px;
+    
+}
+
+table, td, th {
+    border: 1px dashed grey;
+}
+
+td, th {
+    padding:10px;
+}
+
+div#toc {
+    border: 1px dashed grey;
+    padding:10px;
+    width:400px;
+    margin:auto;
+}
+
+div#toc ul {
+    list-style: none;
+    text-transform: uppercase;
+    font-size:small;
+}
+
+div#toc ul li ul {
+    margin-bottom: 0.75em;
+}
+
+div#toc ul li ul li ul {
+    margin-bottom: 0.25em;
+}
+
+a, a:visited {
+    text-decoration:none;
+    color:grey;
+}
+
+a:hover {
+    color:black;
+}
+
+li {
+    margin-left:4em;
+}
+
+</style>
+
+<link rel="icon" href="crawl-discpng.png" type="image/x-icon" />  
+
+<script>
+ function getDateAtXDaysAgo(since) {
+    var d = new Date();
+    d.setDate(d.getDate() - since);
+    return d;
+}
+
+function getDateString(date) {
+    var year = pad(date.getFullYear(), 4);
+    var month = pad(date.getMonth() + 1, 2);
+    var day = pad(date.getDate(), 2);
+    var dateString = year + "-" + month + "-" + day;
+    return dateString;
+    
+}
+
+function pad(number, length) {
+    var str = '' + number;
+    while (str.length < length) {
+        str = '0' + str;
+    }
+    return str;
+}
+
+var date = getDateString((getDateAtXDaysAgo(14)));
+
+
+
+</script>
+
+</head>
+<body>
+
+
+
+<div style="width:800px;margin:auto;" >
+<img src="calligraphic.png">
+</div>
+
+
+<div style="float:right;margin:20px;">
+<div id="toc"></div>
+<P>
+    <em>
+        Note: Generated using <a href="http://jquery.org/">Jquery</a> and a <a href="http://code.google.com/p/samaxesjs/wiki/TableOfContentsPlugin">TOC plugin</a>.
+    </em>
+</P>
+</div>
+
+<h1>Setup Guide</h1>
+
+
+<h2 id="Intro">Introduction</h2>
+
+<P>Crawl provides a standardised API, in the form of web services, for displaying genomic data. It can work directly off 
+a <a href="http://gmod.org/wiki/Chado">Chado</a> database, 
+or instead off an <a href="http://www.elasticsearch.org">ElasticSearch</a> cluster, which 
+uses <a href="http://lucene.apache.org/">Lucene</a> as a back end, and can be indexed off a combination of data sources.</P>
+
+<P>It is currently used by <a href="https://github.com/sanger-pathogens/Web-Artemis">Web-Artemis</a> as an AJAX back end.</P>
+
+<h3 id="Chado">Chado</h3>
+
+<P>Chado is a standard relational database, typically deployed on <a href="http://www.postgresql.org">postgres</a> database. It has a very flexible schema, allowing all sorts of genomic
+features to be modelled. It is the underlying data store for <a href="http://www.genedb.org">GeneDB</a>, <a href="http://flybase.org/">FlyBase</a>, 
+<a href="http://paramecium.cgm.cnrs-gif.fr/">ParameciumDB</a>, <a href="http://www.vectorbase.org/">VectorBase</a>, and <a href="http://www.gnpannot.org/">GNPAnnot</a>. 
+</P>
+
+<P>The Crawl API exposes the contents of these databases via SQL queries.</P>
+
+<h3 id="ElasticSearch">ElasticSearch</h3>
+
+<P>Data can be indexed and stored using ElasticSearch, a distributed search enging that runs ontop of Lucene. There are two kinds of connections to ElasticSearch: local and transport. Local connections
+ are useful to get going with, as an ElasticSearch cluster is automatically created and managed in the same process as Crawl. The only configuration needed for this is usually the location of the 
+ indices. Transport connections connect to a separately instantiated ElasticSearch cluster, which can be on the same or remote machines, and the configuration needed for this is host and port.</P> 
+ 
+<P>The indices can be populated from various data sources: <strong><a href="http://www.sequenceontology.org/gff3.shtml">valid GFF3</a></strong>, Chado, and we are working on adding DAS. It might seem odd to want to index a Chado database when Crawl will run directly off of it, but this might be 
+useful in situations where you want to merge annotations from Chado with other sources (like DAS or GFF3).</P>
+
+
+<P>The Crawl API exposes the contents of these indices via ElasticSearch (Lucene) queries.</P>
+
+<h3 id="nextgen">Next-Gen sequencing data</h3>
+
+<P>Crawl can retrieve segments from Next-Generation sequencing alignments 
+stored in <a href="http://samtools.sourceforge.net/samtools.shtml#4">SAM</a>/BAM files, 
+for overlaying ontop of genomic features. It can also
+do the same for <a href="http://www.1000genomes.org/node/101">VCF</a>/BCF files, 
+for overlaying variation data.</P>
+
+
+<h2 id="build">Setup, build and test</h2>
+
+<p>This is all done through the use of <a href="http://gradle.org/">Gradle</a>. You don't need to install it, though, because there is an executable provided in the root folder of the checkout
+('gradlew').</p>
+
+<h3 id="essential">The Essential build</h3>
+
+<P>The initial build setup might take a while because it will download dependencies, but you should only ever have to run it 
+all once. After that any updates to dependencies should be incremental.To setup the build, run : </P>
+
+<pre><code>./gradlew build</code></pre>
+
+<P>in the crawl checkout root folder. This can take 5-10 minutes depending on your internet connection.</P>
+
+<P>Also, as the build step involves downloading dependencies, and if you're behind a proxy, you may 
+have to initially supply proxyHost and proxyPort Java settings, e.g. :</P>
+
+<pre><code>./gradlew build -Dhttp.proxyHost=wwwcache.sanger.ac.uk -Dhttp.proxyPort=3128</code></pre> 
+
+<P>This will perform all the build steps, including dependency download and running the test harness. You shouldn't worry about configurations for the test harness, because the default configurations
+should just work out of the box. The reason for that will be explained later, but the gist of it is that it connects to the GeneDB public snapshot for its database tests,
+and creates a local ElasticSearch cluster for its indexing tests.</P>
+
+<P> If it's all worked fine, you can safely skip the next section and move onto indexing.</P>
+
+<h3 id="optionbuildsteps">Optional build steps</h3>
+
+<h4 id="dependencies">Fetching dependencies from the GeneDB repository</h4>
+
+<P>Because of the unreliability of some external repositories, the dependencies are hosted on the genedb developer site as well. If you find the resolve step fails, you can try
+you can enable download from this site by adding the genedb developer https certificate. This certificate can be downloaded like this on a Mac (in bash) : </P>
+
+<pre><code>openssl s_client -connect developer.genedb.org:443 2>&1 | \
+    sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' \
+    > /tmp/developer.genedb.org
+</code></pre>
+
+<P>And imported as follows :</P>
+
+<pre><code>sudo keytool -import -alias developer.genedb.org \
+    -keystore /Library/Java/Home/lib/security/cacerts \
+    -file /tmp/developer.genedb.org 
+</code></pre>
+
+<P>The keytool password is 'changeit'.</P>
+
+<P>Finally, you will have to uncomment the repositories in the build.gradle file that have a url that starts with :</P>
+
+<pre><code>https://developer.genedb.org/nexus/content/repositories/</code></pre>
+
+
+<h4 id="eclipse">Customizing eclipse</h4>
+
+<P>If you want to be able to browse and edit the code inside eclipse, you can run :</P>
+
+<pre><code>./gradlew eclipse</code></pre>
+
+<P>which will configure eclipse to be aware of crawl's dependencies.</P>
+
+<h4 id="installation">Installation</h4>
+
+<P>If you need to be able to run (or, more likely, have your users run) the crawl.jar somewhere outside 
+the project checkout, then you can run :</P>
+
+<pre><code>./gradlew install -Pdir=/usr/local/crawl</code></pre>
+
+<P>The folder specified here will be populated with a bin (containing scripts) and lib folder (containing jars).</P>
+
+<P>Please note that property files will not be copied over. <em>If you're only ever going to run things as yourself, this step 
+might is entirely superfluous.</em></P>
+
+
+
+
+
+
+
+
+<h2 id="indexing">Indexing</h2>
+
+<p>These are done using shell scripts. If using a stand-alone ElasticSearch cluster, then it should have been started prior to running these steps. The examples 
+here use a local cluster, which is instantiated by crawl itself. All examples here use bash.</p> 
+
+
+
+
+<h3 id="create organism">Creating an organism manually</h3>
+
+<P>An organism is created by supplying its json using the -o option. Here's an example adding Plasmodium falciparum chromosome 1. </P> 
+
+<pre><code>./crawl org2es -pe resource-elasticsearch-local.properties -o '{
+    "ID":27,
+    "common_name":"Pfalciparum",
+    "genus":"Plasmodium",
+    "species":"falciparum",
+    "translation_table":11,
+    "taxonID":5833
+}'</code></pre>
+
+<P>Here's an example adding Trypanosoma brucei 927 :</P>
+
+<pre><code>./crawl org2es -pe resource-elasticsearch-local.properties -o '{
+    "ID":19,
+    "common_name":"Tbruceibrucei927",
+    "genus":"Trypanosoma",
+    "species":"brucei brucei, strain 927",
+    "translation_table":11,
+    "taxonID":185431
+}'</code></pre>
+
+<P>The ID field is taken out of the GeneDB public repository, in this case, but you can choose whatever convention you like.</P>
+
+
+
+
+
+
+
+
+<h3 id="gffs">Indexing GFF files</h3>
+
+<p>GFF files do not contain information about the organism, so this must be supplied. Here is an example of a small Plasmodium falciparum chromosome 1 : </p>
+
+<pre><code>./crawl gff2es -g src/test/resources/data/Pf3D7_01.gff.gz  \
+    -o '{"common_name":"Pfalciparum"}' \
+    -pe resource-elasticsearch-local.properties </code></pre>
+    
+<P>Here is an example with a larger Trypanosoma brucei chromosome 11 : </P>
+
+<pre><code>./crawl gff2es -g src/test/resources/data/Tb927_11_01_v4.gff.gz  \
+    -o '{"common_name":"Tbruceibrucei927"}' \
+    -pe resource-elasticsearch-local.properties </code></pre>    
+
+<p>You only need to supply a unique identifier for the organism at this stage, which is either its ID or common name.</p>
+
+<P>The -g flag (gffs) is used to specify a path to a GFF file or a folder containing them. If they are gzipped, the files will automatically be unzipped by the parser.</P>
+
+<P>Here is an example of a Bacterium : </P>
+
+<pre><code>./crawl gff2es -pe resource-elasticsearch-local.properties -o '{
+    "ID":999,
+    "common_name":"Spneumoniae",
+    "genus":"Streptococcus",
+    "species":"pneumoniae",
+    "translation_table":1,
+    "taxonID":1313
+}' -g src/test/resources/data/Spn23f.gff</code></pre>
+
+<P>Please note how the organism can be created at the same time</P>
+
+<h3 id="das">Indexing DAS sources</h3>
+
+<P>For this example, we are going to overlay features available from an external DAS source onto the reference sequence and annotations provided in a GFF files.</P>
+
+<pre><code>./crawl gff2es -pe resource-elasticsearch-local.properties -o '{
+    "ID":29,
+    "common_name":"Pberghei",
+    "genus":"Plasmodium",
+    "species":"berghei",
+    "translation_table":11,
+    "taxonID":5821
+}' -g src/test/resources/data/berg01.gff.gz
+
+./crawl das2es -pe resource-elasticsearch-local.properties \
+    -u http://das.sanger.ac.uk/das \
+    -s pjazz_berghei \
+    -r berg01 \
+    -o '{"common_name":"Pberghei"}' </code></pre>
+
+<P>In this example the features overlayed are of type 'clone_genomic_insert'
+
+<P>The first step should be familiar to you by now, it's indexing GFF files as before - just also doing the organism creation/update step also done in the same run. The next step
+uses a das2es script to query a remote DAS server and populate the indices.</P>
+
+<P>Please note that currently the DAS support is quite minimal, only features, locations (on segments / regions) and their types are put in.</P>
+
+<h4 id="das-capabilities">DAS capability requirements</h4>
+
+<P>DAS allows quite a bit of flexibility - a DAS source does not have to implement the full specification. Crawl, however, has a few minimum requirements for it to be able
+to find what it's looking for : </P>
+
+<ul>
+<li>entry_points - needed to know what chromosomes to query</li>
+<li>sequence - only needed if you want pull in regions from the DAS source (-c option)</li>
+<li>features - needed to get the features</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+<h3 id="chadoindex">Indexing Chado</h3>
+
+<P>Crawl can serve up information from Chado directly, but there are situations when one might want to merge data that is in Chado with other kinds of data sources. Also, certain searches are likely
+to benefit from a Lucene rather than a database approach.</P>
+
+<h4 id="chadoglobaloptions">Indexing options</h4>
+
+<P>As indexing from Chado to ElasticSearch requires both kinds of connection details, you will need to specify two property files.</P>
+
+<P>There are a few options applicable to all Chado indexing strategies : </P>
+
+<ul>
+    <li>types (-t) - a list of feature types that can be included or excluded from the index, supplied as a JSON list</li>
+    <li>exclude (-e) - whether to include or exclude the types supplied using the -t option (default is false)</li>
+</ul>
+
+<P>There is a default types list, which currently is : </P>
+
+<pre><code>["gene", "pseudogene", "match_part", "repeat_region", "repeat_unit", "direct_repeat", 
+"EST_match", "region", "polypeptide", "mRNA", "pseudogenic_transcript", "nucleotide_match", 
+"exon", "pseudogenic_exon", "gap", "contig", "ncRNA", "tRNA", 
+"five_prime_UTR", "three_prime_UTR", "polypeptide_motif"]</code></pre>
+
+<P>To exclude a list of types means that Crawl will ignore those types for indexing. To include a list of types means, the opposite, Crawl will 
+ignore <em>all other types</em>. As the default is exclude=false, Crawl will by default ignore all other feature types other than the ones in 
+the types list for indexing.</P>
+
+<h4 id="chadobyorganism">Indexing by organism</h4>
+
+<P>As with all examples of copying data from Chado, two properties files are specified: one for Chado connection details, and the other for ElasticSearch.
+This example connects to the GeneDB public Chado snapshot. To just copy one organism entry (without its features), you can do :</P>
+
+<pre><code>./crawl chado2es -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties \
+    -o Tbruceibrucei927</code></pre>
+
+<P>To copy all of them, ommit the -o organism option :</P>
+
+<pre><code>./crawl chado2es -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties </code></pre>
+
+
+<P>Use the -f option to index an organism <em>as well as</em> its features :</P>
+
+<pre><code>./crawl chado2es -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties \
+    -t '["gene", "pseudogene", "mRNA", "exon", "polypeptide"]' \
+    -o Tbruceibrucei927 -f
+    </code></pre>
+
+<P>Please note that for scaleability reasons the -f option won't work if you try to index all the organisms at once. Also the -t option is used here to selectively index only certain types.</P>
+
+
+<h4  id="indexing regions">Indexing regions from Chado</h4>
+
+<P>Use the -r option to specify a region : </P>
+
+<pre><code>./crawl chado2es -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties \
+    -r Pf3D7_01</code></pre>
+
+<P>As with organisms, you have to specify the -f option to index the region's features : </P>
+
+<pre><code>./crawl chado2es -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties \
+    -r Pf3D7_01 -f </code></pre>
+
+
+
+<h4 id="incrementals">Incremental indexing</h4>
+
+<p>This would typically be run periodically, e.g. in a cron job, after an initial bulk index 
+has been performed. Incremental indexing relies on the use of the timelastmodified stamp. You 
+can indexing everything that has changed since <script>document.write (date);</script>, as follows :</p>
+
+<pre><code>./crawl chado2es -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties -s <script>document.write (date);</script></code></pre>
+
+<p>You can filter on organism:</p>
+
+<pre><code>./crawl chado2es -pc resource-chado-public.properties \
+    -pe resource-elasticsearch-local.properties -o Lmajor -s <script>document.write (date);</script> </code></pre>
+
+<P>If the audit schema exists in this Chado database, then an attempt will be made to remove deleted features from
+the index.</P>
+
+
+
+
+
+
+
+
+<h2  id="ngenconfig">Configuration for Next-Gen sequencing data</h2>
+
+<P>External alignment files are configured using a JSON file, which contains information
+about SAM/BAM alignments), VCF/BCF files, and optionally reference sequence alias names
+(explained below).
+
+<P>Pointing to the alignments is fairly straightforward - an example configuration file is 
+provided in etc/alignments.json. All the files listed there are available on GeneDB, so this
+file should work as an example to get you going without having to configure your own. </P>
+
+<P>Both the alignment file and index properties can be specified using http urls (as in the example files) or unix folder paths.</P>
+
+<P>
+This file can get quite long for large BAM repositories, and it's not expected that in this
+case you manually craft these. The intention is that it would be autogenerated from a tracking database, LIMS system,
+filesystem folder hierarchy. For that reason, it's a JSON file, to make it easy to generate.  
+</P>
+
+<h3  id="sequence aliases">Aliasing sequences</h3>
+
+<P>Sometimes 
+the FASTA sequence names in the alignments file may not correspond to the sequences in the
+ annotation repository. The alignments.json file therefore has mappings of sequence names 
+ present in the BAMs with the chromosomes/contigs in the repository. </P> 
+ 
+
+<h3  id="alignmentsformat">Alignments file format</h3>
+
+<P>Below is an example of an alignments file. It is a hash of three arrays: sequences, variants 
+and alignments. The sequences array defines any sequence aliases (as described above).
+The alignments and variants arrays are used to define SAM/BAM and VCF/BCF next gen sequence data files.</P> 
+
+<code><pre>
+{
+    "sequences" : [
+        {
+            "alignment" : "MAL1",
+            "reference" : "Pf3D7_01"
+        }
+    ],
+    "variants" : [
+        {
+            "file" : "http://www.genedb.org/artemis/NAR/Spneumoniae/4882_6_10_variant.bcf",
+            "organism" : "Spneumoniae"
+        }
+    ],
+    "alignments" : [
+        {
+            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_0h.bam",
+            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_0h.bam.bai",
+            "organism" : "Pfalciparum"
+        }
+    ]
+}
+</pre></code>
+
+
+
+
+
+
+
+
+<h2  id="deploying">Deploying</h2>
+
+<h3  id="war" >Packaging the war </h3>
+
+<p>Here you must specify a config property file. Several of examples are bundled in the top level folder. For example :</p>
+<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties war</code></pre>
+
+<h3  id="jetty">Testing the war using Jetty-runner </h3>
+
+<P>This can be used to run crawler without having to configure a servlet container. This is not good for production use. Only use it for testing.</P>
+
+<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties jettyRunWar</code></pre>
+
+<P>Now point your browser to <a href="http://localhost:8080/services">http://localhost:8080/services</a>.
+
+<h3 id="j2ee">Deploying the war using to a J2EE container  </h3>
+
+<P>For production, or even beta test sites, it should be deployed to a container as follows.</P>
+
+<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties deploy</code></pre>
+
+
+
+<h2  id="cleaning">Cleaning up</h2>
+
+<h3 id="clean build">Cleaning up builds</h3>
+
+<P>To be run whenever method signatures change and you want to spot external references to them.</P> 
+
+<pre><code>./gradlew clean</code></pre>
+
+
+<h3  id="clean es">Cleaning up a local ElasticSearch data</h3>
+
+<P>This task is only useful for non-trasnsport, i.e. local, clusters, and requires the correct config : </P> 
+
+<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties cleanes</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2  id="props">Property files</h2>
+
+
+
+<p>The purpose of these is to specify environmental variables used by crawl. Sometimes only one is used, as is the case when building a war. Sometimes two are used, as is the case when indexing from one data source to another. The following table describes what they are for :</p>
+
+<table >
+<tr><th>Property</th><th>Description</th><th>Configurations</th></tr>
+
+<tr><td>resource.type</td>
+<td>Currently be either chado-postgres, elasticsearch-local, elasticsearch-remote</td>
+<td>all</td></tr>
+
+<tr><td>deploy.dir</td>
+<td>The tomcat webapps folder to which any war that is built using this file is deployed to.</td>
+<td>all</td></tr>
+
+<tr><td>deploy.name</td>
+<td>what the war will be called, which will reflected in the URL domain path.</td>
+<td>all</td></tr>
+
+<tr><td>alignments</td>
+<td>the path to an alignments.json file. This is where BAM alignments are specified. An example alignments.json file is included in the etc folder.</td>
+<td>all</td></tr>
+
+<tr><td>showParameters</td>
+<td>whether or not to always return request parameters in the reponse.</td>
+<td>all</td></tr>
+
+
+
+
+<tr><td>dbhost</td>
+<td>the chado database host</td>
+<td>chado-postgres</td></tr>
+
+<tr><td>dbport</td>
+<td>the chado database port</td>
+<td>chado-postgres</td></tr>
+
+<tr><td>dbname</td>
+<td>the chado database name</td>
+<td>chado-postgres</td></tr>
+
+<tr><td>dbuser</td>
+<td>the chado database user</td>
+<td>chado-postgres</td></tr>
+
+<tr><td>dbpassword</td>
+<td>the chado database password</td>
+<td>chado-postgres</td></tr>
+
+
+<tr><td>resource.elasticsearch.index</td>
+<td>The name of the index</td>
+<td>all ElasticSearch configurations</td></tr>
+
+<tr><td>resource.elasticsearch.regionType</td>
+<td>The name of the type representing regions</td>
+<td>all ElasticSearch configurations</td></tr>
+
+<tr><td>resource.elasticsearch.featureType</td>
+<td>The name of the type representing features</td>
+<td>all ElasticSearch configurations</td></tr>
+
+<tr><td>resource.elasticsearch.organismType</td>
+<td>The name of the type representing organisms</td>
+<td>all ElasticSearch configurations</td></tr>
+
+
+
+
+<tr><td>resource.elasticsearch.address.host</td>
+<td>the elastic search host </td>
+<td>elasticsearch-remote</td></tr>
+<tr><td>resource.elasticsearch.address.port</td>
+<td>the elastic search port </td>
+<td>elasticsearch-remote</td></tr>
+
+
+
+<tr><td>resource.elasticsearch.cluster.name</td>
+<td>the name of the cluster you wish to connect to</td>
+<td>elasticsearch-remote</td></tr>
+
+
+
+<tr><td>resource.elasticsearch.local.pathlogs</td>
+<td>the elastic search log path </td>
+<td>elasticsearch-local</td></tr>
+<tr><td>resource.elasticsearch.local.pathdata</td>
+<td>the elastic search data path </td>
+<td>elasticsearch-local</td></tr>
+
+
+
+
+</table>
+
+
+<p>Not all of these parameters are used in all property files, the third column specifies in what context they are applicable.</p>
+
+<script>
+
+$(document).ready(function() {
+    $('#toc').toc();
+});
+
+</script>
+
+</body>
+
+</html>
