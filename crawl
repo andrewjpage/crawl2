@@ -45,7 +45,7 @@ then
 	elif [ -d "$CP2" ]; then
 		export CRAWL_CLASSPATH="$CP2/*"
 	else
-		echo "Could not find a crawl library in $CP1 or $CP1, and no $CRAWL_CLASSPATH has been set. Aborting." 
+		echo "Could not find a crawl library in $CP1 or $CP1, and no CRAWL_CLASSPATH has been set. Aborting." 
 	fi
 fi
 
