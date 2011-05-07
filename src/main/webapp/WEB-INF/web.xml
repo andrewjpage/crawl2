@@ -35,10 +35,10 @@
 		<servlet-name>crawl</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
-    
-    
-    
-    <!-- this is for the Web-Artemis.inc file -->
+
+
+
+	<!-- this is for the Web-Artemis.inc file -->
 	<mime-mapping>
 		<extension>.inc</extension>
 		<mime-type>text/html</mime-type>
@@ -61,10 +61,11 @@
 	</context-param>
 
 	<welcome-file-list>
-		<welcome-file>
-            index.jsp
-        </welcome-file>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
+
+
 
 </web-app>
 

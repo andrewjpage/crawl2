@@ -108,36 +108,86 @@ li {
 </P>
 </div>
 
-<h1>Welcome</h1>
+<h1 id="welcome">Welcome</h1>
 
-<H2>Setup guide</H2>
+<H2 id="setup">Setup guide</H2>
 
 <ul><li><a href="setup.html">Setup Guide</a></li></ul>
 
-<h2>Explore the data</h2>
+<h2 id="web-artemis">Visually explore the data</h2>
 
-<P>If it has been pulled into this web app, you can browse the data with the Very Nifty
-<a href="./Web-Artemis/index.html">Web Artemis</a>. </P>
+<P><a href="https://github.com/sanger-pathogens/Web-Artemis">Web-Artemis</a> is a <em>very cool</em> genome browser. It can talk
+to Crawl services, so can be used to explore the data they hold. 
 
-<h2>Services</h2>
+<P>If it has been <a href="setup.html#webartemis">pulled</a> into this web app, you can browse the data with the Very Nifty :
+<ul><li><a href="./Web-Artemis/index.html">Web Artemis</a></li></ul>
 
-<P>Services can be accessed at : </P>
+<P>(Or you can install it yourself by grabbing it : </P>
 
-<ul><li><a href="./organisms/">./organisms/</a></li>
-<li><a href="./regions/">./regions/</a></li>
-<li><a href="./features/">./features/</a></li>
-<li><a href="./organisms/">./sams/</a></li>
-<li><a href="./variants"/>./variants/</a></li>
+<code><pre>git clone https://github.com/sanger-pathogens/Web-Artemis.git</pre></code>
+
+<P>and setting it up on this or another web-server.</P>
+
+<h2 id="services">Services</h2>
+
+<P>Metadata about each service can be accessed at : </P>
+
+<ul><li><a href="./organisms/">Organisms</a></li>
+<li><a href="./regions/">Regions</a></li>
+<li><a href="./features/">Features</a></li>
+<li><a href="./organisms/">SAM/BAM files</a></li>
+<li><a href="./variants/">VCF/BCF files</a></li>
 </ul>
 
-<h3>Organisms</h3>
+<h3 id="organisms">Organisms</h3>
 
 <ul>
-    <li><a href="./organisms/list">.organisms/list</a></li>
-    <li><a href="./organisms/get?organism=com:Pfalciparum">./organisms/get?organism=com:Pfalciparum</a></li>
+    <li><a href="./organisms/list">Listing all organisms</a></li>
+    <li><a href="./organisms/get?organism=com:Pfalciparum">Getting Pfalciparum</a></li>
 </ul>
 
+<h3 id="regions">Regions</h3>
 
+<ul>
+    
+    <li><a href="./regions/inorganism.json?organism=org%3A27">Getting regions in an oranism.</a></li>    
+    <li><a href="./regions/sequence.json?region=Pf3D7_01&start=1&end=4001">Getting the sequence of a region</a></li>
+    <li><a href="./regions/locations.json?&region=Pf3D7_01&start=1&end=4001&types=gene&types=pseudogene&exclude=false">Getting features on a sequence.</a></li>
+    
+</ul>
+
+<h3 id="features">Features</h3>
+
+<ul>
+    <li><a href="./features/hierarchy.json?features=PFA0005w%3Aexon%3A1&root_on_genes=true">Getting the gene hiearchy of a feature</a></li>
+    <li><a href="./features/synonyms.json?features=PFA0005w:exon:1&features=PFA0005w&features=PFA0005w:mRNA&features=PFA0005w:pep">Getting synonyms</a></li>
+    <li><a href="./features/properties.json?features=PFA0005w:exon:1,PFA0005w,PFA0005w:pep">Getting properties</a></li>
+    <li><a href="./features/pubs.json?features=PFA0005w:exon:1&features=PFA0005w&features=PFA0005w:mRNA&features=PFA0005w:pep">Getting pubs</a></li>
+    <li><a href="./features/dbxrefs.json?features=PFA0005w:exon:1&features=PFA0005w&features=PFA0005w:mRNA&features=PFA0005w:pep">Getting dbxrefs</a></li>
+    <li><a href="./features/terms.json?features=PFA0005w:exon:1&features=PFA0005w&features=PFA0005w:mRNA&features=PFA0005w:pep">Getting cv terms</a></li>
+    <li><a href="./features/orthologues.json?features=PFA0005w:exon:1&features=PFA0005w&features=PFA0005w:mRNA&features=PFA0005w:pep">Getting orthologues</a></li>
+    
+    
+</ul>
+
+<h3 id="bam">Sequence Alignment/Map files (SAM/BAM)</h3>
+
+<ul>
+    
+    <li><a href="./sams/listforsequence.json?&callback=jsonp1304795281789&sequence=Pf3D7_01">Listing alignment files that match a sequence</a></li>
+    <li><a href="./sams/query.json?&fileID=1&sequence=Pf3D7_01&start=1&end=4001&filter=4&properties=alignmentBlocks&properties=readName&properties=flags">Querying an alignment</a></li>
+    <li><a href="./sams/coverage.json?fileID=4&sequence=Pf3D7_01&start=1&end=5001&window=13">Getting the coverage for an alignment</a></li>
+</ul>
+
+<h3 id="vcf">Variation files (VCF/BCF)</h3>
+
+<ul>
+    <li><a href="./variants/list">Listing all variant files</a></li>
+    <li><a href="./variants/listfororganism?organism=com:Spneumoniae">Listing all variant files that match an organism</a></li>
+    <li><a href="./variants/listforsequence?sequence=S_pneumoniae_Spanish_23F.dna">Listing all variant files that match a region in an organism</a></li>
+    <li><a href="./variants/sequences?fileID=0">Listing all regions in a variant file</a></li>
+    <li><a href="./variants/query.json?fileID=0&sequence=S_pneumoniae_Spanish_23F.dna&start=1&end=1000000">Querying a variant file</a></li>
+</ul>
 
 <script>
 

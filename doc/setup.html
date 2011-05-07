@@ -538,13 +538,19 @@ The alignments and variants arrays are used to define SAM/BAM and VCF/BCF next g
 <p>Here you must specify a config property file. Several of examples are bundled in the top level folder. For example :</p>
 <pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties war</code></pre>
 
+<h3  id="webartemis" >Packaging the war and including Web-Artemis</h3>
+
+<P>This requires git on your system.</P>
+
+<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties -PpullWebArtemis=true war</code></pre>
+
 <h3  id="jetty">Testing the war using Jetty-runner </h3>
 
 <P>This can be used to run crawler without having to configure a servlet container. This is not good for production use. Only use it for testing.</P>
 
-<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties jettyRunWar</code></pre>
+<pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties -PpullWebArtemis=true jettyRunWar</code></pre>
 
-<P>Now point your browser to <a href="http://localhost:8080/services">http://localhost:8080/services</a>.
+<P>Now point your browser to <a href="http://localhost:8080/services/index.html">http://localhost:8080/services/index.html</a>.
 
 <h3 id="j2ee">Deploying the war using to a J2EE container  </h3>
 
