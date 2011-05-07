@@ -5,53 +5,57 @@
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/test/resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER" exported="true"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/uk.ac.ebi.das/jdas/jars/jdas-1.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-aop/jars/spring-aop-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.apache.commons/com.springsource.org.apache.commons.dbcp/jars/com.springsource.org.apache.commons.dbcp-1.2.2.osgi.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.asm/jars/org.springframework.asm-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/args4j/args4j/jars/args4j-2.0.12.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.codehaus.jackson/jackson-core-asl/jars/jackson-core-asl-1.7.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-queries/jars/lucene-queries-3.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.mybatis/mybatis/jars/mybatis-3.0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-jdbc/jars/spring-jdbc-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.mybatis/mybatis-hazelcast/jars/mybatis-hazelcast-1.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/junit/junit/jars/junit-4.8.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.jdbc/jars/org.springframework.jdbc-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.codehaus.jackson/jackson-mapper-asl/jars/jackson-mapper-asl-1.7.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.postgresql/com.springsource.org.postgresql.jdbc4/jars/com.springsource.org.postgresql.jdbc4-8.3.604.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/Documents/workspace/crawl/lib/local/artemis-v13.0.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.web.servlet/jars/org.springframework.web.servlet-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.context.support/jars/org.springframework.context.support-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/Documents/workspace/crawl/lib/local/sam-1.42.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.mybatis/mybatis-spring/jars/mybatis-spring-1.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/jakarta-regexp/jakarta-regexp/jars/jakarta-regexp-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-core/jars/spring-core-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.context/jars/org.springframework.context-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/com.hazelcast/hazelcast/jars/hazelcast-1.9.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.apache.commons/com.springsource.org.apache.commons.pool/jars/com.springsource.org.apache.commons.pool-1.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.aopalliance/com.springsource.org.aopalliance/jars/com.springsource.org.aopalliance-1.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-analyzers/jars/lucene-analyzers-3.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.elasticsearch/elasticsearch/jars/elasticsearch-0.16.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.beans/jars/org.springframework.beans-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-memory/jars/lucene-memory-3.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-context/jars/spring-context-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.transaction/jars/org.springframework.transaction-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.codehaus.jackson/jackson-xc/jars/jackson-xc-1.7.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.expression/jars/org.springframework.expression-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-tx/jars/spring-tx-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-asm/jars/spring-asm-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-highlighter/jars/lucene-highlighter-3.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-core/jars/lucene-core-3.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/javax.servlet/com.springsource.javax.servlet/jars/com.springsource.javax.servlet-2.5.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-beans/jars/spring-beans-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/commons-logging/commons-logging/jars/commons-logging-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.web/jars/org.springframework.web-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/log4j/log4j/bundles/log4j-1.2.16.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-expression/jars/spring-expression-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.aop/jars/org.springframework.aop-3.0.5.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/commons-lang/commons-lang/jars/commons-lang-2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.core/jars/org.springframework.core-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/uk.ac.ebi.das/jdas/jars/jdas-1.0.1.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-aop/jars/spring-aop-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.commons/com.springsource.org.apache.commons.dbcp/jars/com.springsource.org.apache.commons.dbcp-1.2.2.osgi.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.asm/jars/org.springframework.asm-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/args4j/args4j/jars/args4j-2.0.12.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.codehaus.jackson/jackson-core-asl/jars/jackson-core-asl-1.7.5.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-queries/jars/lucene-queries-3.1.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.mybatis/mybatis/jars/mybatis-3.0.4.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-jdbc/jars/spring-jdbc-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.mybatis/mybatis-hazelcast/jars/mybatis-hazelcast-1.0.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/junit/junit/jars/junit-4.8.2.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.jdbc/jars/org.springframework.jdbc-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.codehaus.jackson/jackson-mapper-asl/jars/jackson-mapper-asl-1.7.5.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.postgresql/com.springsource.org.postgresql.jdbc4/jars/com.springsource.org.postgresql.jdbc4-8.3.604.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/Documents/workspace/crawl/lib/local/artemis-v13.0.15.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.web.servlet/jars/org.springframework.web.servlet-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.context.support/jars/org.springframework.context.support-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/Documents/workspace/crawl/lib/local/sam-1.42.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.mybatis/mybatis-spring/jars/mybatis-spring-1.0.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/jakarta-regexp/jakarta-regexp/jars/jakarta-regexp-1.4.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-core/jars/spring-core-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.context/jars/org.springframework.context-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/com.hazelcast/hazelcast/jars/hazelcast-1.9.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.commons/com.springsource.org.apache.commons.pool/jars/com.springsource.org.apache.commons.pool-1.3.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.aopalliance/com.springsource.org.aopalliance/jars/com.springsource.org.aopalliance-1.0.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-analyzers/jars/lucene-analyzers-3.1.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.elasticsearch/elasticsearch/jars/elasticsearch-0.16.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.beans/jars/org.springframework.beans-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-memory/jars/lucene-memory-3.1.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-context/jars/spring-context-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.transaction/jars/org.springframework.transaction-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.codehaus.jackson/jackson-xc/jars/jackson-xc-1.7.5.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.expression/jars/org.springframework.expression-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-tx/jars/spring-tx-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-asm/jars/spring-asm-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-highlighter/jars/lucene-highlighter-3.1.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-core/jars/lucene-core-3.1.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/javax.servlet/com.springsource.javax.servlet/jars/com.springsource.javax.servlet-2.5.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-beans/jars/spring-beans-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/commons-logging/commons-logging/jars/commons-logging-1.1.1.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.web/jars/org.springframework.web-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/aopalliance/aopalliance/jars/aopalliance-1.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/log4j/log4j/bundles/log4j-1.2.16.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-expression/jars/spring-expression-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.aop/jars/org.springframework.aop-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/commons-lang/commons-lang/jars/commons-lang-2.5.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.core/jars/org.springframework.core-3.0.5.RELEASE.jar" exported="true"/>
 </classpath>
