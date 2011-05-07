@@ -42,7 +42,8 @@
     SELECT
     f.uniqueName as uniqueName,
     f.organism_id, 
-    type.name as type, 
+    type.name as type,
+    #{region} as region, 
     fl.fmin, 
     fl.fmax,
     fl.strand,
@@ -97,6 +98,7 @@
     <result property="isObsolete" column="is_obsolete"/>
     <result property="strand" column="strand"/>
     <result property="phase" column="phase"/>
+    <result property="region" column="region"/>
     <result property="fmin" column="fmin"/>
     <result property="fmax" column="fmax"/>
     <result property="parent" column="parent"/>
