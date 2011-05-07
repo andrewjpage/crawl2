@@ -43,6 +43,10 @@
         {
             "alignment" : "MAL11",
             "reference" : "Pf3D7_11"
+        },
+        {
+            "alignment" : "S_pneumoniae_Spanish_23F.dna",
+            "reference" : "Spn23F"
         }
     ],
     "variants" : [
