@@ -1,0 +1,6 @@
+
+The Pf3D7_01 vcf file was made by copying the test vcf file, gunzipping this copy, renaming the chromosome to MAL1, and then doing
+
+bgzip Pf3D7_01.vcf
+tabix -p vcf Pf3D7_01.vcf.gz
+
