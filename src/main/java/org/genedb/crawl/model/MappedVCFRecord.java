@@ -22,6 +22,9 @@ public class MappedVCFRecord {
 	@XmlAttribute
 	public int ref_length;
 	
+	@XmlAttribute
+	public boolean markAsNewStop;
+	
 	@XmlElement
 	public MappedVariantBase alt = new MappedVariantBase();
 	

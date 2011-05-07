@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/testing")
 public class TestingController {
 	
 	private Logger logger = Logger.getLogger(TestingController.class);

@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.elasticsearch.index.RegionFeatureBuilder;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
+import org.genedb.crawl.modelling.RegionFeatureBuilder;
 
 public class GFFAnnotatationAndFastaExtractor {
 	

@@ -1,10 +1,10 @@
 package org.genedb.crawl.elasticsearch;
 
+import java.util.EnumSet;
+
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -12,7 +12,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
-public class LocalConnection extends BaseConnection implements Connection {
+public class LocalConnection extends Connection {
 
 	private Logger logger = Logger.getLogger(LocalConnection.class);
 	
@@ -30,6 +30,7 @@ public class LocalConnection extends BaseConnection implements Connection {
 		this.pathLogs = pathLogs;
 	}
 	
+	@Override
 	@PostConstruct
 	public void configure () {
 		Settings settings = ImmutableSettings.settingsBuilder()
@@ -45,38 +46,18 @@ public class LocalConnection extends BaseConnection implements Connection {
 		
 		client = node.client();
 		
-		ClusterHealthRequest clusterHealth = new ClusterHealthRequest();
-		//clusterHealth.waitForGreenStatus();
-		ClusterHealthResponse response;
-		
-		boolean ok = false;
-		
-		while (! ok) {
-			response = client.admin().cluster().health(clusterHealth).actionGet();
-			ClusterHealthStatus status = response.getStatus();
-			
-			if (status.equals(ClusterHealthStatus.GREEN) || status.equals(ClusterHealthStatus.YELLOW)) {
-				logger.info(status);
-				logger.info("Active shards: " + response.activeShards());
-				ok = true;
-			}
-			
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		waitForStatus(client, EnumSet.of(ClusterHealthStatus.GREEN, ClusterHealthStatus.YELLOW));
 		
 		logger.info("Cluster initialized.");
 		
 	}
 	
-	
+	@Override
 	public Client getClient() {
 		return client;
 	}
-
+	
+	@Override
 	public void close() {
 		if (client != null) {
 			client.close();

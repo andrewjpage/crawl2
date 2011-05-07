@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-import uk.ac.sanger.artemis.components.variant.VariantReaderFacade;
+import uk.ac.sanger.artemis.components.variant.VariantReaderAdapter;
 
 /**
  * Represents a VCF or BVF file.
@@ -14,8 +14,8 @@ import uk.ac.sanger.artemis.components.variant.VariantReaderFacade;
 public class Variant extends BioDataFile {
 	
 	@XmlTransient
-	public VariantReaderFacade getReader() throws IOException {
-		return VariantReaderFacade.getReader(file);
+	public VariantReaderAdapter getReader() throws IOException {
+		return VariantReaderAdapter.getReader(file);
 	}
 	
 }

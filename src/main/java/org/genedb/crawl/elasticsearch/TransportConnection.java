@@ -9,7 +9,7 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
-public class TransportConnection extends BaseConnection implements Connection {
+public class TransportConnection extends Connection {
 	
 	private Logger logger = Logger.getLogger(TransportConnection.class);
 	
@@ -30,7 +30,7 @@ public class TransportConnection extends BaseConnection implements Connection {
 		this.clusterName = clusterName;
 	}
 	
-	
+	@Override
 	@PostConstruct
 	public void configure () {
 		
@@ -44,10 +44,12 @@ public class TransportConnection extends BaseConnection implements Connection {
 		logger.info(String.format("Setup transport client %s : %d, cluster name %s", host, port, settings.get("cluster.name")));
 	}
 	
+	@Override
 	public Client getClient() {
 		return (Client) client;
 	}
-
+	
+	@Override
 	public void close() {
 		if (client != null) {
 			client.close();

@@ -299,7 +299,7 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	private List<LocatedFeature> parseLocations(String region, SearchResponse response) {
 		List<LocatedFeature> features = new ArrayList<LocatedFeature>();
 		
-		String[] fieldNames = new String[] {"uniqueName", "fmin", "fmax", "isObsolete", "parent", "phase", "type", "strand"};
+		String[] fieldNames = new String[] {"uniqueName", "fmin", "fmax", "isObsolete", "parent", "phase", "type", "strand", "region"};
 		
 		for (SearchHit hit : response.getHits()) {
 		

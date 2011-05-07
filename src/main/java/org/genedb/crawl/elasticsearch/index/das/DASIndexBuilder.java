@@ -9,7 +9,6 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.elasticsearch.index.NonDatabaseDataSourceIndexBuilder;
-import org.genedb.crawl.elasticsearch.index.RegionFeatureBuilder;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.LocatedFeature;
@@ -25,6 +24,7 @@ import uk.ac.ebi.das.jdas.schema.entryPoints.SEGMENT;
 import org.genedb.crawl.model.Cv;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.FeatureProperty;
+import org.genedb.crawl.modelling.RegionFeatureBuilder;
 
 
 public class DASIndexBuilder extends NonDatabaseDataSourceIndexBuilder {

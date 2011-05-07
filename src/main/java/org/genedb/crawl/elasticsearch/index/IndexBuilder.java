@@ -74,7 +74,7 @@ public abstract class IndexBuilder {
 		
 	}
 	
-	protected void closeIndex() {
+	public void closeIndex() {
 		if (connection != null) {
 			connection.close();
 		}

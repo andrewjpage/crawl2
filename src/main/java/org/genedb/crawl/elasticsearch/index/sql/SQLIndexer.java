@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.elasticsearch.LocatedFeatureUtil;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchOrganismsMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
@@ -24,6 +23,7 @@ import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.OrganismProp;
 import org.genedb.crawl.model.Sequence;
+import org.genedb.crawl.modelling.LocatedFeatureUtil;
 
 public class SQLIndexer {
 	

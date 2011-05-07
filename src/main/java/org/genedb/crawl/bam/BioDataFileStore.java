@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.samtools.SAMSequenceRecord;
@@ -158,6 +159,25 @@ public class BioDataFileStore <T extends BioDataFile> {
 		return null;
 		
 	}
+	
+	
+	public String getAlignmentFromName(String sequenceName) {
+		if (sequences.containsKey(sequenceName)) {
+			return sequences.get(sequenceName);
+		}
+		return sequenceName;
+	}
+	
+	public String getReferenceFromName(String sequenceName) {
+		for (Entry<String, String> entry : sequences.entrySet()) {
+			if (entry.getValue().equals(sequenceName)) {
+				return entry.getKey();
+			}
+		}
+		return sequenceName;
+	}
+	
+	
 	
 	public List<MappedSAMSequence> getSequences(int fileID) throws IOException {
 		BioDataFile file = getFile(fileID);

@@ -3,6 +3,7 @@ package org.genedb.crawl.elasticsearch.mappers;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -272,7 +273,34 @@ public abstract class ElasticSearchBaseMapper {
 		}
 	}
 	
-	public void waitForYellowOrGreenStatus() {
+//	public void waitForYellowOrGreenStatus() {
+//		ClusterHealthRequest clusterHealth = new ClusterHealthRequest();
+//		ClusterHealthResponse response;
+//		
+//		boolean ok = false;
+//		logger.info("Waiting...");
+//		
+//		while (! ok) {
+//			response = connection.getClient().admin().cluster().health(clusterHealth).actionGet();
+//			ClusterHealthStatus status = response.getStatus();
+//			
+//			if (status.equals(ClusterHealthStatus.GREEN) || status.equals(ClusterHealthStatus.YELLOW)) {
+//				logger.info(status);
+//				
+//				ok = true;
+//			}
+//			
+//			logger.info(status);
+//			
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+	
+	public void waitForStatus(EnumSet<ClusterHealthStatus> acceptableStatuses) {
 		ClusterHealthRequest clusterHealth = new ClusterHealthRequest();
 		ClusterHealthResponse response;
 		
@@ -283,10 +311,10 @@ public abstract class ElasticSearchBaseMapper {
 			response = connection.getClient().admin().cluster().health(clusterHealth).actionGet();
 			ClusterHealthStatus status = response.getStatus();
 			
-			if (status.equals(ClusterHealthStatus.GREEN) || status.equals(ClusterHealthStatus.YELLOW)) {
-				logger.info(status);
-				
-				ok = true;
+			for (ClusterHealthStatus acceptableStatus : acceptableStatuses) {
+				if (acceptableStatus.equals(status)) {
+					ok = true;
+				}
 			}
 			
 			logger.info(status);
@@ -298,5 +326,6 @@ public abstract class ElasticSearchBaseMapper {
 			}
 		}
 	}
+	
 	
 }

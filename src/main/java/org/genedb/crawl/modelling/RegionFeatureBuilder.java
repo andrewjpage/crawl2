@@ -1,4 +1,4 @@
-package org.genedb.crawl.elasticsearch.index;
+package org.genedb.crawl.modelling;
 
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
