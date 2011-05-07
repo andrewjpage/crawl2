@@ -93,7 +93,7 @@ For a quick test run off the GeneDB public Chado database, try :
 
 $ ./gradlew -Pconfig=resource-chado-public.properties jettyRunWar
 
-and goto "http://localhost:8080/services/index.html".
+and goto http://localhost:8080/services/index.html.
 
 ##############################################
 # RUNNING OFF AN INDEXED GFF3 FILE
@@ -113,5 +113,5 @@ $ ./crawl gff2es -pe resource-elasticsearch-local.properties \
 }' 
 $ ./gradlew -Pconfig=resource-elasticsearch-local.properties jettyRunWar
 
-and goto "http://localhost:8080/services/index.html".
+and goto http://localhost:8080/services/index.html.
 
