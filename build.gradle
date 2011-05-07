@@ -3,11 +3,14 @@ apply plugin: 'war'
 apply plugin: 'jetty'
 apply plugin: 'eclipse'
 
-configurations.compile.transitive = true
+//configurations.compile.transitive = true
+
+/*
+ * We need the crawl.jar for command line tasks.  
+ */
 jar.enabled = true
 
-// currently not using the version as it appends it to the jar and war, which would break scripts
-// version = '0.01'
+version = '0.1'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -15,6 +18,11 @@ targetCompatibility = 1.6
 // load properties from the specified config file
 Properties props = new Properties()
 props.load(new FileInputStream(config))
+
+//compileJava.options.fork([memoryMaximumSize:"1024m"])
+
+def tmpResourcesPath = 'tmp/rootContent/resources/'
+def webArtemisClonePath = 'Web-Artemis'
 
 repositories {
 	
@@ -79,8 +87,12 @@ dependencies {
     
 }
 
+jar {
+	archiveName = "crawl.jar"
+}
 
 jar << {
+	
     manifest {
         attributes 'Implementation-Title': 'Crawl', 'Implementation-Version': '0.1'
     }
@@ -97,6 +109,8 @@ jar << {
 			into('build/libs')
 		}
 	}
+	
+	
 }
 
 test.doFirst {
@@ -174,13 +188,27 @@ war.doFirst{
 		project_properties.append(line)
     }
 	
+	def webArtemisClone = new File(tmpResourcesPath + "/" + webArtemisClonePath)
+	
+	if (pullWebArtemis && !webArtemisClone.isDirectory()) {
+		println "Cloning Web-Artemis into " + tmpResourcesPath + webArtemisClonePath
+		gitClone('https://github.com/sanger-pathogens/Web-Artemis.git', file(tmpResourcesPath))
+	}
+	
+	copy {
+		from tree = fileTree("./doc")
+		into tmpResourcesPath
+	}
 	
 }
 
 war {
     webInf { from 'tmp/WEB-INF' } 
     baseName = props["deploy.name"]
+	archiveName = props["deploy.name"] + ".war"
+	from 'tmp/rootContent/'
 }
+
 
 task deploy(dependsOn: 'war') << {
     copy {
@@ -221,9 +249,13 @@ task wrapper(type: Wrapper) {
     gradleVersion = '1.0-milestone-2'
 }
 
-
-
-
+/**
+ * Makes a git clone.
+ */
+def gitClone(String url, File dir) {
+	dir.mkdirs()
+	['git','clone', url].execute(null, dir)
+}
 
 
 
