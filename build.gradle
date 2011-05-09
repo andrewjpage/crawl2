@@ -190,7 +190,7 @@ war.doFirst{
 	
 	def webArtemisClone = new File(tmpResourcesPath + "/" + webArtemisClonePath)
 	
-	if (pullWebArtemis && !webArtemisClone.isDirectory()) {
+	if (pullWebArtemis == "true" && !webArtemisClone.isDirectory()) {
 		println "Cloning Web-Artemis into " + tmpResourcesPath + webArtemisClonePath
 		gitClone('https://github.com/sanger-pathogens/Web-Artemis.git', file(tmpResourcesPath))
 	}
