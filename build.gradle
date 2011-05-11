@@ -62,7 +62,9 @@ dependencies {
     compile group: 'org.mybatis', name: 'mybatis', version:'3.0.4'
     compile group: 'org.mybatis', name: 'mybatis-hazelcast', version:'1.0.0'
     
-    compile group: 'commons-lang', name: 'commons-lang', version:'2.5'
+    compile group: 'commons-lang', name: 'commons-lang', version:'2.2'
+	compile group: 'commons-net', name: 'commons-net', version:'2.2'
+	
     compile group: 'org.elasticsearch', name: 'elasticsearch', version:'0.16.0'
     
     compile group: 'org.codehaus.jackson', name: 'jackson-xc', version:'1.7.5'

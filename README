@@ -72,7 +72,12 @@ OMMMMMMMMMMMMMMMMMMMMM   ,MMMMMMMMMMMMMMMMMMMMMMMMMM$      .,8MMMMMMMMMMMM   ZMM
 More detailed documentation can be found in doc/index.html.
 
 Crawl should run "out of the box", if you use the config files below, as these all point to public 
-data or locally instantiated index clusters. The project is build with gradle, and includes a 
+data or locally instantiated index clusters. Please note that all the example data used here are 
+subject to the WSTI's data policies, see :
+
+    http://www.sanger.ac.uk/legal/
+
+The project is build with gradle, and includes a 
 "gradlew" executable so you don't have to download and install gradle yourself. The first build will
 take a while because it will download dependencies. OSX users please note that Java build tools like 
 gradle need a properly set JAVA_HOME environmental variable. To build, do :
