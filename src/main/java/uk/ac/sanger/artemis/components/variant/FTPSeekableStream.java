@@ -122,13 +122,13 @@ public class FTPSeekableStream extends SeekableStream {
 	@Override
 	public int read(byte[] bytes, int offset, int length) throws IOException {
 		
-		FTPClient client = getClient();
-		
-		if (position != 0) {
-			client.setRestartOffset(position);
-		}
-		
-		InputStream in = client.retrieveFileStream(remoteFilePath);
+//		FTPClient client = getClient();
+//		
+//		if (position != 0) {
+//			client.setRestartOffset(position);
+//		}
+//		
+		InputStream in = initStream();
 		
 		logger.info("read " + offset + "-" + (offset + length));
 		logger.info(in);
@@ -153,8 +153,7 @@ public class FTPSeekableStream extends SeekableStream {
 		}
 		
 
-		in.close();
-		client.completePendingCommand();
+		finishStream(in);
 		
 		position += i;
 		
@@ -193,19 +192,33 @@ public class FTPSeekableStream extends SeekableStream {
 	public int read() throws IOException {
 		logger.info("read");
 		
-		FTPClient client = getClient();
+//		FTPClient client = getClient();
+//		
+//		client.setRestartOffset(position);
+//		InputStream in = client.retrieveFileStream(remoteFilePath);
+//		
 		
-		client.setRestartOffset(position);
-		InputStream in = client.retrieveFileStream(remoteFilePath);
+		InputStream in = initStream();
+		
 		int read = in.read();
-		
 		position++;
 		
-		in.close();
-		client.completePendingCommand();
+		finishStream(in);
 		
 		return read;
 		
+	}
+	
+	private InputStream initStream() throws SocketException, IOException {
+		FTPClient client = getClient();
+		client.setRestartOffset(position);
+		InputStream in = client.retrieveFileStream(remoteFilePath);
+		return in;
+	}
+	
+	private void finishStream(InputStream in) throws IOException {
+		in.close();
+		getClient().completePendingCommand();
 	}
 	
 
