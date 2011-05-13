@@ -5,10 +5,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
@@ -120,18 +122,9 @@ public class FTPSeekableStream extends SeekableStream {
 	}
 
 	@Override
-	public int read(byte[] bytes, int offset, int length) throws IOException {
+	synchronized public int read(byte[] bytes, int offset, int length) throws IOException {
 		
-//		FTPClient client = getClient();
-//		
-//		if (position != 0) {
-//			client.setRestartOffset(position);
-//		}
-//		
 		InputStream in = initStream();
-		
-		logger.info("read " + offset + "-" + (offset + length));
-		logger.info(in);
 		
 		if (in == null) {
 			throw new IOException("Could not get stream");
@@ -148,7 +141,7 @@ public class FTPSeekableStream extends SeekableStream {
 					break;
 				}
 			}
-			logger.info(i);
+			
 			i += bytesRead;
 		}
 		
@@ -164,8 +157,22 @@ public class FTPSeekableStream extends SeekableStream {
 
 	@Override
 	public void close() throws IOException {
+		
 		if (_client != null) {
+			
+            try {
+            	_client.completePendingCommand();
+            } catch (IOException e) {
+                logger.error(e);
+            }
+            try {
+                _client.logout();
+            } catch (IOException e) {
+                logger.error(e);
+            }
+	        
 			_client.disconnect();
+			_client = null;
 		}
 	}
 
@@ -189,14 +196,9 @@ public class FTPSeekableStream extends SeekableStream {
 
 	}
 	@Override
-	public int read() throws IOException {
+	synchronized public int read() throws IOException {
 		logger.info("read");
 		
-//		FTPClient client = getClient();
-//		
-//		client.setRestartOffset(position);
-//		InputStream in = client.retrieveFileStream(remoteFilePath);
-//		
 		
 		InputStream in = initStream();
 		
@@ -218,7 +220,13 @@ public class FTPSeekableStream extends SeekableStream {
 	
 	private void finishStream(InputStream in) throws IOException {
 		in.close();
-		getClient().completePendingCommand();
+		 try {
+			 getClient().completePendingCommand();
+         } catch (FTPConnectionClosedException suppressed) {
+         } catch (SocketTimeoutException stx) {
+             close();
+         }
+		
 	}
 	
 
@@ -240,47 +248,56 @@ public class FTPSeekableStream extends SeekableStream {
 		
 		if (index == null) {
 			
-			FTPClient client = getClient();
-			
 			String indexFileName = remoteFileName + ".bai";
 			String localPath = getTmpFolder().getAbsolutePath()  + "/" + indexFileName;
-			String remotePath = remoteFilePath + ".bai";
 			
-			logger.info(String.format("Downloading from %s to %s", remotePath, localPath));
+			File localFile = new File(localPath);
 			
-			FileOutputStream out = new FileOutputStream(localPath);
-			
-			client.setRestartOffset(0);
-			InputStream in = client.retrieveFileStream(remotePath);
-			
-			byte[] buffer = new byte[1024];
-			
-			int len;
-			int total = 0;
-			
-		    while((len=in.read(buffer))>0) {
-		    	total += len;
-		    	out.write(buffer,0,len);
-		    }
-		    
-		    logger.info("Index Size in bytes : " + total);
-		    
-		    in.close();
-		    out.close();
-		    client.completePendingCommand();
-		    
-			index = new File(localPath);
-			
-			if (! index.isFile()) {
-				throw new IOException("Could not save the index file locally");
+			if (! localFile.isFile()) {
+				
+				String remotePath = remoteFilePath + ".bai";
+				logger.info(String.format("Downloading from %s to %s", remotePath, localPath));
+				
+
+				FTPClient client = getClient();
+				client.setRestartOffset(0);
+				
+				InputStream in = client.retrieveFileStream(remotePath);
+				FileOutputStream out = new FileOutputStream(localPath);
+				
+				byte[] buffer = new byte[1024];
+				
+				int len;
+				int total = 0;
+				
+			    while((len=in.read(buffer))>0) {
+			    	total += len;
+			    	out.write(buffer,0,len);
+			    }
+			    
+			    logger.info("Index Size in bytes : " + total);
+			    
+			    in.close();
+			    out.close();
+			    client.completePendingCommand();
+			    
+				index = new File(localPath);
+				
+				if (! index.isFile()) {
+					throw new IOException("Could not save the index file locally");
+				}
+				
+				logger.info("Saved " + index.getAbsolutePath());
+				
+			} else {
+				logger.info("Using cached index " + localFile.getAbsolutePath());
+				index = localFile;
 			}
 			
-			logger.info("Saved " + index.getAbsolutePath());
 			logger.info("File size " + index.length());
 			
 		}
 		
-		logger.info("returning index " + index.getAbsolutePath());
 		return index;
 		
 	}
