@@ -4,27 +4,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.mappers.FeaturesMapper;
+import org.genedb.crawl.mappers.MapperUtil;
 import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.mappers.TermsMapper;
-import org.genedb.crawl.model.Change;
+import org.genedb.crawl.mappers.MapperUtil.HierarchicalSearchType;
+import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
-import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.HierarchicalFeature;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.Results;
+import org.genedb.crawl.model.Statistic;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,25 +45,17 @@ public class FeaturesController extends BaseQueryController {
 	@Autowired
 	OrganismsMapper organismsMapper;
 	
-	private enum HierarchicalSearchType {
-		PARENTS,
-		CHILDREN
-	}
-	
-	
 	private String[] defaultRelationshipTypes = new String[] {"part_of", "derives_from"};
 	
 	@ResourceDescription("Get a feature's gene")
 	@RequestMapping(method=RequestMethod.GET, value="/genes")
-	public Results genes(Results results, @RequestParam(value="features") List<String> features) {
-		results.features = MapperUtil.getGeneFeatures(featuresMapper, features);
-		return results;
-		
+	public List<Feature> genes(@RequestParam(value="features") List<String> features) {
+		return MapperUtil.getGeneFeatures(featuresMapper, features);
 	}
 	
 	@ResourceDescription("Returns the hierarchy of a feature (i.e. the parent/child relationship graph), but routed on the feature itself (rather than Gene).")
 	@RequestMapping(method=RequestMethod.GET, value="/hierarchy")
-	public Results hierarchy(Results results, 
+	public List<HierarchicalFeature> hierarchy( 
 			@RequestParam("features") List<String> features, 
 			@RequestParam(value="root_on_genes", defaultValue="false", required=false) boolean root_on_genes,
 			@RequestParam(value="relationships", required=false) String[] relationships) throws CrawlException {
@@ -95,8 +84,8 @@ public class FeaturesController extends BaseQueryController {
 			HierarchicalFeature hf = new HierarchicalFeature();
 			hf.uniqueName = feature;
 			
-			this.searchForRelations(hf, relationshipTypes, HierarchicalSearchType.CHILDREN);
-			this.searchForRelations(hf, relationshipTypes, HierarchicalSearchType.PARENTS);
+			MapperUtil.searchForRelations(featuresMapper, hf, relationshipTypes, HierarchicalSearchType.CHILDREN);
+			MapperUtil.searchForRelations(featuresMapper, hf, relationshipTypes, HierarchicalSearchType.PARENTS);
 			
 			hfs.add(hf);
 			
@@ -106,88 +95,81 @@ public class FeaturesController extends BaseQueryController {
 		}
 		
 		
-		results.hierarchy = hfs;
+		return hfs;
 		
-		return results;
+		
 		
 	}
 	
 	@ResourceDescription("Returns coordinages of a feature if located on a region.")
 	@RequestMapping(method=RequestMethod.GET, value="/coordinates")
-	public Results coordinates(Results results, @RequestParam("features") List<String> features, @RequestParam(value="region", required=false) String region ) {
-		results.features = featuresMapper.coordinates(features, region);
-		return results;
+	public List<Feature> coordinates(
+			@RequestParam("features") List<String> features, 
+			@RequestParam(value="region", required=false) String region ) {
+		return featuresMapper.coordinates(features, region);
 	}
 	
 	@ResourceDescription("Returns a feature's synonyms.")
 	@RequestMapping(method=RequestMethod.GET, value="/synonyms")
-	public Results synonyms(Results results, @RequestParam("features") List<String> features, @RequestParam(value="types", required=false) List<String> types) {
-		results.features = featuresMapper.synonyms(features, types);
-		return results;
+	public List<Feature> synonyms(
+			@RequestParam("features") List<String> features,
+			@RequestParam(value="types", required=false) List<String> types) {
+		return featuresMapper.synonyms(features, types);
 	}
 	
 	@ResourceDescription("Return matching features")
 	@RequestMapping(method=RequestMethod.GET, value="/withnamelike")
-	public Results withnamelike(Results results, 
+	public List<Feature> withnamelike( 
 			@RequestParam("term") String term,
 			@RequestParam(value="regex", defaultValue="false") boolean regex, 
 			@RequestParam(value="region", required=false) String region) {
 		List<Feature> synonyms = featuresMapper.synonymsLike(term, regex, region);
 		List<Feature> matchingFeatures = featuresMapper.featuresLike(term, regex, region);
 		matchingFeatures.addAll(synonyms);
-		results.features = matchingFeatures;
-		return results;
+		return matchingFeatures;
 	}
 	
 	
 	@ResourceDescription("Return feature properties")
 	@RequestMapping(method=RequestMethod.GET, value="/properties")
-	public Results properties(Results results, @RequestParam(value="features") List<String> features, @RequestParam(value="types", required=false) List<String> types) {
-		results.features = featuresMapper.properties(features,types);
-		return results;
+	public List<Feature> properties(
+			@RequestParam(value="features") List<String> features, 
+			@RequestParam(value="types", required=false) List<String> types) {
+		return featuresMapper.properties(features,types);
 	}
 	
 	@ResourceDescription("Return feature properties")
 	@RequestMapping(method=RequestMethod.GET, value="/withproperty")
-	public Results withproperty(Results results, 
+	public List<Feature> withproperty( 
 			@RequestParam("value") String value,
 			@RequestParam(value="regex", defaultValue="false") boolean regex, 
 			@RequestParam(value="region", required=false) String region,
 			@RequestParam(value="type", required=false) String type) {
-		results.features = featuresMapper.withproperty(value, regex, region, type);
-		return results;
+		return featuresMapper.withproperty(value, regex, region, type);
 	}
 	
 	@ResourceDescription("Return feature pubs")
 	@RequestMapping(method=RequestMethod.GET, value="/pubs")
-	public Results pubs(Results results, @RequestParam(value="features") List<String> features) {
-		results.features = featuresMapper.pubs(features);
-		return results;
+	public List<Feature> pubs(@RequestParam(value="features") List<String> features) {
+		return featuresMapper.pubs(features);
 	}
 	
 	@ResourceDescription("Return feature dbxrefs")
 	@RequestMapping(method=RequestMethod.GET, value="/dbxrefs")
-	public Results dbxrefs(Results results, @RequestParam(value="features") List<String> features) {
-		results.features = featuresMapper.dbxrefs(features);
-		return results;
+	public List<Feature> dbxrefs(@RequestParam(value="features") List<String> features) {
+		return featuresMapper.dbxrefs(features);
 	}
 	
-	@ResourceDescription(value="Return feature cvterms")
-	@RequestMapping(method=RequestMethod.POST, value="/terms")
-	public Results termsPOST(Results results, @RequestParam(value="features") List<String> features, @RequestParam(value="cvs", required=false) List<String> cvs) {
-		return terms(results, features, cvs);
-	}
 	
 	@ResourceDescription(value="Return feature cvterms")
 	@RequestMapping(method=RequestMethod.GET, value="/terms")
-	public Results terms(Results results, @RequestParam(value="features") List<String> features, @RequestParam(value="cvs", required=false) List<String> cvs) {
-		results.features = featuresMapper.terms(features, cvs);
-		return results;
+	public List<Feature> terms(@RequestParam(value="features") List<String> features, @RequestParam(value="cvs", required=false) List<String> cvs) {
+		return featuresMapper.terms(features, cvs);
 	}
 	
 	@ResourceDescription("Return feature with specified cvterm")
 	@RequestMapping(method=RequestMethod.GET, value="/withterm")
-	public Results withterm(Results results, 
+	public List<Feature> withterm(
 			@RequestParam(value="term") String term, 
 			@RequestParam(value="cv", required=false) String cv,
 			@RequestParam(value="regex", defaultValue="false") boolean regex, 
@@ -195,140 +177,55 @@ public class FeaturesController extends BaseQueryController {
 		
 		logger.info(String.format("%s - %s - %s - %s", term, cv, regex, region));
 		
-		results.features = featuresMapper.withterm(term, cv, regex, region);
-		return results;
-		
+		return featuresMapper.withterm(term, cv, regex, region);
 		
 	}
 	
 	@ResourceDescription("Return feature orthologues")
 	@RequestMapping(method=RequestMethod.GET, value="/orthologues")
-	public Results orthologues(Results results, @RequestParam(value="features") List<String> features) {
-		results.features = featuresMapper.orthologues(features);
-		return results;
+	public List<Feature> orthologues(@RequestParam(value="features") List<String> features) {
+		return featuresMapper.orthologues(features);
 	}
 	
-	@ResourceDescription(value="Return feature clusters", type="Results")
+	@ResourceDescription(value="Return feature clusters")
 	@RequestMapping(method=RequestMethod.GET, value="/clusters")
-	public Results clusters(Results results, @RequestParam(value="features") List<String> features) {
-		results.features = featuresMapper.clusters(features);
-		return results; 
+	public List<Feature> clusters(@RequestParam(value="features") List<String> features) {
+		return featuresMapper.clusters(features);
 	}
 	
-	@ResourceDescription(value="Return features that have had annotation changes", type="Results")
+	@ResourceDescription(value="Return features that have had annotation changes")
 	@RequestMapping(method=RequestMethod.GET, value="/annotation_changes")
-	public Results annotationModified(Results results, 
+	public List<Feature> annotationModified( 
 			@RequestParam(value="date") Date date, 
 			@RequestParam("organism") String organism, 
 			@RequestParam(value="region", required = false) String region) throws CrawlException {
 		Organism o = getOrganism(organismsMapper, organism);
-		results.features = featuresMapper.annotationModified(date, o.ID, region);
-		return results; 
+		return featuresMapper.annotationModified(date, o.ID, region);
 	}
 	
-	@ResourceDescription(value="Return features that have had annotation changes", type="Results")
+	@ResourceDescription(value="Return features that have had annotation changes")
 	@RequestMapping(method=RequestMethod.GET, value="/annotation_changes_statistics")
-	public Results annotationModifiedStatistics(Results results, 
+	public List<Statistic> annotationModifiedStatistics( 
 			@RequestParam(value="date") Date date, 
 			@RequestParam("organism") String organism, 
 			@RequestParam(value="region", required = false) String region) throws CrawlException {
 		Organism o = getOrganism(organismsMapper, organism);
-		results.statistics  = featuresMapper.annotationModifiedStatistics(date, o.ID, region);
-		return results; 
+		return featuresMapper.annotationModifiedStatistics(date, o.ID, region);
 	}
 	
 	
 	@ResourceDescription("Return blast hits between two features")
 	@RequestMapping(method=RequestMethod.GET, value="/blastpair")
-	public Results blastpair(Results results, 
+	public List<BlastPair> blastpair( 
 			@RequestParam(value="f1") String f1, @RequestParam(value="start1") int start1, @RequestParam(value="end1") int end1,
 			@RequestParam(value="f2") String f2, @RequestParam(value="start1") int start2, @RequestParam(value="end1") int end2,
 			@RequestParam(value="length", required=false) Integer length,
 			@RequestParam(value="score", required=false) Integer score) {
-		results.blastPairs = featuresMapper.blastPairs(f1, start1, end1, f2, start2, end2, length, score);
-		return results; 
+		return featuresMapper.blastPairs(f1, start1, end1, f2, start2, end2, length, score); 
 	}
 	
-//	private List<FeatureGenes> getGeneFeatures(List<String> featureList) {
-//		Map <String, FeatureGenes> map = new HashMap<String, FeatureGenes>();
-//		List<HierarchyGeneFetchResult> possibleGenes = features.getGeneForFeature(featureList);
-//		
-//		for (HierarchyGeneFetchResult result : possibleGenes) {
-//			
-//			String[] ftypes = new String[]{result.ftype,result.ftype2,result.ftype3};
-//			String[] fs = new String[]{result.f,result.f2,result.f3};
-//			
-//			if (! map.containsKey(result.f)) {
-//				FeatureGenes fg = new FeatureGenes();
-//				fg.feature = result.f;
-//				fg.type = result.ftype;
-//				map.put(result.f, fg);
-//			}
-//			
-//			for (int i = 0; i < ftypes.length; i++) {
-//				String ftype = ftypes[i];
-//				String f = fs[i];
-//				
-//				logger.debug(String.format("Type: %s, Feature %s .", ftype, f));
-//				
-//				if (geneTypes.contains(ftype)) {
-//					map.get(result.f).genes.add(f);
-//				}
-//				
-//			}
-//			
-//		}
-//		
-//		logger.debug(map);
-//		
-//		return new ArrayList<FeatureGenes>(map.values());
-//	}
-
+		
+		
 	
-	
-	/**
-	 * 
-	 * A recursive trawl up or down feature relationships. Can go up (parents) or down (children).
-	 * 
-	 * @param feature
-	 * @param relationshipTypeIDs
-	 * @param searchType
-	 */
-	private void searchForRelations(HierarchicalFeature feature, List<Cvterm> relationshipTypes, HierarchicalSearchType searchType) {
-		
-		List<HierarchyRelation> relations = null;
-		
-		if (searchType == HierarchicalSearchType.CHILDREN) {
-			relations = featuresMapper.getRelationshipsChildren(feature.uniqueName, relationshipTypes);
-		} else {
-			relations = featuresMapper.getRelationshipsParents(feature.uniqueName, relationshipTypes);
-		}
-		
-		if (relations == null) {
-			return;
-		}
-		
-		for (HierarchyRelation relation : relations) {
-			
-			HierarchicalFeature hf = new HierarchicalFeature();
-			
-			hf.relationship = relation.relationship_type;
-			hf.relationshipType = relation.type;
-			hf.uniqueName = relation.uniqueName;
-			hf.name = relation.name;
-			
-			if (searchType == HierarchicalSearchType.CHILDREN) {
-				feature.children.add(hf);
-			} else {
-				feature.parents.add(hf);
-			}
-			
-			searchForRelations(hf, relationshipTypes, searchType);
-			
-		}
-		
-		
-		
-	}
 	
 }

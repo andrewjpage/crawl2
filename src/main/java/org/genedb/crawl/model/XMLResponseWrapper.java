@@ -18,54 +18,12 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * */
 
-@XmlRootElement(name="returned") // the root element's name is set to response for JAXB XML marshaling, but is ignored by Jackson JSON. 
+@XmlRootElement(name="response") // the root element's name is set to response for JAXB XML marshaling, but is ignored by Jackson JSON. 
 public class XMLResponseWrapper {
 	
-	public XMLResponseWrapper () {
-		// deliberately empty constructor (for JAXB)
-	}
-	
-	public XMLResponseWrapper (String name, Map<String, ?>map, Map<String, ?>parameters) {
-		
-		for (Entry<String, ?> entry : map.entrySet()) {
-			
-			Object value = entry.getValue();
-			
-			if (value instanceof ResultsVariants) {
-				response = new Response (name, (ResultsVariants) value);
-			} else if (value instanceof ResultsSAM) {
-				response = new Response (name, (ResultsSAM) value);
-			} else if (value instanceof ResultsRegions) {
-				response = new Response (name, (ResultsRegions) value);
-			}
-			else if (value instanceof Results) {
-				response = new Response (name, (Results) value);
-			}
-			else if (value instanceof CrawlError) {
-				error = (CrawlError) value;
-			}
-			else if (value instanceof Service) {
-				service = (Service) value;
-			}
-			
-		}
-		
-		if (parameters != null) {
-			setParameters(parameters);
-		}
-		
-	}
-	
-	// Explicitly define all the different kinds of Results subclass, so that JAXB maps them properly.
-//	@XmlElements({
-//        @XmlElement(name="results", type=Results.class),
-//        @XmlElement(name="results", type=ResultsRegions.class),
-//        @XmlElement(name="results", type=ResultsSAM.class)
-//	})
-	// This property has to be called "response", so that the Jackson mapper writes this element out with that name.
-	
-	@XmlElement(name="response")
-	public Response response;
+	@XmlElementWrapper(name="results")
+	@XmlElement(name="result")
+	public List<Object> results;
 	
 	@XmlElement(name="error")
 	public CrawlError error;
@@ -91,13 +49,6 @@ public class XMLResponseWrapper {
 			
 			Object value = entry.getValue();
 			
-//			if (value instanceof List) {
-//				List<?> list = (List<?>) value;
-//				
-//				for (Object v : list) {
-//					pList.values.add(v.toString());
-//				}
-//			} else 
 			if (value instanceof String[]) {
 				
 				String[] strings = (String[]) value;
@@ -128,18 +79,6 @@ public class XMLResponseWrapper {
 		public List<String> values = new ArrayList<String>();
 	}
 	
-	static class Response {
-		
-		public Results results;
-		
-		public Response() {}
-		
-		public Response(String name, Results results) {
-			this.results=results;
-			this.results.name = name;
-		}
-		
-	}
 	
 }
 

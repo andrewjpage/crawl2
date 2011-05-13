@@ -20,4 +20,5 @@ public class Organism implements Serializable {
 	public String name;
 	@XmlAttribute
 	public Integer ID;
+	
 }

@@ -19,9 +19,9 @@ import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.ResultsRegions;
 import org.genedb.crawl.model.Sequence;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,8 +103,7 @@ public class RegionsController extends BaseQueryController {
 	 */
 	@RequestMapping(method=RequestMethod.GET, value={"/locations", "/locations.*"})
 	@ResourceDescription("Returns features and their locations on a region of interest")
-	public ResultsRegions locations(
-			ResultsRegions results,
+	public List<LocatedFeature> locations(
 			@RequestParam("region") String region, 
 			@RequestParam(value="start",required=false) Integer start, 
 			@RequestParam(value="end", required=false) Integer end, 
@@ -143,18 +142,17 @@ public class RegionsController extends BaseQueryController {
         
 		logger.info( String.format("Locating on %s : %s-%s (%s)", region, actualStart, actualEnd, exclude));
 		
-		results.locations = regionsMapper.locations(region, actualStart, actualEnd, exclude, types);
-		results.actual_end = actualEnd;
-		results.actual_start = actualStart;
-		
-		return results;
+		return regionsMapper.locations(region, actualStart, actualEnd, exclude, types);
+//		results.actual_end = actualEnd;
+//		results.actual_start = actualStart;
+//		
+//		return results;
 
 	}
 	
 //	@RequestMapping(method=RequestMethod.GET, value={"/locations_paged", "/locations_paged.*"})
 //	@ResourceDescription("Returns features and their locations on a region of interest, paged by limit and offset.")
 //	public ResultsRegions locationsPaged(
-//			ResultsRegions results,
 //			@RequestParam("region") String region, 
 //			@RequestParam("limit") int limit, 
 //			@RequestParam("offset") int offset, 
@@ -181,8 +179,7 @@ public class RegionsController extends BaseQueryController {
 	
 	@RequestMapping(method=RequestMethod.GET, value="/sequence")
 	@ResourceDescription("Returns the sequence on a region.")
-	public ResultsRegions sequence(
-			ResultsRegions results,
+	public List<Sequence>  sequence(
 			@RequestParam("region") String region, 
 			@RequestParam(value="start", required=false) Integer start, 
 			@RequestParam(value="end", required=false) Integer end,
@@ -191,13 +188,13 @@ public class RegionsController extends BaseQueryController {
 		List<Sequence> sequences = new ArrayList<Sequence>();
 		Sequence sequence = regionsMapper.sequence(region);
 		sequences.add(sequence);
-		results.sequences = sequences;
+		//results.sequences = sequences;
 		
 		String sequenceResidues = sequence.dna;
 		
 		int length = (sequence.length == null) ? sequenceResidues.length() : sequence.length;
 		if (length == 0) {
-			return results;
+			return sequences;
 		}
 		
 		// if it's a simple case of no start or end position, just return what we've got
@@ -210,7 +207,7 @@ public class RegionsController extends BaseQueryController {
 			sequence.end = length -1;
 			sequence.region = region;
 			
-			return results;
+			return sequences;
 		}
 		
 		
@@ -227,7 +224,7 @@ public class RegionsController extends BaseQueryController {
 		int actualEnd = end -1;
 		
 		if (actualStart > lastResiduePosition || actualStart > actualEnd) {
-			return results;
+			return sequences;
 		}
 		
 		if (actualEnd > lastResiduePosition) {
@@ -245,12 +242,12 @@ public class RegionsController extends BaseQueryController {
 		sequence.length = length;
 		sequence.region = region;
 		
-		return results;
+		return sequences;
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="inorganism")
 	@ResourceDescription("Returns the regions in an organism.")
-	public ResultsRegions inorganism(ResultsRegions results, 
+	public List<Feature> inorganism( 
 			@RequestParam("organism") String organism,
 			@RequestParam(value="limit", required=false) Integer limit, 
 			@RequestParam(value="offset", required=false) Integer offset,
@@ -267,14 +264,14 @@ public class RegionsController extends BaseQueryController {
 			organismRegionMap.put(String.valueOf(o.ID), r);
 		}
 		
-		results.regions = r;
+		//results.regions = r;
 		
-		return results;
+		return r;
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="typesinorganism")
 	@ResourceDescription("Returns the types of region present in an organism.")
-	public ResultsRegions typesInOrganism(ResultsRegions results, 
+	public List<Feature> typesInOrganism( 
 			@RequestParam("organism") String organism
 			) throws CrawlException {
 		
@@ -289,9 +286,9 @@ public class RegionsController extends BaseQueryController {
 			regions.add(region);
 		}
 		
-		results.regions = regions;
+		//results.regions = regions;
 		
-		return results;
+		return regions;
 	}
 	
 	class FeatureUniqueNameSorter implements Comparator<Feature> {

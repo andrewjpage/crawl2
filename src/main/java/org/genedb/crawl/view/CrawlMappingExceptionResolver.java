@@ -34,7 +34,10 @@ public class CrawlMappingExceptionResolver extends SimpleMappingExceptionResolve
 		
 		ex.printStackTrace();
 		
-		mav.addObject("model" , error);
+		mav.addObject("error" , error);
+		
+		response.setStatus(500);
+		
 		return mav;
 	}
 	

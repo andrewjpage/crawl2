@@ -1,4 +1,4 @@
-package org.genedb.crawl.controller;
+package org.genedb.crawl.mappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,10 +9,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.mappers.FeaturesMapper;
+
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.HierarchicalFeature;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
+import org.genedb.crawl.model.HierarchyRelation;
 
 public class MapperUtil {
 	
@@ -64,4 +66,53 @@ public class MapperUtil {
 		return new ArrayList<Feature>(map.values());
 	}
 	
+	/**
+	 * 
+	 * A recursive trawl up or down feature relationships. Can go up (parents) or down (children).
+	 * 
+	 * @param feature
+	 * @param relationshipTypeIDs
+	 * @param searchType
+	 */
+	public static void searchForRelations(FeaturesMapper featuresMapper, HierarchicalFeature feature, List<Cvterm> relationshipTypes, HierarchicalSearchType searchType) {
+		
+		List<HierarchyRelation> relations = null;
+		
+		if (searchType == HierarchicalSearchType.CHILDREN) {
+			relations = featuresMapper.getRelationshipsChildren(feature.uniqueName, relationshipTypes);
+		} else {
+			relations = featuresMapper.getRelationshipsParents(feature.uniqueName, relationshipTypes);
+		}
+		
+		if (relations == null) {
+			return;
+		}
+		
+		for (HierarchyRelation relation : relations) {
+			
+			HierarchicalFeature hf = new HierarchicalFeature();
+			
+			hf.relationship = relation.relationship_type;
+			hf.relationshipType = relation.type;
+			hf.uniqueName = relation.uniqueName;
+			hf.name = relation.name;
+			
+			if (searchType == HierarchicalSearchType.CHILDREN) {
+				feature.children.add(hf);
+			} else {
+				feature.parents.add(hf);
+			}
+			
+			searchForRelations(featuresMapper, hf, relationshipTypes, searchType);
+			
+		}
+		
+	}
+	
+	public enum HierarchicalSearchType {
+		PARENTS,
+		CHILDREN
+	}
 }
+
+

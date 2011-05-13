@@ -13,8 +13,9 @@ import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
+import org.genedb.crawl.model.MappedSAMSequence;
+import org.genedb.crawl.model.MappedVCFRecord;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.ResultsVariants;
 import org.genedb.crawl.model.Sequence;
 import org.genedb.crawl.model.Variant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,48 +49,38 @@ public class VariantController extends BaseQueryController {
 	
 	@ResourceDescription("Returns the complete list of variant files.")
 	@RequestMapping(method=RequestMethod.GET, value={"/list", "/list.*"})
-	public ResultsVariants list(ResultsVariants results) throws IOException {
-		results.files = variantStore.getFiles();
-		return results;
+	public List<Variant> list() throws IOException {
+		return variantStore.getFiles();
 	}
 	
 	@ResourceDescription("Returns a list of sequences in a variant file.")
 	@RequestMapping(method=RequestMethod.GET, value={"/sequences", "/sequences.*"})
-	public ResultsVariants sequences(
-			ResultsVariants results, 
+	public List<MappedSAMSequence> sequences(
 			@RequestParam("fileID") int fileID) throws IOException {
-		results.sequences = variantStore.getSequences(fileID);
-		return results;
+		return variantStore.getSequences(fileID);
 	}
 	
 	@ResourceDescription("Returns a list of variant files for a particular organism.")
 	@RequestMapping(method=RequestMethod.GET, value={"/listfororganism", "/listfororganism.*"})
-	public ResultsVariants listfororganism(
-			ResultsVariants results, 
+	public List<Variant> listfororganism( 
 			@RequestParam("organism") String organism) throws IOException {
 		
 		Organism mappedOrganism = getOrganism(organismsMapper, organism);
-		results.files = variantStore.listfororganism(mappedOrganism.common_name);
-		logger.info(results.files);
-		return results;
-		
+		return variantStore.listfororganism(mappedOrganism.common_name);
 	}
 	
 	@ResourceDescription("Returns a list of variant files for a particular sequence.")
 	@RequestMapping(method=RequestMethod.GET, value={"/listforsequence", "/listforsequence.*"})
-	public ResultsVariants listforsequence( 
-			ResultsVariants results,
+	public List<Variant> listforsequence( 
 			@RequestParam("sequence") String sequence) throws Exception {
-		results.files = variantStore.listforsequence(sequence);
-		return results;
+		return variantStore.listforsequence(sequence);
 	}
 	
 	private static final List<String> geneTypes = Arrays.asList(new String[]{"gene", "pseudogene"});
 	
 	@ResourceDescription("Queries a region of a variant file.")
 	@RequestMapping(method=RequestMethod.GET, value={"/query", "/query.*"})
-	public ResultsVariants query(
-			ResultsVariants results, 
+	public List<MappedVCFRecord> query(
 			@RequestParam("fileID") int fileID, 
 			@RequestParam("sequence") String sequence, 
 			@RequestParam("start") int start, 
@@ -108,9 +99,8 @@ public class VariantController extends BaseQueryController {
 		Sequence regionSequence = regionsMapper.sequence(referenceName);
 		List<GeneFeature> geneFeatures = getGenesAt(referenceName, start, end, regionsMapper); 
 		
+		return variantStore.getFile(fileID).getReader().query(alignmentName, start, end, geneFeatures, options, regionSequence);
 		
-		results.records = variantStore.getFile(fileID).getReader().query(alignmentName, start, end, geneFeatures, options, regionSequence);
-		return results;
 	}
 	
 	public static List<GeneFeature> getGenesAt(String sequence, int start, int end, RegionsMapper regionsMapper) {

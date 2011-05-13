@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Argument;
@@ -43,15 +42,15 @@ public abstract class BaseQueryController {
 		
 		@Override
 		public void setAsText(String text) {
-			logger.info("setAsText");
-			logger.info(text);
+//			logger.info("setAsText");
+//			logger.info(text);
 			
 			List<String> list = Arrays.asList(text.split(","));
 			
 			this.setValue(list);
 			
-			logger.info("value??");
-			logger.info(this.getValue());
+//			logger.info("value??");
+//			logger.info(this.getValue());
 		}
 		
 		
@@ -61,7 +60,7 @@ public abstract class BaseQueryController {
 			@SuppressWarnings("unchecked")
 			List<String> list = (List<String>) this.getValue();
 			String str = StringUtils.arrayToCommaDelimitedString(list.toArray());
-			logger.info(str);
+			// logger.info(str);
 			return str;
 		}
 	}
