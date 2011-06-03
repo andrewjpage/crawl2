@@ -17,7 +17,7 @@ public class JacksonView extends BaseView implements View {
 	private static final Logger logger = Logger.getLogger(JacksonView.class);
 	
 	private String contentType = "application/json";
-	protected JsonIzer jsonIzer = JsonIzer.getJsonIzer();
+	protected JsonIzer jsonIzer = new JsonIzer();
 	
 	@Override
 	public String getContentType() {

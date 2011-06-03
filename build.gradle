@@ -59,7 +59,7 @@ dependencies {
     
     compile group: 'org.postgresql', name: 'com.springsource.org.postgresql.jdbc4', version:'8.3.604'
     
-    compile group: 'org.mybatis', name: 'mybatis', version:'3.0.4'
+    compile group: 'org.mybatis', name: 'mybatis', version:'3.0.5'
     compile group: 'org.mybatis', name: 'mybatis-hazelcast', version:'1.0.0'
     
     compile group: 'commons-lang', name: 'commons-lang', version:'2.2'
@@ -92,6 +92,49 @@ dependencies {
 jar {
 	archiveName = "crawl.jar"
 }
+
+task clientJar(type : Jar) {
+	from sourceSets.main.classes
+	include 'org/genedb/crawl/client/**'
+	include 'org/genedb/crawl/model/**'
+	include 'org/genedb/crawl/json/**'
+	baseName = "crawl-client"
+}
+
+task elasticSearchRegexPlugin(type: Jar) {
+	from sourceSets.main.classes
+	include 'org/genedb/crawl/elasticsearch/plugin/**'
+	include 'es-plugin.properties'
+	archiveName = "elasticsearch-regex-0.16.0.jar"
+}
+
+pluginDistDir = "tmp/plugin"
+
+task copyDist(dependsOn: [elasticSearchRegexPlugin], description: 'Builds the plugin zip file') << {
+	copy {
+		from project.buildDir.getPath() + "/libs/elasticsearch-regex-0.16.0.jar"
+		into pluginDistDir
+	}
+}
+
+task zipPlugin(type: Zip, dependsOn: ['copyDist']) {
+	from(pluginDistDir) {
+	}
+	archiveName = "elasticsearch-regex-0.16.0.zip"
+	ant.delete(dir: pluginDistDir)
+}
+
+task releasePlugin(dependsOn: [zipPlugin]) << {
+	copy {
+		from distsDir
+		into new File("/Library/WebServer/Documents/plugins/regex")
+	}
+}
+
+
+
+
+
 
 jar << {
 	
@@ -218,6 +261,8 @@ task deploy(dependsOn: 'war') << {
         into props["deploy.dir"] 
     }
 }
+
+
 
 
 /*

@@ -108,7 +108,7 @@
                 select type_id from featureprop sfp 
                 where sfp.feature_id = sf.feature_id 
                     and sfp.type_id = 
-                        (<include refid="org.genedb.crawl.mappers.FeatureMapper.topleveltype"/>)
+                        (<include refid="org.genedb.crawl.mappers.RegionsMapper.topleveltype"/>)
             ) as toplevel
             
 		  FROM feature f

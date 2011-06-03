@@ -29,7 +29,7 @@ public abstract class IndexBuilder {
 	
 	private Properties elasticSearchProperties;
 	
-	protected JsonIzer jsonIzer = JsonIzer.getJsonIzer();
+	protected JsonIzer jsonIzer = new JsonIzer();
 	protected Client client;
 	protected Connection connection;
 	

@@ -3,9 +3,12 @@ package org.genedb.crawl.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.ParameterizedType;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -13,34 +16,44 @@ import java.util.Map.Entry;
 import org.genedb.crawl.model.*;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.type.TypeReference;
+import org.codehaus.jackson.map.type.TypeFactory;
 import org.genedb.crawl.json.JsonIzer;
 
 @SuppressWarnings("unused")
 public class CrawlClient {
 
-	public String host;
+	public String baseURL;
 
-	public CrawlClient(String host) {
-		this.host = host;
+	public CrawlClient(String baseURL) {
+		this.baseURL = baseURL;
 	}
 
 	private static final String sep = "/";
 	private static final String extension = ".json";
 	private static final String encoding = "UTF-8";
-	private static final JsonIzer jsonIzer = JsonIzer.getJsonIzer();
+	private static final JsonIzer jsonIzer = new JsonIzer();
 
 	private static Logger logger = Logger.getLogger(CrawlClient.class);
+	
+	public <T extends Object> List<T> request(
+			Class<T> cls,
+			String resource, 
+			String method
+			) throws IOException {
+		return request(cls, resource, method, null);
+	}
 
-	public <T extends Object> T request(String resource, String method,
-			Map<String, String[]> parameters, TypeReference<T> type)
-			throws IOException {
+	public <T extends Object> List<T> request(
+			Class<T> cls,
+			String resource, 
+			String method,
+			Map<String, String[]> parameters) throws IOException {
 
 		URLConnection conn = null;
 		BufferedReader rd = null;
 		StringBuffer result = null;
 
-		String urlString = host + sep + resource + sep + method + extension;
+		String urlString = baseURL + sep + resource + sep + method + extension;
 
 		StringBuffer encodedParameters = new StringBuffer();
 
@@ -80,11 +93,11 @@ public class CrawlClient {
 			}
 
 		}
-
-		@SuppressWarnings("unchecked")
-		T t = (T) jsonIzer.fromJson(result.toString(), type);
-
-		return t;
+		
+		List<T> list = jsonIzer.getMapper().readValue(
+				result.toString(), 
+				TypeFactory.collectionType(ArrayList.class, cls));
+		return list;
 
 	}
 

@@ -265,7 +265,10 @@ public class FeatureBeanFactory {
 				} else if (key.equals("isObsolete")) {
 					
 					feature.isObsolete = Boolean.parseBoolean(stringValue);
+				
+				} else if (key.equals("translation")) {
 					
+					feature.residues = stringValue;
 					
 				} else {
 					

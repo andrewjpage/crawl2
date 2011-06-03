@@ -31,8 +31,14 @@ public interface RegionsMapper {
 //			@Param("exclude") boolean exclude,
 //			@Param("types") List<String> types);
 	
-	public Sequence sequence(
-			@Param("region") String region);
+	public Sequence sequence(@Param("region") String region);
+	
+	public Sequence sequenceLength(@Param("region") String region);
+	
+	public Sequence sequenceTrimmed(
+			@Param("region") String region,
+			@Param("start") Integer start, 
+			@Param("end") Integer end);
 	
 	public List<Feature> inorganism(
 			@Param("organismid") int organismid,

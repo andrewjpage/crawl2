@@ -11,9 +11,9 @@ import org.genedb.crawl.model.OrganismProp;
 public interface OrganismsMapper {
 	
 	List<Organism> list() ;
-	Organism getByID(int ID) ;
-	Organism getByTaxonID(String taxonID) ;
-	Organism getByCommonName(String commonName) ;
+	Organism getByID(@Param("ID") int ID) ;
+	Organism getByTaxonID(@Param("taxonID") String taxonID) ;
+	Organism getByCommonName(@Param("commonName") String commonName) ;
 	OrganismProp getOrganismProp(@Param("ID") int ID, @Param("cv") String cv, @Param("cvterm") String cvterm);
 	
 }

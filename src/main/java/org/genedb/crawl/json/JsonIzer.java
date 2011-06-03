@@ -22,14 +22,18 @@ public class JsonIzer {
 	
 	private static JsonIzer inst;
 	
-	public static final JsonIzer getJsonIzer() {
-		if (inst == null) {
-			inst = new JsonIzer();
-		}
-		return inst;
+//	public static final JsonIzer getJsonIzer() {
+//		if (inst == null) {
+//			inst = new JsonIzer();
+//		}
+//		return inst;
+//	}
+	
+	public final ObjectMapper getMapper() {
+		return mapper;
 	}
 	
-	private JsonIzer () {
+	public JsonIzer () {
 		mapper = new ObjectMapper();
 	    AnnotationIntrospector jaxbIntrospector = new JaxbAnnotationIntrospector();
 	    

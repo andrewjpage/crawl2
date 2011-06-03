@@ -87,7 +87,7 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	
 	private List<Cvterm> relationships = new ArrayList<Cvterm>(); 
 	
-	private JsonIzer jsonIzer = JsonIzer.getJsonIzer();
+	private JsonIzer jsonIzer = new JsonIzer();
 	
 	void run() throws CrawlException, ParseException, IOException {
 		

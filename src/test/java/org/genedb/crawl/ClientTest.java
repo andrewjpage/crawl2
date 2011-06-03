@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.type.TypeReference;
 import org.genedb.crawl.client.CrawlClient;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
@@ -24,15 +23,15 @@ public class ClientTest extends TestCase {
 	
 	private Logger logger = Logger.getLogger(ClientTest.class);
 	
-	String host = "http://localhost:8080/services";
+	String baseURL = "http://localhost:8080/services";
 	
-	public void testOrganisms()  {
+	public void testOrganisms() throws IOException  {
 		
-		CrawlClient client = new CrawlClient(host); 
+		CrawlClient client = new CrawlClient(baseURL); 
 		
 		try {
 			
-			List<Organism> organisms = client.request("organisms", "list", null, new TypeReference<List<Organism>>() {});
+			List<Organism> organisms = client.request(Organism.class, "organisms", "list");
 			
 			for (Organism o : organisms) {
 				logger.info(o.common_name);
@@ -46,7 +45,7 @@ public class ClientTest extends TestCase {
 	
 	public void testOrganismsList() {
 		
-		CrawlClient client = new CrawlClient(host); 
+		CrawlClient client = new CrawlClient(baseURL); 
 		
 		try {
 			
@@ -55,7 +54,7 @@ public class ClientTest extends TestCase {
 			parameters.put("start", new String[] {"100"});
 			parameters.put("end", new String[] {"10000"});
 			
-			List<LocatedFeature> features = client.request("regions", "locations", parameters, new TypeReference<List<LocatedFeature>>() {});
+			List<LocatedFeature> features = client.request(LocatedFeature.class, "regions", "locations", parameters);
 			
 			for (LocatedFeature o : features) {
 				logger.info(o.uniqueName);

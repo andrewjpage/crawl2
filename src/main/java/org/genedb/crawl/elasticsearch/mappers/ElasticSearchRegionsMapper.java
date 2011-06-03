@@ -377,7 +377,6 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			sequence.organism_id = regionFeature.organism_id;
 			
 			
-			
 		} catch (Exception e) {
 			logger.error(e);
 		} 
@@ -385,6 +384,35 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		return sequence;
 		
 	}
+	
+	@Override
+	public Sequence sequenceLength(String region) {
+		return sequence(region);
+	}
+
+	@Override
+	public Sequence sequenceTrimmed(String region, Integer start, Integer end) {
+		Sequence s = sequence(region);
+		
+		// if it's a simple case of no start or end position, just return what we've got
+		if (start == null && end == null) {
+			
+			s.start = 0;
+			s.end = s.length -1;
+			s.region = region;
+			
+			return s;
+		}
+		
+		int actualStart = start -1;
+		int actualEnd = end -1;
+		
+		s.dna = s.dna.substring(actualStart, actualEnd);
+		s.length = s.dna.length();
+		
+		return s;
+	}
+	
 
 	@Override
 	public List<Feature> inorganism(int organismid, Integer limit, Integer offset, String type_name) {
@@ -494,6 +522,8 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	public void createOrUpdate(Feature feature) {
 		this.createOrUpdate(connection.getIndex(), connection.getRegionType(), feature.uniqueName, feature);
 	}
+
+
 
 
 	

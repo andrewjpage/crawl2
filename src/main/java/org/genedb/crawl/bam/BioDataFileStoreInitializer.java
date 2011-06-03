@@ -22,7 +22,7 @@ public class BioDataFileStoreInitializer {
 	
 	private static Logger logger = Logger.getLogger(BioDataFileStoreInitializer.class);
 	
-	private JsonIzer jsonIzer = JsonIzer.getJsonIzer();
+	private JsonIzer jsonIzer = new JsonIzer();
 	
 	private BioDataFileStore<Alignment> alignmentStore = new BioDataFileStore<Alignment>();
 	private BioDataFileStore<Variant> variantStore = new BioDataFileStore<Variant>();

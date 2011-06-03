@@ -1,5 +1,6 @@
 package org.genedb.crawl.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.genedb.crawl.CrawlException;
@@ -29,48 +30,44 @@ public class OrganismsController extends BaseQueryController {
 	@RequestMapping(method=RequestMethod.GET, value={"/list", "/list.*"})
 	public List<Organism> list() throws CrawlException {
 		List<Organism> list = organismsMapper.list();
-		
-		for (Organism organism : list) {
-			OrganismProp prop = organismsMapper.getOrganismProp(organism.ID, "genedb_misc", "translationTable");
-			
-			if (prop != null) {
-				organism.translation_table = Integer.parseInt(prop.value);
-			}
-			
-		}
-		
-		return list;		
+		return addProps(list);
 	}
 	
 	@ResourceDescription(value="Get an organism using the organism id", type="Organism")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByID", "/getByID.*"})
-	public List<Organism> getByID(@RequestParam("ID") int id) throws CrawlException {
-		List<Organism> list = organismsMapper.list();
+	public List<Organism> getByID(ArrayList<Organism> list, @RequestParam("ID") int id) throws CrawlException {
 		list.add(organismsMapper.getByID(id));
-		return list;
+		return addProps(list);
 	}
 	
 	@ResourceDescription(value="Get an organism using its taxon ID", type="Organism")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByTaxonID", "/getByTaxonID.*"})
-	public List<Organism> getByTaxonID(@RequestParam("taxonID") int taxonID) throws CrawlException {
-		List<Organism> list = organismsMapper.list();
+	public List<Organism> getByTaxonID(ArrayList<Organism> list, @RequestParam("taxonID") int taxonID) throws CrawlException {
 		list.add(organismsMapper.getByTaxonID(String.valueOf(taxonID)));
-		return list;
+		return addProps(list);
 	}
 	
 	@ResourceDescription(value="Get an organism by specifying its common name", type="Organism")
 	@RequestMapping(method=RequestMethod.GET, value={"/getByCommonName", "/getByCommonName.*"})
-	public List<Organism> getByCommonName(@RequestParam("commonName") String commonName) throws CrawlException {
-		List<Organism> list = organismsMapper.list();
+	public List<Organism> getByCommonName(ArrayList<Organism> list, @RequestParam("commonName") String commonName) throws CrawlException {
 		list.add(organismsMapper.getByCommonName(commonName));
-		return list;
+		return addProps(list);
 	}
 	
 	@ResourceDescription(value="Get an organism using a taxon ID, common name, or organism ID", type="Organism")
 	@RequestMapping(method=RequestMethod.GET, value="/get")
-	public List<Organism> get(@RequestParam("organism") String organism) throws CrawlException {
-		List<Organism> list = organismsMapper.list();
+	public List<Organism> get(ArrayList<Organism> list, @RequestParam("organism") String organism) throws CrawlException {
 		list.add(getOrganism(organismsMapper, organism));
+		return addProps(list);
+	}
+	
+	private List<Organism> addProps(List<Organism> list) {
+		for (Organism organism : list) {
+			OrganismProp prop = organismsMapper.getOrganismProp(organism.ID, "genedb_misc", "translationTable");
+			if (prop != null) {
+				organism.translation_table = Integer.parseInt(prop.value);
+			}
+		}
 		return list;
 	}
 	

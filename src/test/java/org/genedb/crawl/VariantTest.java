@@ -30,7 +30,7 @@ public class VariantTest extends TestCase {
 	
 	private Logger logger = Logger.getLogger(VariantTest.class);
 	
-	JsonIzer jsonIzer = JsonIzer.getJsonIzer();
+	JsonIzer jsonIzer = new JsonIzer();
 	MyGFFIndexBuilder builder;
 	
 	class MyGFFIndexBuilder extends GFFIndexBuilder {

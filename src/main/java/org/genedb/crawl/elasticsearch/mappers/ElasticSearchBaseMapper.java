@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class ElasticSearchBaseMapper {
 	
 	private Logger logger = Logger.getLogger(ElasticSearchBaseMapper.class);
-	protected JsonIzer jsonIzer = JsonIzer.getJsonIzer();
+	protected JsonIzer jsonIzer = new JsonIzer();
 	
 	private static final Field[] featureFields = Feature.class.getDeclaredFields();
 	

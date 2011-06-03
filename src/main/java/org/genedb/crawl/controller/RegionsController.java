@@ -176,71 +176,103 @@ public class RegionsController extends BaseQueryController {
 //
 //	}
 	
+//	@RequestMapping(method=RequestMethod.GET, value="/sequence")
+//	@ResourceDescription("Returns the sequence on a region.")
+//	public List<Sequence>  sequenceInfo(
+//			@RequestParam("region") String region, 
+//			@RequestParam(value="metadata_only", required=false, defaultValue="false") boolean metadataOnly) {
+//		
+//		List<Sequence> sequences = new ArrayList<Sequence>();
+//		Sequence sequence = regionsMapper.sequenceTrimmed(region, start, end);
+//		
+//	}
+	
+	@RequestMapping(method=RequestMethod.GET, value="/sequenceLength")
+	@ResourceDescription("Returns the sequence on a region.")
+	public List<Sequence>  sequenceLength(
+			@RequestParam("region") String region) {
+		
+		List<Sequence> sequences = new ArrayList<Sequence>();
+		Sequence sequence = regionsMapper.sequenceLength(region);
+		sequences.add(sequence);
+		return sequences;
+	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="/sequence")
 	@ResourceDescription("Returns the sequence on a region.")
 	public List<Sequence>  sequence(
 			@RequestParam("region") String region, 
 			@RequestParam(value="start", required=false) Integer start, 
-			@RequestParam(value="end", required=false) Integer end,
-			@RequestParam(value="metadata_only", required=false, defaultValue="false") boolean metadataOnly) {
+			@RequestParam(value="end", required=false) Integer end) {
 		
 		List<Sequence> sequences = new ArrayList<Sequence>();
-		Sequence sequence = regionsMapper.sequence(region);
-		sequences.add(sequence);
-		//results.sequences = sequences;
 		
-		String sequenceResidues = sequence.dna;
-		
-		int length = (sequence.length == null) ? sequenceResidues.length() : sequence.length;
-		if (length == 0) {
-			return sequences;
-		}
-		
-		// if it's a simple case of no start or end position, just return what we've got
 		if (start == null && end == null) {
-			
-			if (metadataOnly) {
-				sequence.dna = null;
-			}
-			sequence.start = 0;
-			sequence.end = length -1;
-			sequence.region = region;
-			
-			return sequences;
-		}
-		
-		
-		if (start == null) {
-			start = 0;
-		}
-		
-		if (end == null) {
-			end = length;
-		}
-		
-		int lastResiduePosition = length -1;
-		int actualStart = start -1;
-		int actualEnd = end -1;
-		
-		if (actualStart > lastResiduePosition || actualStart > actualEnd) {
-			return sequences;
-		}
-		
-		if (actualEnd > lastResiduePosition) {
-			actualEnd = lastResiduePosition;
-		}
-		
-		if (! metadataOnly) {
-			sequence.dna = sequenceResidues.substring(actualStart, actualEnd);
+			Sequence sequence = regionsMapper.sequence(region);
+			sequence.start = 1;
+			sequence.end = sequence.length; 
+			sequences.add(sequence);
 		} else {
-			sequence.dna = null;
+			Sequence sequence = regionsMapper.sequenceTrimmed(region, start, end);
+			sequences.add(sequence);
 		}
 		
-		sequence.start = start;
-		sequence.end = end;
-		sequence.length = length;
-		sequence.region = region;
+		
+		
+		
+		//results.sequences = sequences;
+//		
+//		String sequenceResidues = sequence.dna;
+//		
+//		int length = (sequence.length == null) ? sequenceResidues.length() : sequence.length;
+//		if (length == 0) {
+//			return sequences;
+//		}
+//		
+//		// if it's a simple case of no start or end position, just return what we've got
+//		if (start == null && end == null) {
+//			
+//			if (metadataOnly) {
+//				sequence.dna = null;
+//			}
+//			sequence.start = 0;
+//			sequence.end = length -1;
+//			sequence.region = region;
+//			
+//			return sequences;
+//		}
+//		
+//		
+//		if (start == null) {
+//			start = 0;
+//		}
+//		
+//		if (end == null) {
+//			end = length;
+//		}
+//		
+//		int lastResiduePosition = length -1;
+//		int actualStart = start -1;
+//		int actualEnd = end -1;
+//		
+//		if (actualStart > lastResiduePosition || actualStart > actualEnd) {
+//			return sequences;
+//		}
+//		
+//		if (actualEnd > lastResiduePosition) {
+//			actualEnd = lastResiduePosition;
+//		}
+//		
+//		if (! metadataOnly) {
+//			sequence.dna = sequenceResidues.substring(actualStart, actualEnd);
+//		} else {
+//			sequence.dna = null;
+//		}
+		
+//		sequence.start = start;
+//		sequence.end = end;
+//		sequence.length = length;
+//		sequence.region = region;
 		
 		return sequences;
 	}

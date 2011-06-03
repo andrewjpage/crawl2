@@ -4,7 +4,7 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="org.genedb.crawl.mappers.RegionsMapper">  
 
-  <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/>
+  <!-- <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/> -->
     
   
   <select id="locationsMinAndMaxBoundaries" resultType="org.genedb.crawl.model.LocationBoundaries">
@@ -112,7 +112,7 @@
     
   </resultMap>
   
-  <select id="sequence" resultType="org.genedb.crawl.model.Sequence">
+  <!-- <select id="sequence" resultType="org.genedb.crawl.model.Sequence">
         SELECT 
             residues as dna, 
             seqlen as length, 
@@ -120,6 +120,35 @@
         FROM feature 
         WHERE uniqueName = #{region}
          
+  </select> -->
+
+  <select id="sequenceTrimmed" resultType="org.genedb.crawl.model.Sequence">
+        SELECT 
+            substring (residues from ${start} for (${end} - ${start})) as dna, 
+            seqlen as length, 
+            organism_id,
+            '${start}' as start,
+            '${end}' as end,
+            '${region}' as region
+        FROM feature 
+        WHERE uniqueName = #{region}
+  </select>
+  
+  <select id="sequenceLength" resultType="org.genedb.crawl.model.Sequence">
+        SELECT  
+            seqlen as length 
+        FROM feature 
+        WHERE uniqueName = #{region}
+  </select>
+  
+  <select id="sequence" resultType="org.genedb.crawl.model.Sequence">
+        SELECT 
+            residues as dna, 
+            seqlen as length, 
+            organism_id,
+            '${region}' as region
+        FROM feature 
+        WHERE uniqueName = #{region}
   </select>
   
   <sql id="topleveltype"> select cvterm_id from cvterm join cv using (cv_id) where cv.name = 'genedb_misc' and cvterm.name = 'top_level_seq' </sql> 
