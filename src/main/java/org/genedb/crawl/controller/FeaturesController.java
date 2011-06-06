@@ -217,8 +217,12 @@ public class FeaturesController extends BaseQueryController {
 	@ResourceDescription("Return blast hits between two features")
 	@RequestMapping(method=RequestMethod.GET, value="/blastpair")
 	public List<BlastPair> blastpair( 
-			@RequestParam(value="f1") String f1, @RequestParam(value="start1") int start1, @RequestParam(value="end1") int end1,
-			@RequestParam(value="f2") String f2, @RequestParam(value="start1") int start2, @RequestParam(value="end1") int end2,
+			@RequestParam(value="f1") String f1, 
+			@RequestParam(value="start1") int start1, 
+			@RequestParam(value="end1") int end1,
+			@RequestParam(value="f2") String f2, 
+			@RequestParam(value="start2") int start2, 
+			@RequestParam(value="end2") int end2,
 			@RequestParam(value="length", required=false) Integer length,
 			@RequestParam(value="score", required=false) Integer score) {
 		return featuresMapper.blastPairs(f1, start1, end1, f2, start2, end2, length, score); 
