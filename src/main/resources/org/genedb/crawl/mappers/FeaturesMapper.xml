@@ -734,7 +734,7 @@
         this SQL is for now untested as we do not have it up on a test db 
         ##################################################################
     -->
-    <select id="blastPair" resultType="org.genedb.crawl.model.BlastPair">
+    <select id="blastPairs" resultType="org.genedb.crawl.model.BlastPair">
         SELECT
             
 		    f1.uniquename as f1,
@@ -756,30 +756,30 @@
 		
 		FROM feature f1 
 		
-		JOIN featureloc fl1 ON f1.feature_id = fl1.srcfeature_id AND f1.uniquename = %(f1)s
+		JOIN featureloc fl1 ON f1.feature_id = fl1.srcfeature_id AND f1.uniquename = #{f1}
 		
 		JOIN feature af ON fl1.feature_id = af.feature_id AND af.is_analysis = true 
 		JOIN analysisfeature ON af.feature_id = analysisfeature.feature_id 
 		JOIN analysis ON analysisfeature.analysis_id = analysis.analysis_id
 		
 		JOIN featureloc fl2 ON af.feature_id = fl2.feature_id AND fl2.srcfeature_id != f1.feature_id
-		JOIN feature f2 ON fl2.srcfeature_id = f2.feature_id AND f2.uniquename = %(f2)s
+		JOIN feature f2 ON fl2.srcfeature_id = f2.feature_id AND f2.uniquename = #{f2}
 		
 		WHERE (( 
-		    (fl1.fmin BETWEEN %(start1)s AND %(end1)s ) OR (fl1.fmax BETWEEN %(start1)s AND %(end1)s ) 
+		    (fl1.fmin BETWEEN #{start1} AND #{end1} ) OR (fl1.fmax BETWEEN #{start1} AND #{end1} ) 
 		) OR ( 
-		    (fl2.fmin BETWEEN %(start2)s AND %(end2)s ) OR (fl2.fmax BETWEEN %(start2)s AND %(end2)s ) 
+		    (fl2.fmin BETWEEN #{start2} AND #{end2} ) OR (fl2.fmax BETWEEN #{start2} AND #{end2} ) 
 		))
 		
 		<if test="normscore != null">
 		  <![CDATA[
-		      AND analysisfeature.normscore <= %(normscore)s
+		      AND analysisfeature.normscore <= #{normscore}
 		  ]]>
 		</if>
 		
 		<if test="length != null">
 		  <![CDATA[
-		      AND ( (fl1.fmax - fl1.fmin >= %(length)s ) AND (fl2.fmax - fl2.fmin >= %(length)s ))
+		      AND ( (fl1.fmax - fl1.fmin >= #{length} ) AND (fl2.fmax - fl2.fmin >= #{length} ))
 		  ]]>
 		</if>
     </select>
