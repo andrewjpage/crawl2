@@ -224,7 +224,7 @@ public class FeaturesController extends BaseQueryController {
 			@RequestParam(value="start2") int start2, 
 			@RequestParam(value="end2") int end2,
 			@RequestParam(value="length", required=false) Integer length,
-			@RequestParam(value="score", required=false) Integer score) {
+			@RequestParam(value="score", required=false) Double score) {
 		return featuresMapper.blastPairs(f1, start1, end1, f2, start2, end2, length, score); 
 	}
 	

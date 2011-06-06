@@ -296,7 +296,7 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 
 	@Override
 	public List<BlastPair> blastPairs(String f1, int start1, int end1,
-			String f2, int start2, int end2, Integer length, Integer normscore) {
+			String f2, int start2, int end2, Integer length, Double normscore) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -77,6 +77,6 @@ public interface FeaturesMapper {
 		@Param("start2") int start2, 
 		@Param("end2") int end2, 
 		@Param("length") Integer length, 
-		@Param("normscore") Integer normscore);
+		@Param("normscore") Double normscore);
 	
 }
