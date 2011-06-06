@@ -8,15 +8,15 @@ public class BlastPair {
     
 	public String analysis; 
 	public String program; 
-	public String score; 
+	public double score; 
     
-	public String fmin1; 
-	public String fmax1; 
+	public Integer fmin1; 
+	public Integer fmax1; 
     
-	public String fmin2; 
-	public String fmax2;
+	public Integer fmin2; 
+	public Integer fmax2;
     
-	public String f1strand;
-	public String f2strand;
+	public Integer f1strand;
+	public Integer f2strand;
 	
 }

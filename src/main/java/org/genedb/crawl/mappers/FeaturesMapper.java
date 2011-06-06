@@ -70,9 +70,13 @@ public interface FeaturesMapper {
 	List<Statistic> annotationModifiedStatistics(@Param("date") Date date, @Param("organism_id") Integer organism_id, @Param("region") String region);
 	
 	List<BlastPair> blastPairs(
-		@Param("regex") String f1, @Param("regex") int start1, @Param("regex") int end1, 
-		@Param("regex") String f2, @Param("regex") int start2, @Param("regex") int end2, 
-		@Param("regex") Integer length, 
-		@Param("regex") Integer normscore);
+		@Param("f1") String f1, 
+		@Param("start1") int start1, 
+		@Param("end1") int end1, 
+		@Param("f2") String f2, 
+		@Param("start2") int start2, 
+		@Param("end2") int end2, 
+		@Param("length") Integer length, 
+		@Param("normscore") Integer normscore);
 	
 }
