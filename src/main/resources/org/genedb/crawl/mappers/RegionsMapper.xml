@@ -4,7 +4,7 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="org.genedb.crawl.mappers.RegionsMapper">  
 
-  <!-- <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/> -->
+  <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/>
     
   
   <select id="locationsMinAndMaxBoundaries" resultType="org.genedb.crawl.model.LocationBoundaries">
@@ -52,7 +52,10 @@
     f2.uniquename as parent,
     frt.name as parent_relationship_type,
     fl.is_fmin_partial,
-    fl.is_fmax_partial
+    fl.is_fmax_partial,
+    
+    'colour' as propname,
+    fp.value as value
     
         FROM feature f
     
@@ -64,6 +67,8 @@
     LEFT JOIN feature f2 ON fr.object_id = f2.feature_id 
     LEFT JOIN cvterm frt ON fr.type_id = frt.cvterm_id AND frt.cvterm_id in 
                                (select cvterm_id from cvterm where name in ('part_of', 'derives_from'))  
+	
+	LEFT OUTER JOIN featureprop fp ON fp.feature_id = f.feature_id AND fp.type_id = (SELECT cvterm_id FROM cvterm WHERE name = 'colour') 
 	
 	
 	WHERE 
@@ -109,6 +114,11 @@
     <association property="type" javaType="org.genedb.crawl.model.Cvterm">
         <result property="name" column="type"/>
     </association>
+    
+    <collection property="properties" ofType="org.genedb.crawl.model.FeatureProperty"> 
+        <result property="name" column="propname"/> 
+        <result property="value" column="value"/> 
+    </collection>
     
   </resultMap>
   
