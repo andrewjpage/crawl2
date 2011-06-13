@@ -26,6 +26,7 @@ import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.FeatureProperty;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.Sequence;
@@ -299,7 +300,7 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	private List<LocatedFeature> parseLocations(String region, SearchResponse response) {
 		List<LocatedFeature> features = new ArrayList<LocatedFeature>();
 		
-		String[] fieldNames = new String[] {"uniqueName", "fmin", "fmax", "isObsolete", "parent", "phase", "type", "strand", "region"};
+		String[] fieldNames = new String[] {"uniqueName", "fmin", "fmax", "isObsolete", "parent", "phase", "type", "strand", "region", "properties"};
 		
 		for (SearchHit hit : response.getHits()) {
 		
@@ -307,6 +308,18 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			//logger.debug(source);
 			
 			LocatedFeature feature = this.getFeatureFromJson(source);
+			
+			// we only want to return colour
+			List<FeatureProperty> fps = new ArrayList<FeatureProperty>();
+			if (feature.properties != null) {
+				for (FeatureProperty prop : feature.properties) {
+					if (prop.name.equals("colour")) {
+						fps.add(prop);
+					}
+				}
+			}
+			feature.properties=fps;
+			
 			if (feature != null) {
 				
 				
