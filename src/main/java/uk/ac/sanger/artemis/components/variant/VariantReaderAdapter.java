@@ -114,8 +114,7 @@ public abstract class VariantReaderAdapter {
 		}
 		
 		mappedRecord.alt.length = record.getAlt().length();
-		
-		mappedRecord.alternateBase = record.getAlt().toString();
+		mappedRecord.alt.alternateBase = record.getAlt().toString();
 		
 		return mappedRecord;
 	}

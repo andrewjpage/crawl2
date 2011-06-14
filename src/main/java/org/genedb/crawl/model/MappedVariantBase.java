@@ -16,6 +16,9 @@ public class MappedVariantBase {
 	public Boolean isDeletion;
 	
 	@XmlAttribute
+	public String alternateBase;
+	
+	@XmlAttribute
 	public int length;
 
 }
