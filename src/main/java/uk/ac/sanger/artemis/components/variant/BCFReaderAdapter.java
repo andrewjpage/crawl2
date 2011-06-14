@@ -18,8 +18,10 @@ public class BCFReaderAdapter extends VariantReaderAdapter {
 	
 	public BCFReaderAdapter(String url) throws IOException {
 		reader = new BCFReader(url);
+		String hdr = reader.headerToString();
+	    if(hdr.indexOf("VCFv4") > -1)
+	    	reader.setVcf_v4(true);
 		abstractReader = reader;
-		isVcf_v4 = reader.isVcf_v4();
 	}
 	
 	

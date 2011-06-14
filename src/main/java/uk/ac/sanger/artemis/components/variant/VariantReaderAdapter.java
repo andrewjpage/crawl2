@@ -9,8 +9,7 @@ import org.genedb.crawl.model.Sequence;
 
 
 public abstract class VariantReaderAdapter {
-	
-	protected boolean isVcf_v4;
+
 	protected AbstractVCFReader abstractReader;
 	
 	public static final VariantReaderAdapter getReader(String url) throws IOException {
@@ -46,11 +45,11 @@ public abstract class VariantReaderAdapter {
 			Sequence regionSequence) {
 		
 		if (!options.isEnabled(VariantFilterOption.SHOW_DELETIONS) //.showDeletions
-				&& record.getAlt().isDeletion(isVcf_v4))
+				&& record.getAlt().isDeletion(isVcf_v4()))
 			return false;
 
 		if (!options.isEnabled(VariantFilterOption.SHOW_INSERTIONS) //.showInsertions
-				&& record.getAlt().isInsertion(isVcf_v4))
+				&& record.getAlt().isInsertion(isVcf_v4()))
 			return false;
 
 		if (!options.isEnabled(VariantFilterOption.SHOW_NON_OVERLAPPINGS) //.showNonOverlappings
@@ -64,8 +63,8 @@ public abstract class VariantReaderAdapter {
 		
 		record.markAsNewStop = false;
 		if (options.isEnabled(VariantFilterOption.MARK_NEW_STOPS) //.markNewStops
-				&& !record.getAlt().isDeletion(isVcf_v4)
-				&& !record.getAlt().isInsertion(isVcf_v4)
+				&& !record.getAlt().isDeletion(isVcf_v4())
+				&& !record.getAlt().isInsertion(isVcf_v4())
 				&& record.getAlt().length() == 1
 				&& record.getRef().length() == 1) {
 
@@ -74,8 +73,8 @@ public abstract class VariantReaderAdapter {
 		}
 
 		if ((!options.isEnabled(VariantFilterOption.SHOW_SYNONYMOUS) /*.showSynonymous*/ || !options.isEnabled(VariantFilterOption.SHOW_NON_SYNONYMOUS) /*.showNonSynonymous*/)
-				&& !record.getAlt().isDeletion(isVcf_v4)
-				&& !record.getAlt().isInsertion(isVcf_v4)
+				&& !record.getAlt().isDeletion(isVcf_v4())
+				&& !record.getAlt().isInsertion(isVcf_v4())
 				&& record.getAlt().length() == 1
 				&& record.getRef().length() == 1) {
 
@@ -107,9 +106,9 @@ public abstract class VariantReaderAdapter {
 		
 		if (record.getAlt().isMultiAllele()) {
 			mappedRecord.alt.isMultiAllele = true;
-		} else if (record.getAlt().isDeletion(isVcf_v4)) {
+		} else if (record.getAlt().isDeletion(isVcf_v4())) {
 			mappedRecord.alt.isDeletion = true;
-		} else if (record.getAlt().isInsertion(isVcf_v4)) {
+		} else if (record.getAlt().isInsertion(isVcf_v4())) {
 			mappedRecord.alt.isInsertion = true;
 		}
 		
@@ -117,6 +116,11 @@ public abstract class VariantReaderAdapter {
 		mappedRecord.alt.alternateBase = record.getAlt().toString();
 		
 		return mappedRecord;
+	}
+	
+	private boolean isVcf_v4()
+	{
+		return abstractReader.isVcf_v4();
 	}
 	
 }

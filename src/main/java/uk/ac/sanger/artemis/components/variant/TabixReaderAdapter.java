@@ -22,7 +22,17 @@ public class TabixReaderAdapter extends VariantReaderAdapter{
 		reader = new TabixReader(url);
 		abstractReader = reader;
 		logger.info(String.format("Intantiatging tabix reader %s with url %s ", reader.getName(), reader.getFileName()));
-		isVcf_v4 = reader.isVcf_v4();
+		
+		String line;
+	    while( (line = reader.readLine() ) != null ) {
+	        if(!line.startsWith("##"))
+	          break;
+	        
+	        if(line.indexOf("VCFv4") > -1) {
+	        	reader.setVcf_v4(true);
+	        	break;
+	        }
+	    }
 		//reader.getSeqNames();
 	}
 	
