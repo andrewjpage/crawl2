@@ -3,6 +3,7 @@ package org.genedb.crawl.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import uk.ac.sanger.artemis.components.variant.GeneFeature;
+import uk.ac.sanger.artemis.components.variant.VariantFilterOption;
 import uk.ac.sanger.artemis.components.variant.VariantFilterOptions;
 
 @Controller
@@ -86,13 +88,35 @@ public class VariantController extends BaseQueryController {
 			@RequestParam("start") int start, 
 			@RequestParam("end") int end,
 			@RequestParam(value="filter", required=false) Integer filter) throws IOException {
-		
-		
+		return doQuery(fileID,sequence,start,end,filter);
+	}
+	
+	@ResourceDescription("Queries a region of a variant file, passing a list of VariantFilterOption filters as a parameter. Current valid values are SHOW_SYNONYMOUS, SHOW_NON_SYNONYMOUS, SHOW_DELETIONS, SHOW_INSERTIONS, SHOW_MULTI_ALLELES, SHOW_NON_OVERLAPPINGS, SHOW_NON_VARIANTS, MARK_NEW_STOPS.")
+	@RequestMapping(method=RequestMethod.GET, value={"/queryWithFilters", "/queryWithFilters.*"})
+	public List<MappedVCFRecord> queryWithFilters(
+			@RequestParam("fileID") int fileID, 
+			@RequestParam("sequence") String sequence, 
+			@RequestParam("start") int start, 
+			@RequestParam("end") int end,
+			@RequestParam(value="filters", required=true) List<String> filters) throws IOException {
+		Integer filter = null;
+		if (filters.size() > 0) {
+			filter = 0;
+			for (String f : filters) {
+				VariantFilterOption option = VariantFilterOption.valueOf(f);
+				filter += option.index();			
+			}
+		}
+		return doQuery(fileID,sequence,start,end,filter);
+	}
+	
+	private List<MappedVCFRecord> doQuery(int fileID, String sequence, int start, int end, Integer filter) throws IOException {
 		VariantFilterOptions options = new VariantFilterOptions(filter);
+		
+		logger.info(String.format("Filter %d, values: %s ", filter, options.toString()));
 		
 		String alignmentName = variantStore.getAlignmentFromName(sequence);
 		String referenceName = variantStore.getReferenceFromName(sequence);
-		
 		
 		logger.info(String.format("sequence name supplied: %s, alignment sequence name used: %s, reference sequence name used: %s", sequence, alignmentName, referenceName));
 		
@@ -100,7 +124,6 @@ public class VariantController extends BaseQueryController {
 		List<GeneFeature> geneFeatures = getGenesAt(referenceName, start, end, regionsMapper); 
 		
 		return variantStore.getFile(fileID).getReader().query(alignmentName, start, end, geneFeatures, options, regionSequence);
-		
 	}
 	
 	public static List<GeneFeature> getGenesAt(String sequence, int start, int end, RegionsMapper regionsMapper) {

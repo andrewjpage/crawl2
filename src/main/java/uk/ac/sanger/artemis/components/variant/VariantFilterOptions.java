@@ -57,9 +57,9 @@ public class VariantFilterOptions {
 		for (VariantFilterOption opt : VariantFilterOption.values()) {
 			s.append(sep);
 			s.append(opt.index());
-			s.append(" ");
+			s.append(" : ");
 			s.append(opt.name());
-			s.append(" ");
+			s.append(" - enabled? ");
 			s.append(isEnabled(opt));
 			sep = ",";
 		}
