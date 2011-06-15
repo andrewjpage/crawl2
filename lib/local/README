@@ -1,0 +1,20 @@
+#
+# Artemis is updated as follows.
+#
+
+# update artemis
+$ cd ../artemis
+$ svn update
+
+# make all kinds of jars
+$ make jar
+
+# get the version
+$ grep Artemis etc/versions 
+Artemis Release 13.1.1
+
+# copy it accross with the right version number
+$ cp jar_build/artemis_mac.jar ../crawl/lib/local/artemis-v13.1.1.jar
+
+# edit build.gradle
+# compile group: 'org.sanger', name: 'artemis', version: 'v13.1.1', ext:'jar'

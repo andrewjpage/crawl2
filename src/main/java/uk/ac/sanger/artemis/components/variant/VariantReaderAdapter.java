@@ -1,36 +1,66 @@
 package uk.ac.sanger.artemis.components.variant;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.genedb.crawl.model.MappedVCFRecord;
 import org.genedb.crawl.model.Sequence;
 
 
 public abstract class VariantReaderAdapter {
-
+	
+	private static Logger logger = Logger.getLogger(VariantReaderAdapter.class);
+	
 	protected AbstractVCFReader abstractReader;
 	
 	public static final VariantReaderAdapter getReader(String url) throws IOException {
 		if (IOUtils.isBCF(url)) {
+			logger.info("BCF " + url);
 			return new BCFReaderAdapter(url);
 		} 
+		logger.info("Tabix " + url);
 		return new TabixReaderAdapter(url);
 	}
 	
-	public abstract List<VCFRecord> unFilteredQuery(
-			String region, 
+	public List<VCFRecord> unFilteredQuery(String region, 
 			int start, 
-			int end) throws IOException;
+			int end) throws IOException {
+		logger.info("BEGIN QUERY " + region + ":" + start + "-" + end);
+		List<VCFRecord> records = new ArrayList<VCFRecord>();
+		VCFRecord record;
+		while((record = abstractReader.getNextRecord(region, start, end)) != null) {
+			records.add(record);
+		}
+		return records;
+	}
 	
-	public abstract List<MappedVCFRecord> query(
+	public List<MappedVCFRecord> query(
 			String region, 
 			int start, 
 			int end, 
 			List<GeneFeature> genes, 
-			VariantFilterOptions options,
-			Sequence regionSequence) throws IOException;
+			VariantFilterOptions options, 
+			Sequence regionSequence) throws IOException {
+		List<MappedVCFRecord> records = new ArrayList<MappedVCFRecord>();
+		
+		logger.info("BEGIN QUERY " + region + ":" + start + "-" + end);
+		
+		VCFRecord record;
+		while((record = abstractReader.getNextRecord(region, start, end)) != null) {
+			logger.info(record);
+			VCFRecordAdapter recordAdapter = new VCFRecordAdapter(record, regionSequence);
+			if (showRecord(recordAdapter, genes, options, end, regionSequence)) {
+				records.add(processRecord(recordAdapter));
+			} else {
+				logger.warn("not showing " + record.getPos());
+			}
+		}
+		
+		return records;
+	}
 	
 	public List<String> getSeqNames() {
 		return Arrays.asList(abstractReader.getSeqNames());
@@ -122,5 +152,7 @@ public abstract class VariantReaderAdapter {
 	{
 		return abstractReader.isVcf_v4();
 	}
+	
+	
 	
 }

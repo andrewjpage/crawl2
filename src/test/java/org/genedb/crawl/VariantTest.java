@@ -67,7 +67,7 @@ public class VariantTest extends TestCase {
 		String sequenceNameInVCF = "S_pneumoniae_Spanish_23F.dna";
 		String organism = "{\"ID\":999,\"common_name\":\"Spneumoniae\",\"genus\":\"Streptococcus\",\"species\":\"pneumoniae\",\"translation_table\":1,\"taxonID\":1313}";
 		int start = 1;
-		int end = 10000000;
+		int end =   100000;
 		
 		logger.info(String.format("Running %s %s %s %s:%d-%d", gffFile, variantFile, organism, region, start, end));
 		
@@ -78,7 +78,7 @@ public class VariantTest extends TestCase {
 	
 	
 	private void runQueryDirectly(String variantFile, String region, int start, int end) throws IOException {
-		
+		logger.info("runQueryDirectly");
 		VariantReaderAdapter reader = VariantReaderAdapter.getReader(variantFile);
 		logger.info(reader.getSeqNames());
 		List<?> records = reader.unFilteredQuery(region, start, end);
@@ -90,7 +90,7 @@ public class VariantTest extends TestCase {
 	
 	
 	private void run (String gffFile, String variantFile, String organism, String region, int start, int end) throws SecurityException, IllegalArgumentException, IOException, ParseException, NoSuchFieldException, IllegalAccessException {
-		
+		logger.info("run");
 		builder = new MyGFFIndexBuilder();
 		builder.elasticSearchPropertiesFile = new File("resource-elasticsearch-local.properties");
 		

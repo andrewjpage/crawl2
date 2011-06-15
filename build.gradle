@@ -81,8 +81,8 @@ dependencies {
 	
 	// note that this information is matched up to jars in the local repository by the use of naming convention assumptions
 	// as well as some trial and error by ivy
-	compile group: 'net.sf', name: 'sam', version: '1.42', ext: 'jar'
-	compile group: 'org.sanger', name: 'artemis', version: 'v13.0.15', ext:'jar'
+	compile group: 'net.sf', name: 'sam', version: '1.45', ext: 'jar'
+	compile group: 'org.sanger', name: 'artemis', version: 'v13.1.1', ext:'jar'
 	
 	// does not currently work with eclipse target
     // compile fileTree(dir: 'lib/local', includes: ['**.jar'])

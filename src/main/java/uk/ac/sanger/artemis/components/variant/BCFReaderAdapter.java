@@ -8,8 +8,6 @@ import org.apache.log4j.Logger;
 import org.genedb.crawl.model.MappedVCFRecord;
 import org.genedb.crawl.model.Sequence;
 
-import uk.ac.sanger.artemis.components.variant.BCFReader.BCFReaderIterator;
-
 public class BCFReaderAdapter extends VariantReaderAdapter {
 	
 	private Logger logger = Logger.getLogger(BCFReaderAdapter.class);
@@ -19,8 +17,10 @@ public class BCFReaderAdapter extends VariantReaderAdapter {
 	public BCFReaderAdapter(String url) throws IOException {
 		reader = new BCFReader(url);
 		String hdr = reader.headerToString();
-	    if(hdr.indexOf("VCFv4") > -1)
+		logger.info(hdr);
+	    if(hdr.indexOf("VCFv4") > -1) {
 	    	reader.setVcf_v4(true);
+	    }
 		abstractReader = reader;
 	}
 	
@@ -28,14 +28,14 @@ public class BCFReaderAdapter extends VariantReaderAdapter {
 	@Override
 	public List<VCFRecord> unFilteredQuery(String region, int start, int end)
 			throws IOException {
-		BCFReaderIterator it = reader.query(region, start, end);
-		logger.info("BEGIN QUERY " + region + ":" + start + "-" + end);
-		VCFRecord record;
-		List<VCFRecord> records = new ArrayList<VCFRecord>();
-		while((record = it.next()) != null) {
-			logger.info(record);
-			records.add(record);
+		
+		List<VCFRecord> records = super.unFilteredQuery(region, start,end);
+		
+		if (records.size() == 1) {
+			logger.warn("running second time, suspicious size of 1.");
+			records = super.unFilteredQuery(region, start,end);
 		}
+		
 		return records;
 	}
 	
@@ -48,30 +48,21 @@ public class BCFReaderAdapter extends VariantReaderAdapter {
 			VariantFilterOptions options, 
 			Sequence regionSequence) throws IOException {
 		
-		List<MappedVCFRecord> records = new ArrayList<MappedVCFRecord>();
+		List<MappedVCFRecord> records = super.query(region, start, end, genes, options, regionSequence);
 		
-		logger.info("BEGIN QUERY " + region + ":" + start + "-" + end);
-		
-		BCFReaderIterator it = reader.query(region, start, end);
-		logger.info("Iterating with " + it);
-		
-		VCFRecord record;
-		while((record = it.next()) != null) {
-			logger.info(record);
-			
-			VCFRecordAdapter recordAdapter = new VCFRecordAdapter(record, regionSequence);
-			if (showRecord(recordAdapter, genes, options, end, regionSequence)) {
-				records.add(processRecord(recordAdapter));
-			} else {
-				logger.warn("not showing " + record.getPos());
-			}
-			
+		if (records.size() == 1) {
+			logger.warn("running second time, suspicious size of 1.");
+			records = super.query(region, start, end, genes, options, regionSequence);
 		}
 		
 		return records;
 	          
 	}
-
+	
+	
+	
+	
+	
 
 
 	
