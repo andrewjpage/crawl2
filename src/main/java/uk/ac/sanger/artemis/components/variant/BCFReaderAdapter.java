@@ -31,7 +31,7 @@ public class BCFReaderAdapter extends VariantReaderAdapter {
 		
 		List<VCFRecord> records = super.unFilteredQuery(region, start,end);
 		
-		if (records.size() == 1) {
+		if (records.size() <= 1) {
 			logger.warn("running second time, suspicious size of 1.");
 			records = super.unFilteredQuery(region, start,end);
 		}
