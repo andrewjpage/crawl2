@@ -301,7 +301,9 @@ task wrapper(type: Wrapper) {
  */
 def gitClone(String url, File dir) {
 	dir.mkdirs()
-	['git','clone', url].execute(null, dir)
+	def proc = ['git','clone', url].execute(null, dir)
+	proc.waitFor()
+	if (proc.exitValue > 1) throw new Exception (proc.err.text)
 }
 
 
