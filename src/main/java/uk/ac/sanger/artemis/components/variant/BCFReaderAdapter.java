@@ -50,8 +50,8 @@ public class BCFReaderAdapter extends VariantReaderAdapter {
 		
 		List<MappedVCFRecord> records = super.query(region, start, end, genes, options, regionSequence);
 		
-		if (records.size() == 1) {
-			logger.warn("running second time, suspicious size of 1.");
+		if (records.size() <= 1) {
+			logger.warn("running second time, suspicious size of <= 1.");
 			records = super.query(region, start, end, genes, options, regionSequence);
 		}
 		
