@@ -303,7 +303,7 @@ def gitClone(String url, File dir) {
 	dir.mkdirs()
 	def proc = ['git','clone', url].execute(null, dir)
 	proc.waitFor()
-	if (proc.exitValue > 1) throw new Exception (proc.err.text)
+	if (proc.exitValue() > 1) throw new Exception (proc.err.text)
 }
 
 
