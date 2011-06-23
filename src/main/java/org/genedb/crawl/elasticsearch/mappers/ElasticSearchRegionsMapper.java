@@ -421,6 +421,8 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		int actualEnd = end ;
 		
 		s.dna = s.dna.substring(actualStart, actualEnd);
+		s.start = start;
+		s.end = end;
 		//s.length = s.dna.length();
 		
 		return s;
