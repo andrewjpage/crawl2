@@ -65,7 +65,7 @@
     
     LEFT OUTER JOIN feature_relationship fr ON f.feature_id = fr.subject_id
     LEFT JOIN feature f2 ON fr.object_id = f2.feature_id 
-    LEFT JOIN cvterm frt ON fr.type_id = frt.cvterm_id AND frt.cvterm_id in 
+    JOIN cvterm frt ON fr.type_id = frt.cvterm_id AND frt.cvterm_id in 
                                (select cvterm_id from cvterm where name in ('part_of', 'derives_from'))  
 	
 	LEFT OUTER JOIN featureprop fp ON fp.feature_id = f.feature_id AND fp.type_id = (SELECT cvterm_id FROM cvterm WHERE name = 'colour') 
