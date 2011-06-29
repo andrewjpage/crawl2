@@ -61,7 +61,10 @@ public class BioDataFileStoreInitializer {
 		}
 		
 		alignmentStore = new BioDataFileStore<Alignment>(store.alignments, sequences);
-		variantStore = new BioDataFileStore<Variant>(store.variants, sequences);
+		
+		if (store.variants != null) {
+			variantStore = new BioDataFileStore<Variant>(store.variants, sequences);
+		}
 		
 	}
 	

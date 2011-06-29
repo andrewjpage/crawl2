@@ -25,10 +25,14 @@ public class Alignment extends BioDataFile {
 	@XmlAttribute(required=false)
 	public String index;
 	
+	@XmlAttribute(required=false)
+	public String qc_status;
+	
 	private SAMFileReader reader;
 	private File bamFile;
 	private File indexFile;
 	private URL bamFileURL;
+	
 	
 	@XmlTransient
 	public SAMFileReader getReader() throws IOException {

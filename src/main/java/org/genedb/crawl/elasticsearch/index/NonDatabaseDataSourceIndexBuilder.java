@@ -15,7 +15,7 @@ public abstract class NonDatabaseDataSourceIndexBuilder extends IndexBuilder {
 	
 	private static Logger logger = Logger.getLogger(NonDatabaseDataSourceIndexBuilder.class);
 	
-	@Option(name = "-o", aliases = { "--organism" }, usage = "The organism, expressed as a JSON.", required = true)
+	@Option(name = "-o", aliases = { "--organism" }, usage = "The organism, expressed as a JSON.", required = false)
 	public String organism;
 	
 	protected ElasticSearchFeatureMapper featureMapper;

@@ -120,12 +120,12 @@ public class RegionsController extends BaseQueryController {
 			end = regionsMapper.sequence(region).dna.length();
 		}
 		
-		logger.info(String.format("Getting locations for %s.", region));
+//		logger.info(String.format("Getting locations for %s.", region));
 				
 		// trying to speed up the boundary query by determining the types in advance
         String[] geneTypes = new String[] {"gene", "pseudogene"};
         
-        logger.info("Gene Types " + geneTypes);
+//        logger.info("Gene Types " + geneTypes);
         
         int actualStart = start;
         int actualEnd = end;
@@ -140,7 +140,7 @@ public class RegionsController extends BaseQueryController {
 			}
         }
         
-		logger.info( String.format("Locating on %s : %s-%s (%s)", region, actualStart, actualEnd, exclude));
+		logger.debug( String.format("Locating on %s : %s-%s (%s)", region, actualStart, actualEnd, exclude));
 		
 		return regionsMapper.locations(region, actualStart, actualEnd, exclude, types);
 //		results.actual_end = actualEnd;

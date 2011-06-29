@@ -21,4 +21,7 @@ public class Alignments {
 	@XmlElement(required=true, name="variants")
 	public List<Variant> variants;
 	
+	@XmlElement(required=true, name="references")
+	public List<Reference> references;
+	
 }

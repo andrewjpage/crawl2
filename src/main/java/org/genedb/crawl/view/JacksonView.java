@@ -39,7 +39,7 @@ public class JacksonView extends BaseView implements View {
 		
 		for (Entry<String, ?> entry : map.entrySet()) {
 			
-			logger.debug(entry.getKey());
+			//logger.debug(entry.getKey());
 			//logger.debug(entry.getValue());
 			
 			Object value = entry.getValue();

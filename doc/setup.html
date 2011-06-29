@@ -329,6 +329,36 @@ here use a local cluster, which is instantiated by crawl itself. All examples he
 
 <P>Please note how the organism can be created at the same time</P>
 
+
+
+
+
+<h3 id="gff3json">Indexing GFF3 files specified in a JSON file</h3>
+
+<P>
+    If a references block is made available in a JSON file, then this can be provided using the -j parameter. 
+</P>
+
+<pre><code>./crawl gff2es -pe resource-elasticsearch-vrtrack-gv1.properties -j src/test/resources/alignments-vrtrack.json</code></pre>
+
+<P>A references block in the json file should look like this :</P>
+
+<pre><code>{
+    "references": [{
+        "file":"src/test/resources/data/Spn23f_bodged.gff",
+        "organism": {
+            "ID":"999",
+            "common_name":"Streptococcus_pneumoniae_23F_FM211187",
+            "genus":"Streptococcus",
+            "species":"pneumoniae_23F_FM211187",
+            "translation_table":"1",
+            "taxonID":"1313"
+        }
+    }]
+}</code></pre>
+
+
+
 <h3 id="das">Indexing DAS sources</h3>
 
 <P>For this example, we are going to overlay features available from an external DAS source onto the reference sequence and annotations provided in a GFF files.</P>

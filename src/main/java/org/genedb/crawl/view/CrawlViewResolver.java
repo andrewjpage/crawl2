@@ -9,6 +9,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 
@@ -30,8 +31,6 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
 	public View resolveViewName(String viewName, Locale locale)
 			throws Exception {
 
-		logger.info(viewName);
-
 		String[] viewSplit = viewName.split(":");
 
 		if (viewSplit.length < 1) {
@@ -39,7 +38,7 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
 		}
 
 		String prefix = viewSplit[0];
-		logger.info(String.format("prefix: '%s'", prefix));
+		//logger.info(String.format("prefix: '%s'", prefix));
 
 		String extensionViewName = "";
 		if (viewSplit.length == 2) {
@@ -49,8 +48,8 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
 		}
 
 		View view = viewMap.get(extensionViewName);
-		logger.info(String.format("Returning view of type '%s'",
-				view.getClass()));
+//		logger.info(String.format("Returning view of type '%s'",
+//				view.getClass()));
 		return view;
 	}
 
@@ -68,11 +67,21 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
 		HttpServletRequest request = servletAttrs.getRequest();
 
 		String uri = request.getRequestURI();
-		logger.debug("parsing uri: " + uri);
 		String extension = "xml";
 		if (uri.endsWith(".json")) {
 			extension = "json";
 		}
+		
+		StringBuilder sb = new StringBuilder (uri);
+		String sep = " - ";
+		Map<String, String[]> parameters = request.getParameterMap();
+    	for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+    		sb.append(sep + entry.getKey() + " : " +  Arrays.asList(entry.getValue()).toString());
+    		sep = ", ";
+    	}
+    	
+    	logger.debug(sb.toString());
+		
 		return extension;
 	}
 
