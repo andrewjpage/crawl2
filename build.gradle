@@ -26,6 +26,10 @@ def webArtemisClonePath = 'Web-Artemis'
 
 repositories {
 	
+	
+	// a local repository for jars that are not available from online ones
+	flatDir name: 'localRepository', dirs: 'lib/local'
+	
 	// commented out - let's see if we can get away without having to maintain this.
     // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/jboss/"] 
     // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"]
@@ -43,8 +47,6 @@ repositories {
     mavenRepo urls: ["http://repository.springsource.com/maven/bundles/milestone"]
     //mavenRepo urls: ["http://repository.springsource.com/maven/bundles/snapshot"]
     
-	// a local repository for jars that are not available from online ones
-	flatDir name: 'localRepository', dirs: 'lib/local'
 	
     mavenCentral()
 }
