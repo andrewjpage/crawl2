@@ -11,6 +11,16 @@
 		<param-value>/WEB-INF/log4j.properties</param-value>
 	</context-param>
 
+	<context-param>
+	    <!--  
+	        very important - this allows multiple deployments on the same tomcat, see
+	        - http://forum.springframework.org/archive/index.php/t-32873.html
+	        - http://blog.richeton.com/2010/06/22/how-to-solve-error-listenerstart-error-with-spring-log4j-and-tomcat/
+	     -->
+		<param-name>log4jExposeWebAppRoot</param-name>
+		<param-value>false</param-value>
+	</context-param>
+    
 	<listener>
 		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
 	</listener>
