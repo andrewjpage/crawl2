@@ -1,22 +1,26 @@
 package org.genedb.crawl.elasticsearch.index;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.genedb.crawl.elasticsearch.index.gff.GFFAnnotatationAndFastaExtractor;
+import org.genedb.crawl.elasticsearch.index.gff.GFFFileFilter;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchOrganismsMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
 import org.genedb.crawl.model.Organism;
-import org.kohsuke.args4j.Option;
 
 public abstract class NonDatabaseDataSourceIndexBuilder extends IndexBuilder {
 	
 	private static Logger logger = Logger.getLogger(NonDatabaseDataSourceIndexBuilder.class);
-	
-	@Option(name = "-o", aliases = { "--organism" }, usage = "The organism, expressed as a JSON.", required = false)
-	public String organism;
 	
 	protected ElasticSearchFeatureMapper featureMapper;
 	protected ElasticSearchOrganismsMapper organismsMapper;
@@ -39,12 +43,56 @@ public abstract class NonDatabaseDataSourceIndexBuilder extends IndexBuilder {
 		regionsMapper.setConnection(connection);
 	}
 	
-	protected Organism getAndPossiblyStoreOrganism() throws JsonParseException,
+	protected void convertPath(String path, Organism organism) throws ParseException, IOException {
+		
+		File gffFile = new File(path);
+		
+		GFFFileFilter filter = new GFFFileFilter();
+		filter.filter_set = GFFFileFilter.GFFFileExtensionSet.ALL;
+		
+		if (gffFile.isDirectory()) {
+			for (File f : gffFile.listFiles(filter)) {
+				convertFile(f, organism);
+				f = null;
+			}
+		} else {
+			if (! gffFile.isFile() ) {
+				throw new IOException("File " + path + " does not exist");
+			}
+			convertFile(gffFile, organism);
+			gffFile = null;
+		}
+		
+	}
+	
+	protected void convertFile(File gffFile, Organism organism) throws ParseException, IOException {
+		BufferedReader reader = getReader(gffFile);
+		new GFFAnnotatationAndFastaExtractor(reader, organism, featureMapper, regionsMapper);
+	}
+	
+
+	private BufferedReader getReader(File file) throws IOException {
+		
+		BufferedReader reader = null;
+		
+		FileInputStream fileStream = new FileInputStream(file);
+		
+		if (file.getName().endsWith("gz")) {
+			logger.info("unzipping");
+		    reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(fileStream)));
+		} else {
+			reader = new BufferedReader(new InputStreamReader(fileStream));
+		}
+		
+		return reader;
+	}
+	
+	protected Organism getAndPossiblyStoreOrganism(String organismString) throws JsonParseException,
 			JsonMappingException, IOException, SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException {
 				
-				Organism userSuppliedOrganism = (Organism) jsonIzer.fromJson(organism, Organism.class);
+				Organism userSuppliedOrganism = (Organism) jsonIzer.fromStringOrFile(organismString, Organism.class);
 				
 				Organism organism = null;
 				

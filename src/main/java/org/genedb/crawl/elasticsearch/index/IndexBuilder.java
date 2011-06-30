@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.elasticsearch.client.Client;
 
 import org.genedb.crawl.elasticsearch.Connection;
@@ -14,9 +15,13 @@ import org.genedb.crawl.elasticsearch.TransportConnection;
 import org.genedb.crawl.json.JsonIzer;
 
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 public abstract class IndexBuilder {
+	
+	static Logger logger = Logger.getLogger(IndexBuilder.class);
 	
 	@Option(name = "-h", aliases = {"--help"}, usage = "Print help")
 	public boolean help;
@@ -24,15 +29,40 @@ public abstract class IndexBuilder {
 	@Option(name = "-pe", aliases = {"--properties_elasticsearch"}, usage = "A properties file specifying elastic search connection details", required=true)
 	public File elasticSearchPropertiesFile;
 	
-//	@Option(name = "-n", aliases = {"--no_features"}, usage = "Do not index features, just load organisms.", required = false)
-//	public boolean noFeatures = false;
-	
 	private Properties elasticSearchProperties;
 	
 	protected JsonIzer jsonIzer = new JsonIzer();
 	protected Client client;
 	protected Connection connection;
 	
+	public abstract void run() throws Exception;
+	
+	protected void prerun (String[] args) throws Exception {
+		
+		CmdLineParser parser = new CmdLineParser(this);
+		
+		try {
+			
+			parser.parseArgument(args);
+		
+			if (this.help) {
+				parser.setUsageWidth(80);
+	            parser.printUsage(System.out);
+	            System.exit(1);
+			}
+			
+			this.run();
+		
+		} catch (CmdLineException e) {
+			logger.error(e.getMessage());
+            parser.setUsageWidth(80);
+            parser.printUsage(System.out);
+            System.exit(1);
+		} finally {
+			
+			closeIndex();
+		}
+	}
 	
 	protected void setupIndex() throws IOException {
 		

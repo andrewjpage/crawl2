@@ -13,15 +13,12 @@ import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import uk.ac.ebi.das.jdas.adapters.features.FeatureAdapter;
 import uk.ac.ebi.das.jdas.exceptions.ValidationException;
 import uk.ac.ebi.das.jdas.schema.entryPoints.SEGMENT;
 
-import org.genedb.crawl.model.Cv;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.FeatureProperty;
 import org.genedb.crawl.modelling.RegionFeatureBuilder;
@@ -46,12 +43,14 @@ public class DASIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 	@Option(name = "-i", aliases = {"--interbase"}, usage = "If true, assumes the DAS source coordinates are interbase (default is true). If false, it will subtract 1 from the start position.", required = false)
 	public boolean interbase = true;
 	
+	@Option(name = "-o", aliases = { "--organism" }, usage = "The organism, expressed as a JSON.", required = false)
+	public String organism;
 	
-	void run () throws IOException, JAXBException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, ValidationException {
+	public void run () throws IOException, JAXBException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, ValidationException {
 		
 		init();
 		
-		Organism o = getAndPossiblyStoreOrganism();
+		Organism o = getAndPossiblyStoreOrganism(organism);
 		
 		DasFetcher fetcher = new DasFetcher(url, source);
 		
@@ -127,25 +126,8 @@ public class DASIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 	
 	
 	
-	public static void main(String[] args) throws SecurityException, IllegalArgumentException, IOException, JAXBException, NoSuchFieldException, IllegalAccessException, ValidationException {
-		DASIndexBuilder builder = new DASIndexBuilder();
-		CmdLineParser parser = new CmdLineParser(builder);
-		
-		try {
-			
-			parser.parseArgument(args);
-			builder.run();
-			
-		} catch (CmdLineException e) {
-			logger.error(e.getMessage());
-            parser.setUsageWidth(80);
-            parser.printUsage(System.out);
-            System.exit(1);
-		} finally {
-			
-			builder.closeIndex();
-		}
-		
+	public static void main(String[] args) throws Exception {
+		new DASIndexBuilder().prerun(args);
 	}
 	
 }

@@ -46,6 +46,21 @@ public class JsonIzer {
 	    
 	}
 	
+	@SuppressWarnings("unchecked")
+	public <T> T fromStringOrFile(String json, Class<T> cls) throws JsonMappingException, IOException {
+		T object = null;
+		
+		File jsonFile = new File(json);
+		
+		if (jsonFile.isFile()) {
+			object = (T) fromJson(jsonFile, cls);
+		} else {
+			object = (T) fromJson(json, cls);
+		}
+		
+		return object;
+	}
+	
 	public Object fromJson(String string, @SuppressWarnings("rawtypes") Class cls) throws JsonParseException, JsonMappingException, IOException {
 		@SuppressWarnings("unchecked")
 		Object obj =  mapper.readValue(string, cls);

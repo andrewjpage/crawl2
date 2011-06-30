@@ -7,7 +7,6 @@ import java.io.Reader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -33,8 +32,6 @@ import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Organism;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import com.hazelcast.core.Hazelcast;
@@ -89,7 +86,7 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	
 	private JsonIzer jsonIzer = new JsonIzer();
 	
-	void run() throws CrawlException, ParseException, IOException {
+	public void run() throws CrawlException, ParseException, IOException {
 		
 		setupIndex();
 		setupSession();
@@ -202,42 +199,8 @@ public class IncrementalSQLIndexBuilder extends IndexBuilder {
 	
 	
 	
-	/**
-	 * @param args
-	 * @throws ParseException 
-	 * @throws CrawlException 
-	 * @throws IOException 
-	 * @throws CorruptIndexException 
-	 */
-	public static void main(String[] args) throws CrawlException, ParseException, IOException {
-		
-		IncrementalSQLIndexBuilder incrementalBuilder = new IncrementalSQLIndexBuilder();
-		CmdLineParser parser = new CmdLineParser(incrementalBuilder);
-		
-		try {
-			
-			parser.parseArgument(args);
-		
-			if (incrementalBuilder.help) {
-				parser.setUsageWidth(80);
-	            parser.printUsage(System.out);
-	            System.exit(1);
-			}
-			
-			incrementalBuilder.run();
-		
-		} catch (CmdLineException e) {
-			System.out.println(e.getMessage());
-            parser.setUsageWidth(80);
-            parser.printUsage(System.out);
-            System.exit(1);
-		} finally {
-			
-			incrementalBuilder.closeIndex();
-			incrementalBuilder.closeSession();
-			
-		}
-		
+	public static void main(String[] args) throws Exception {
+		new IncrementalSQLIndexBuilder().prerun(args);
 	}
 	
 	

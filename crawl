@@ -15,8 +15,8 @@ hget() {
 hput COMMANDS chado2es org.genedb.crawl.elasticsearch.index.sql.IncrementalSQLIndexBuilder
 hput COMMANDS das2es org.genedb.crawl.elasticsearch.index.das.DASIndexBuilder
 hput COMMANDS gff2es org.genedb.crawl.elasticsearch.index.gff.GFFIndexBuilder
-hput COMMANDS org2es org.genedb.crawl.elasticsearch.index.gff.GFFIndexBuilder
-
+hput COMMANDS org2es org.genedb.crawl.elasticsearch.index.json.OrganismIndexBuilder
+hput COMMANDS ref2es org.genedb.crawl.elasticsearch.index.json.ReferenceIndexBuilder
 
 usage() {
 	usage_string="crawl ["

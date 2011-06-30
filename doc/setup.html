@@ -291,7 +291,7 @@ here use a local cluster, which is instantiated by crawl itself. All examples he
 
 <P>The ID field is taken out of the GeneDB public repository, in this case, but you can choose whatever convention you like.</P>
 
-
+<P>Note : any JSON  can be passed either as a file or a string on the command line.</P>   
 
 
 
@@ -327,23 +327,25 @@ here use a local cluster, which is instantiated by crawl itself. All examples he
     "taxonID":1313
 }' -g src/test/resources/data/Spn23f.gff</code></pre>
 
-<P>Please note how the organism can be created at the same time</P>
+<P>Please note how the organism can be created at the same time.</P>
 
 
 
 
 
-<h3 id="gff3json">Indexing GFF3 files specified in a JSON file</h3>
+<h3 id="gff3json">Indexing both GFF3 &amp; organisms together from reference blocks specified in a JSON</h3>
 
-<P>
-    If a references block is made available in a JSON file, then this can be provided using the -j parameter. 
+<P>The above example of creating an organism with one command-line parameter and supplying its annotation file(s) with another is fine if 
+your repository if you have only a few organisms. However, if you have loads, and/or are adding all the time, then it might be easier 
+to generate a single JSON for all these GFF/Organism combinations. 
 </P>
 
-<pre><code>./crawl gff2es -pe resource-elasticsearch-vrtrack-gv1.properties -j src/test/resources/alignments-vrtrack.json</code></pre>
+<P>We call this combination of organism + annotation a reference sequence, since it's likely that alignments and variants from sub-strains 
+will be plotted against this.</P> 
 
-<P>A references block in the json file should look like this :</P>
+<P>A references block can be provided using the -r parameter. It is a collection of one or more organism+annotation entries.</P>
 
-<pre><code>{
+<pre><code>./crawl ref2es -pe resource-elasticsearch-vrtrack-gv1.properties -r '{
     "references": [{
         "file":"src/test/resources/data/Spn23f_bodged.gff",
         "organism": {
@@ -355,9 +357,14 @@ here use a local cluster, which is instantiated by crawl itself. All examples he
             "taxonID":"1313"
         }
     }]
-}</code></pre>
+}'</code></pre>
 
-<P>This block could be included in the same JSON file along with the alignments and variant blocks (see below).</P>
+<P>Likewise it can be provided in a file. </P>
+
+<pre><code>./crawl ref2es -pe resource-elasticsearch-vrtrack-gv1.properties \
+    -r src/test/resources/alignments-vrtrack.json</code></pre>
+
+<P>This block could be included in the same JSON file along with the alignments and variant blocks (see below). </P>
 
 
 <h3 id="das">Indexing DAS sources</h3>
