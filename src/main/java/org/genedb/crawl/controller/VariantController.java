@@ -130,7 +130,7 @@ public class VariantController extends BaseQueryController {
 		
 		List<GeneFeature> geneFeatures = new ArrayList<GeneFeature>(); 
 		
-		LocationBoundaries boundaries = regionsMapper.locationsMinAndMaxBoundaries(sequence, start, end, geneTypes);
+		LocationBoundaries boundaries = regionsMapper.locationsMinAndMaxBoundaries(sequence, start, end, false, geneTypes);
 		
 		if (boundaries == null) {
 			return geneFeatures;
