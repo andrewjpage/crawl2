@@ -14,7 +14,7 @@
 	    max(fmax) as end 
 	    
 	FROM feature f
-	
+	JOIN cvterm type ON f.type_id = type.cvterm_id 
 	JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = 
 	   (select feature_id from feature where uniqueName = #{region} )  )
 	JOIN cvterm t ON f.type_id = t.cvterm_id
