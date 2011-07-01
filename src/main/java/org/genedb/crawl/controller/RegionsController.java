@@ -123,14 +123,22 @@ public class RegionsController extends BaseQueryController {
 //		logger.info(String.format("Getting locations for %s.", region));
 				
 		// trying to speed up the boundary query by determining the types in advance
-        String[] geneTypes = new String[] {"gene", "pseudogene"};
-        
+//        String[] geneTypes = new String[] {"gene", "pseudogene"};
+        List<String> geneTypes = types;
+		if (! geneTypes.contains("gene")) {
+			geneTypes.add("gene");
+		}
+		if (! geneTypes.contains("pseudogene")) {
+			geneTypes.add("pseudogene");
+		}
+		
+		
 //        logger.info("Gene Types " + geneTypes);
         
         int actualStart = start;
         int actualEnd = end;
         
-        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(region, start, end, Arrays.asList(geneTypes));
+        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(region, start, end, geneTypes);
         if (expandedBoundaries != null) {
 			if (expandedBoundaries.start != null && expandedBoundaries.start < start) {
 				actualStart = expandedBoundaries.start;
