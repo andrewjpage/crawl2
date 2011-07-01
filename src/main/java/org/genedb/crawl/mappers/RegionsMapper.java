@@ -15,6 +15,7 @@ public interface RegionsMapper {
 			@Param("region") String region, 
 			@Param("start") int start, 
 			@Param("end") int end, 
+			@Param("exclude") boolean exclude,
 			@Param("types") List<String> types);
 	
 	public List<LocatedFeature> locations(

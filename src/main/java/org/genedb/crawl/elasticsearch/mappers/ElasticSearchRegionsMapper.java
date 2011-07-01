@@ -158,9 +158,9 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	
 	@Override
 	public LocationBoundaries locationsMinAndMaxBoundaries(String region,
-			int start, int end, List<String> types) {
+			int start, int end, boolean exclude, List<String> types) {
 		
-		BoolQueryBuilder isOverlap = isOverlap(region, start, end, false, types);
+		BoolQueryBuilder isOverlap = isOverlap(region, start, end, exclude, types);
 		
 		SearchRequestBuilder builder = 
 			connection

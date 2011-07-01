@@ -31,6 +31,9 @@
 		    OR ( fl.fmin <= #{start} AND fl.fmax >= #{end} ) 
 		)
     ]]>
+    
+    <include refid="types_exclude_filter"/>
+    
   </select>
   
   
