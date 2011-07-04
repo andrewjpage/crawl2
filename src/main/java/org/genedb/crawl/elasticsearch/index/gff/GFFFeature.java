@@ -213,6 +213,16 @@ public class GFFFeature {
 				map.put(key, list);
 				
 			} else {
+				
+				String quote = "\"";
+				String quote2 = "'";
+				
+				if ( (obj.startsWith(quote) && obj.endsWith(quote)) || (obj.startsWith(quote2) && obj.endsWith(quote2)) ){
+					String oldObj = obj;
+					obj = obj.substring(1, obj.length() -2);
+				}
+				
+				
 				map.put(key, obj);
 				
 				// attempt to store an ID for this feature.
@@ -251,7 +261,6 @@ public class GFFFeature {
 				
 				String key = attribute.substring(0, equals);
 				String value = attribute.substring(equals+1);
-				
 				
 				put(key, value);
 				

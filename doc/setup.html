@@ -343,7 +343,22 @@ to generate a single JSON for all these GFF/Organism combinations.
 <P>We call this combination of organism + annotation a reference sequence, since it's likely that alignments and variants from sub-strains 
 will be plotted against this.</P> 
 
-<P>A references block can be provided using the -r parameter. It is a collection of one or more organism+annotation entries.</P>
+<P>A references block can be provided using the -r parameter. It is a collection of one or more organism+annotation entries, and can be included 
+in the same JSON file along with the alignments and variant blocks (see below). </P>
+
+<P> There are several methods to then tell crawl to index the organism. It can referred to using "alignments" property in the property file.</P>
+
+<pre><code>./crawl ref2es -pe resource-elasticsearch-vrtrack-gv1.properties</code></pre>
+
+<P>The file can be referred to on command line instead : </P>
+
+<pre><code>./crawl ref2es -pe resource-elasticsearch-vrtrack-gv1.properties \
+    -r src/test/resources/alignments-vrtrack.json</code></pre>
+
+<P>So in this above example, the "alignments" section of the file is ignored for the purposes of identifying the references, and the file passed using
+the -r option is used instead.</P>
+
+<P>Finally, the references block can be supplied as a string : </P>
 
 <pre><code>./crawl ref2es -pe resource-elasticsearch-vrtrack-gv1.properties -r '{
     "references": [{
@@ -359,12 +374,12 @@ will be plotted against this.</P>
     }]
 }'</code></pre>
 
-<P>Likewise it can be provided in a file. </P>
 
-<pre><code>./crawl ref2es -pe resource-elasticsearch-vrtrack-gv1.properties \
-    -r src/test/resources/alignments-vrtrack.json</code></pre>
-
-<P>This block could be included in the same JSON file along with the alignments and variant blocks (see below). </P>
+<P>
+So to summarise, if you don't specify a -r parameter, crawl will look inside the property file for an "alignments" property and try to find 
+a "references" block in there. If OTOH you do supply a -r parameter, that can either be a path to a JSON file or a JSON string, that should
+contain an "references" block as well. 
+</P>
 
 
 <h3 id="das">Indexing DAS sources</h3>

@@ -29,7 +29,7 @@ public abstract class IndexBuilder {
 	@Option(name = "-pe", aliases = {"--properties_elasticsearch"}, usage = "A properties file specifying elastic search connection details", required=true)
 	public File elasticSearchPropertiesFile;
 	
-	private Properties elasticSearchProperties;
+	protected Properties elasticSearchProperties;
 	
 	protected JsonIzer jsonIzer = new JsonIzer();
 	protected Client client;

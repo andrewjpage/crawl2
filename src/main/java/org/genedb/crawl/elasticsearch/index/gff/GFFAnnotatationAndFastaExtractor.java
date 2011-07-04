@@ -50,6 +50,12 @@ public class GFFAnnotatationAndFastaExtractor {
 					if (line.startsWith(">")) {
 						String sequenceName = line.substring(1);
 						
+						/* we ignore everything after a space */
+						int spacePos = sequenceName.indexOf(" ");
+						if (spacePos != -1) {
+							sequenceName = sequenceName.substring(0, spacePos);
+						}
+						
 						sequence = new RegionFeatureBuilder(sequenceName, organism.ID);
 						logger.debug("Parsing sequence : " + sequenceName);
 						sequences.add(sequence);

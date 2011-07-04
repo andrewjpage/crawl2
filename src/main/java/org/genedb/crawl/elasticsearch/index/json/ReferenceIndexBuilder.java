@@ -22,8 +22,25 @@ public class ReferenceIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 		
 		init();
 		
+		
+		boolean converted = false;
+		
 		if (refs != null) {
 			convertJson(refs);
+			converted = true;
+		} else {
+			String alignments = elasticSearchProperties.getProperty("alignments");
+			if (alignments != null) {
+				convertJson(alignments);
+				converted = true;
+			}
+		}
+		
+		
+		
+		if (! converted) {
+			logger.warn("Did not perform any conversions - please supply a reference JSON block " +
+				"either on the command line (-r) or in the alignments section of the properties file.");
 		}
 		
 		logger.debug("Complete");
