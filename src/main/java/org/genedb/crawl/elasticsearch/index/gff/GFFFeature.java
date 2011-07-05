@@ -204,9 +204,11 @@ public class GFFFeature {
 		
 		public void put (String key, String obj) {
 			
+			if (obj == null || obj.length() == 0) {
+				return;
+			}
+			
 			if (obj.contains(";") && obj.contains(",")) {
-				//logger.info("[" + key + "]" + obj);
-				// then it's a list of records
 				GFFAttributeMapList list = new GFFAttributeMapList();
 				list.parseAttributes(obj);
 				
@@ -217,9 +219,12 @@ public class GFFFeature {
 				String quote = "\"";
 				String quote2 = "'";
 				
-				if ( (obj.startsWith(quote) && obj.endsWith(quote)) || (obj.startsWith(quote2) && obj.endsWith(quote2)) ){
-					String oldObj = obj;
-					obj = obj.substring(1, obj.length() -2);
+				if ((obj.startsWith(quote) && obj.endsWith(quote)) || (obj.startsWith(quote2) && obj.endsWith(quote2))) {
+					
+					if (obj.length() <= 2) 
+						return;
+					
+					obj = obj.substring(1, obj.length() -1);
 				}
 				
 				
