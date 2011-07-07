@@ -237,9 +237,28 @@ war.doFirst{
 	
 	def webArtemisClone = new File(tmpResourcesPath + "/" + webArtemisClonePath)
 	
-	if (pullWebArtemis == "true" && !webArtemisClone.isDirectory()) {
+	if (pullWebArtemis == "true") {
+	
+		def proc = ['rm', '-rf', tmpResourcesPath + "/" + webArtemisClonePath].execute()
+		proc.waitFor()
+		if (proc.exitValue() > 1) throw new Exception (proc.err.text)
+	
 		println "Cloning Web-Artemis into " + tmpResourcesPath + webArtemisClonePath
 		gitClone('https://github.com/sanger-pathogens/Web-Artemis.git', file(tmpResourcesPath))
+		
+		String ws = "/" + props["deploy.name"];
+		
+		String indexFileName = tmpResourcesPath + "/" + webArtemisClonePath + "/index.html";
+		String html =   new File(indexFileName).getText();
+		
+		String toReplace = "{'directory':'.', 'source':'Pf3D7_01', 'start':'1', 'bases':'8000', 'showFeatureList':true, 'start': '1', 'zoomMaxRatio':'1.'});";
+		String with = "{webService:'${ws}', 'directory':'.', 'source':'Pf3D7_01', 'start':'1', 'bases':'8000', 'showFeatureList':true, 'start': '1', 'zoomMaxRatio':'1.'});";
+		
+		println("Attempting to replace \n ${toReplace} \nwith \n ${with}");
+		String replaced = html.replace(toReplace, with); 
+		
+		new File(indexFileName).setText(replaced);
+		
 	}
 	
 	copy {
@@ -303,7 +322,7 @@ task wrapper(type: Wrapper) {
  */
 def gitClone(String url, File dir) {
 	dir.mkdirs()
-	def proc = ['env', 'GIT_SSL_NO_VERIFY=true', 'git','clone', url].execute(null, dir)
+	def proc = ['git','clone', url].execute(['GIT_SSL_NO_VERIFY=true'], dir)
 	proc.waitFor()
 	if (proc.exitValue() > 1) throw new Exception (proc.err.text)
 }
