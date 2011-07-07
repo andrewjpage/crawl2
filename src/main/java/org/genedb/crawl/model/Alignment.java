@@ -33,6 +33,9 @@ public class Alignment extends BioDataFile {
 	private File indexFile;
 	private URL bamFileURL;
 	
+	@Override public void init() throws IOException {
+		getReader();
+	}
 	
 	@XmlTransient
 	public SAMFileReader getReader() throws IOException {
