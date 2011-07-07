@@ -94,11 +94,6 @@
             "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_8h.bam",
             "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_8h.bam.bai",
             "organism" : "Pfalciparum"
-        },
-        {
-            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Module_1_Mapping_sequence_data/malaria/all.bam",
-            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Module_1_Mapping_sequence_data/malaria/all.bam.bai",
-            "organism" : "Pfalciparum"
         }
     ]
 }
