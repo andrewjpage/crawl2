@@ -41,12 +41,13 @@ public class BioDataFileStore <T extends BioDataFile> {
 		sequences = new HashMap<String, String>();
 	}
 	
-	BioDataFileStore (List<T> files, Map<String, String> sequences) {
+	BioDataFileStore (List<T> files, Map<String, String> sequences) throws IOException {
 		this.files = files;
 		this.sequences = sequences;
 		
 		generateMetaFields();
 		assignFileIDs();
+		getReaders();
 	}
 	
 	
@@ -110,6 +111,12 @@ public class BioDataFileStore <T extends BioDataFile> {
 			file.fileID = fileID++;
 			logger.info(String.format("Assigning file %d (%s) :: %s", 
 					file.fileID, file.getClass() , file.file));
+		}
+	}
+	
+	void getReaders() throws IOException {
+		for (BioDataFile file : files) {
+			file.init();
 		}
 	}
 	

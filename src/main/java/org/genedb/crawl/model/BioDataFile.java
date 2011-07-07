@@ -1,5 +1,7 @@
 package org.genedb.crawl.model;
 
+import java.io.IOException;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
 public class BioDataFile {
@@ -19,6 +21,10 @@ public class BioDataFile {
 	@Override
 	public String toString() {
 		return (String.format("%d : %s : %s", fileID, file, meta));
+	}
+	
+	public void init() throws IOException {
+		// do nothing
 	}
 	
 }
