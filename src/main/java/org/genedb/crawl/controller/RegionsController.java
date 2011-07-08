@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -120,11 +122,16 @@ public class RegionsController extends BaseQueryController {
 			end = regionsMapper.sequence(region).dna.length();
 		}
 		
-//		logger.info(String.format("Getting locations for %s.", region));
-				
+		// logger.info(String.format("Getting locations for %s.", region));
 		// trying to speed up the boundary query by determining the types in advance
-//        String[] geneTypes = new String[] {"gene", "pseudogene"};
-        List<String> geneTypes = types;
+		// String[] geneTypes = new String[] {"gene", "pseudogene"};
+		
+        Set<String> geneTypes = new HashSet<String>();
+        
+        if (types != null) {
+        	geneTypes.addAll(types);
+        }
+        
 		if (! geneTypes.contains("gene")) {
 			geneTypes.add("gene");
 		}
@@ -138,7 +145,7 @@ public class RegionsController extends BaseQueryController {
         int actualStart = start;
         int actualEnd = end;
         
-        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(region, start, end, exclude, geneTypes);
+        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(region, start, end, exclude, new ArrayList<String>(geneTypes));
         if (expandedBoundaries != null) {
 			if (expandedBoundaries.start != null && expandedBoundaries.start < start) {
 				actualStart = expandedBoundaries.start;
