@@ -167,6 +167,9 @@ test.doFirst {
     systemProperties.putAll( props )
 }
 
+test {
+	maxHeapSize = '2048m'
+}
 
 /*
 * Currently using a custom install task because the gradle application plugin only supports one main class.
