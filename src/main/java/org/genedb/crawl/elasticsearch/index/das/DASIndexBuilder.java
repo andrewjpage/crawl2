@@ -127,7 +127,7 @@ public class DASIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 	
 	
 	public static void main(String[] args) throws Exception {
-		new DASIndexBuilder().prerun(args);
+		new DASIndexBuilder().prerun(args).closeIndex();
 	}
 	
 }

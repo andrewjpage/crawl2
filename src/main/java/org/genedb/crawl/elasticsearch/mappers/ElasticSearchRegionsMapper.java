@@ -176,7 +176,7 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			.execute()
 			.actionGet();
 	
-		logger.info(toString(builder.internalBuilder()));
+		//logger.info(toString(builder.internalBuilder()));
 		
 		LocationBoundaries lb = new LocationBoundaries();
 		lb.start = start;
@@ -417,8 +417,10 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			return s;
 		}
 		
+		int max = s.dna.length() -1;
+		
 		int actualStart = start -1;
-		int actualEnd = end ;
+		int actualEnd = (end < max) ? end : max ;
 		
 		s.dna = s.dna.substring(actualStart, actualEnd);
 		s.start = start;
@@ -463,12 +465,12 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			srb.setFrom(offset);
 		}
 		
-		logger.info(toString(srb.internalBuilder()));
+		//logger.info(toString(srb.internalBuilder()));
 		
 		SearchResponse response = srb.execute()
 			.actionGet();
 		
-		logger.info(response);
+		//logger.info(response);
 		
 		SearchHits hits = response.getHits();
 		
@@ -476,15 +478,15 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		
 		for (SearchHit hit : hits) {
 			
-			logger.info(hit.id());
-			
-			for (Entry<String, SearchHitField> fieldEntry : hit.getFields().entrySet()) {
-				logger.debug("-" + fieldEntry.getKey());
-				
-				SearchHitField field = fieldEntry.getValue();
-				logger.debug("---" + field.getValue());
-				
-			}
+//			logger.info(hit.id());
+//			
+//			for (Entry<String, SearchHitField> fieldEntry : hit.getFields().entrySet()) {
+//				logger.debug("-" + fieldEntry.getKey());
+//				
+//				SearchHitField field = fieldEntry.getValue();
+//				logger.debug("---" + field.getValue());
+//				
+//			}
 			
 			Feature region = new Feature();
 			region.uniqueName = hit.getId();

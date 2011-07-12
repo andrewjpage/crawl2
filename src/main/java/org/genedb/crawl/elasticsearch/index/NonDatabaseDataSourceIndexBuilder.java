@@ -71,7 +71,7 @@ public abstract class NonDatabaseDataSourceIndexBuilder extends IndexBuilder {
 	}
 	
 
-	private BufferedReader getReader(File file) throws IOException {
+	public BufferedReader getReader(File file) throws IOException {
 		
 		BufferedReader reader = null;
 		

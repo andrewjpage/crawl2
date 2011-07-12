@@ -1,14 +1,36 @@
 {
     "references": [{
-        "file":"src/test/resources/data/Spn23f_bodged.gff",
-        "organism": {
-            "ID":"999",
-            "common_name":"Streptococcus_pneumoniae_23F_FM211187",
-            "genus":"Streptococcus",
-            "species":"pneumoniae_23F_FM211187",
-            "translation_table":"1",
-            "taxonID":"1313"
-        }
+            "file":"src/test/resources/data/Spn23f_bodged.gff",
+            "organism": {
+                "ID":"999",
+                "common_name":"Streptococcus_pneumoniae_23F_FM211187",
+                "genus":"Streptococcus",
+                "species":"pneumoniae_23F_FM211187",
+                "translation_table":"1",
+                "taxonID":"1313"
+            }
+        },
+        {
+            "file":"/nfs/pathogen/refs/Ascaris/suum/test.gff",
+            "organism": {
+                 "ID":1111,
+                "common_name":"Asuum",
+                "genus":"Ascaris",
+                "species":"suum",
+                "translation_table":11,
+                "taxonID":11111
+            }
+        },
+        {
+            "file":"/nfs/pathogen/refs/Aliivibrio/salmonicida_LFI1238/Aliivibrio_salmonicida_LFI1238_v1.gff",
+            "organism": {
+                "ID":22222,
+                "common_name":"Asalmonicida_LFI1238",
+                "genus":"Aliivibrio",
+                "species":"salmonicida_LFI1238",
+                "translation_table":11,
+                "taxonID":222222
+            }
     }],
     "alignments": [{
         "qc_status": "pending",

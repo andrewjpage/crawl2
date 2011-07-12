@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
+import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
@@ -42,6 +43,39 @@ public class GFFAnnotatationAndFastaExtractor {
 					
 					
 					LocatedFeature feature = new FeatureBeanFactory(organism, line).getFeature();
+					
+					LocatedFeature existingFeature = featureMapper.get(feature.uniqueName);
+					if (existingFeature != null) {
+						
+						if (feature.fmin != existingFeature.fmin 
+								|| feature.fmax != existingFeature.fmax) {
+							
+							// we are currently assuming this is never null (because FeatureBeanFactory creates it) 
+							List<Coordinates> existingCoordinates = existingFeature.coordinates;
+							
+							boolean coordinatesAlreadyPresent = false;
+								
+							for (Coordinates c : existingCoordinates) {
+								if (c.fmin == feature.fmin && c.fmax == feature.fmax) {
+									coordinatesAlreadyPresent = true;
+								}
+							}
+							
+							if (! coordinatesAlreadyPresent) {
+								assert(feature.coordinates.get(0).fmin == feature.fmin);
+								assert(feature.coordinates.get(0).fmax == feature.fmax);
+								logger.warn(String.format("Adding extra %d %d coordinates for %s", feature.coordinates.get(0).fmin, feature.coordinates.get(0).fmax, feature.uniqueName));
+								existingFeature.coordinates.add(feature.coordinates.get(0));
+								// TODO we won't bother adding extra annotations on this for the time being
+							} 
+							
+							feature = existingFeature;
+							
+						}
+						
+					}
+					
+					
 					featureMapper.createOrUpdate(feature);
 					
 					

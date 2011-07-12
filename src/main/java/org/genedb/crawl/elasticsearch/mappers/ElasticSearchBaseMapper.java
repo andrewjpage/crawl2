@@ -103,6 +103,10 @@ public abstract class ElasticSearchBaseMapper {
 		return featureResults;
 	}
 	
+	protected String getFromElastic(String index, String type, String uniqueName) {
+		return connection.getClient().prepareGet(index,type, uniqueName).execute().actionGet().sourceAsString();
+	}
+	
 	protected String getFromElastic(String index, String type, String uniqueName, String[] fields) {
 		return connection.getClient().prepareGet(index,type, uniqueName).execute().actionGet().sourceAsString();
 		
