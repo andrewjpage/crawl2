@@ -38,7 +38,7 @@ public class GFFIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		new GFFIndexBuilder().prerun(args);
+		new GFFIndexBuilder().prerun(args).closeIndex();
 	}
 
 }

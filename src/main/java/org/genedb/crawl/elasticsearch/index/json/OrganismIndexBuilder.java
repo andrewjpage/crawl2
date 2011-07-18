@@ -23,7 +23,7 @@ static Logger logger = Logger.getLogger(OrganismIndexBuilder.class);
 	}
 	
 	public static void main(String[] args) throws Exception {
-		new OrganismIndexBuilder().prerun(args);
+		new OrganismIndexBuilder().prerun(args).closeIndex();
 	}
 
 }

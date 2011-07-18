@@ -37,7 +37,7 @@ public abstract class IndexBuilder {
 	
 	public abstract void run() throws Exception;
 	
-	protected void prerun (String[] args) throws Exception {
+	protected IndexBuilder prerun (String[] args) throws Exception {
 		
 		CmdLineParser parser = new CmdLineParser(this);
 		
@@ -58,10 +58,11 @@ public abstract class IndexBuilder {
             parser.setUsageWidth(80);
             parser.printUsage(System.out);
             System.exit(1);
-		} finally {
-			
+		} /*finally {
 			closeIndex();
-		}
+		} */
+		
+		return this;
 	}
 	
 	protected void setupIndex() throws IOException {

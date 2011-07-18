@@ -24,6 +24,15 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public LocatedFeature get(String uniqueName) {
+		try {
+			return (LocatedFeature) jsonIzer.fromJson (getFromElastic(connection.getIndex(), connection.getFeatureType(), uniqueName), LocatedFeature.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	@Override
 	public List<FeatureProperty> properties(Feature feature) {
