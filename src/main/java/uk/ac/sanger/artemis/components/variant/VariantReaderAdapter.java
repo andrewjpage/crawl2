@@ -52,7 +52,7 @@ public abstract class VariantReaderAdapter {
 		while((record = abstractReader.getNextRecord(region, start, end)) != null) {
 			logger.info(record);
 			VCFRecordAdapter recordAdapter = new VCFRecordAdapter(record, regionSequence);
-			if (showRecord(recordAdapter, genes, options, end, regionSequence)) {
+			if (showRecord(recordAdapter, genes, options, record.getPos(), regionSequence)) {
 				records.add(processRecord(recordAdapter));
 			} else {
 				logger.warn("not showing " + record.getPos());
@@ -73,7 +73,7 @@ public abstract class VariantReaderAdapter {
 			VariantFilterOptions options, 
 			int basePosition,
 			Sequence regionSequence) {
-		
+
 		if (!options.isEnabled(VariantFilterOption.SHOW_DELETIONS) //.showDeletions
 				&& record.getAlt().isDeletion(isVcf_v4()))
 			return false;
@@ -88,7 +88,6 @@ public abstract class VariantReaderAdapter {
 
 		if (!options.isEnabled(VariantFilterOption.SHOW_NON_VARIANTS) /*.showNonVariants*/ && record.getAlt().isNonVariant())
 			return false;
-
 		short isSyn = record.isSynonymous(genes, basePosition);
 		
 		record.markAsNewStop = false;
