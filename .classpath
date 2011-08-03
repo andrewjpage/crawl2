@@ -17,7 +17,6 @@
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-jdbc/jars/spring-jdbc-3.0.5.RELEASE.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.jdbc/jars/org.springframework.jdbc-3.0.5.RELEASE.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.codehaus.jackson/jackson-mapper-asl/jars/jackson-mapper-asl-1.7.5.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/git/crawl2/lib/local/artemis-v13.1.1.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-analyzers/jars/lucene-analyzers-3.1.0.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.beans/jars/org.springframework.beans-3.0.5.RELEASE.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.codehaus.jackson/jackson-xc/jars/jackson-xc-1.7.5.jar" exported="true"/>
@@ -45,13 +44,14 @@
 	<classpathentry kind="lib" path="/Users/gv1/git/crawl2/lib/local/sam-1.45.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-core/jars/spring-core-3.0.5.RELEASE.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.context/jars/org.springframework.context-3.0.5.RELEASE.jar" exported="true"/>
-	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/com.hazelcast/hazelcast/jars/hazelcast-1.9.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.commons/com.springsource.org.apache.commons.pool/jars/com.springsource.org.apache.commons.pool-1.3.0.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.aopalliance/com.springsource.org.aopalliance/jars/com.springsource.org.aopalliance-1.0.0.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.elasticsearch/elasticsearch/jars/elasticsearch-0.16.0.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-memory/jars/lucene-memory-3.1.0.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-context/jars/spring-context-3.0.5.RELEASE.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.transaction/jars/org.springframework.transaction-3.0.5.RELEASE.jar" exported="true"/>
+	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/com.hazelcast/hazelcast/jars/hazelcast-1.9.3.jar" exported="true"/>
+	<classpathentry kind="lib" path="/Users/gv1/git/crawl2/lib/local/artemis-v13.2.1.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.expression/jars/org.springframework.expression-3.0.5.RELEASE.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-highlighter/jars/lucene-highlighter-3.1.0.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/javax.servlet/com.springsource.javax.servlet/jars/com.springsource.javax.servlet-2.5.0.jar" exported="true"/>

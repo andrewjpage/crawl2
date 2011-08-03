@@ -1,10 +1,10 @@
 package uk.ac.sanger.artemis.components.variant;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.genedb.crawl.model.Gene;
 import org.genedb.crawl.model.MappedVCFRecord;
 import org.genedb.crawl.model.Sequence;
 
@@ -44,15 +44,14 @@ public class BCFReaderAdapter extends VariantReaderAdapter {
 			String region, 
 			int start, 
 			int end, 
-			List<GeneFeature> genes, 
-			VariantFilterOptions options, 
-			Sequence regionSequence) throws IOException {
+			List<CDSFeature> genes, 
+			VariantFilterOptions options) throws IOException {
 		
-		List<MappedVCFRecord> records = super.query(region, start, end, genes, options, regionSequence);
+		List<MappedVCFRecord> records = super.query(region, start, end, genes, options);
 		
 		if (records.size() <= 1) {
 			logger.warn("running second time, suspicious size of <= 1.");
-			records = super.query(region, start, end, genes, options, regionSequence);
+			records = super.query(region, start, end, genes, options);
 		}
 		
 		return records;

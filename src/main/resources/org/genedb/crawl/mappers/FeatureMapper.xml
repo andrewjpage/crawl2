@@ -12,9 +12,45 @@
             f.name,
             type.name as type 
         FROM feature f
-        JOIN cvterm type ON type.cvterm_id = f.type_id
+        JOIN cvterm type ON type.cvterm_id = f.type_id 
         WHERE <include refid="featureSelector"/>
     </select>
+    
+    <!-- 
+    
+     -->
+    <select id="getOfType" resultMap="typedFeatureResult" >
+        SELECT 
+            feature_id, 
+            organism_id, 
+            uniqueName,
+            f.name,
+            type.name as type 
+        FROM feature f
+        JOIN cvterm type ON type.cvterm_id = f.type_id and type.name = #{type}
+        WHERE <include refid="featureSelector"/> 
+    </select>
+    
+    <resultMap type="org.genedb.crawl.model.LocatedFeature"
+    	id="typedFeatureResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult">
+    	
+    	<!-- if none of the types are found by this discriminator, the resultmap 
+    	defined outside of the discriminator block will be returned instead 
+    	as this resultMap inherits from basicFeatureResult, 
+    	this will be whatever is contained in basicFeatureResult
+    	-->
+    	<discriminator column="type" javaType="String" >
+    	   <case value="gene" resultMap="geneResult" />
+    	   <case value="exon" resultMap="exonResult" />
+    	   <case value="transcript" resultMap="transcriptResult" />
+    	</discriminator> 
+    	
+    </resultMap>
+
+    <resultMap type="org.genedb.crawl.model.Gene" id="geneResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap>
+    <resultMap type="org.genedb.crawl.model.Transcript" id="transcriptResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap>
+    <resultMap type="org.genedb.crawl.model.Exon" id="exonResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap> 
+    
     
     <select id="properties"  resultMap="properties" parameterType="org.genedb.crawl.model.Feature" >
         SELECT 
@@ -161,6 +197,37 @@
     <delete id="delete">
         delete from feature where <include refid="featureSelector"/> 
     </delete>
+    
+    <select id="transcripts" resultMap="transcripts" >
+        SELECT
+            
+            transcript.uniquename as uniqueName
+            <if test="exons == true">
+            , exon.uniqueName as exonUniqueName
+            </if>
+            
+        FROM feature f
+        
+        JOIN feature_relationship fr ON fr.object_id = f.feature_id and fr.type_id IN (42, 69)
+        JOIN feature transcript ON fr.subject_id = transcript.feature_id
+        JOIN cvterm transcript_type ON transcript.type_id = transcript_type.cvterm_id AND transcript_type.name = 'mRNA'  
+        
+        <if test="exons == true">
+                JOIN feature_relationship fr2 ON fr2.object_id = transcript.feature_id and fr2.type_id IN (42, 69)
+                JOIN feature exon ON fr2.subject_id = exon.feature_id
+                JOIN cvterm exon_type ON exon.type_id = exon_type.cvterm_id AND exon_type.name = 'exon'
+        </if>
+        
+        WHERE f.uniquename = #{gene.uniqueName} 
+        
+    </select>
+    
+    <resultMap type="org.genedb.crawl.model.Transcript" id="transcripts">
+        <result property="uniqueName" column="uniqueName"/>
+        <collection property="exons" ofType="org.genedb.crawl.model.Exon"> 
+            <result property="uniqueName" column="exonUniqueName"/> 
+        </collection>
+    </resultMap>
     
 
 </mapper>

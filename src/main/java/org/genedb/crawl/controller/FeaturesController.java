@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
+import org.genedb.crawl.mappers.FeatureMapper;
 import org.genedb.crawl.mappers.FeaturesMapper;
 import org.genedb.crawl.mappers.MapperUtil;
 import org.genedb.crawl.mappers.OrganismsMapper;
@@ -17,10 +18,13 @@ import org.genedb.crawl.mappers.MapperUtil.HierarchicalSearchType;
 import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.Gene;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.HierarchicalFeature;
+import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Statistic;
+import org.genedb.crawl.model.Transcript;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,6 +42,9 @@ public class FeaturesController extends BaseQueryController {
 	
 	@Autowired
 	FeaturesMapper featuresMapper;
+	
+	@Autowired
+	FeatureMapper featureMapper;
 	
 	@Autowired
 	TermsMapper terms;
@@ -233,5 +240,49 @@ public class FeaturesController extends BaseQueryController {
 		
 		
 	
+	@ResourceDescription("Return a gene's transcripts")
+	@RequestMapping(method=RequestMethod.GET, value="/transcripts")
+	public List<Gene> transcripts(@RequestParam(value="gene") String gene, @RequestParam(value="exons") boolean exons) {
+		List<Gene> l = new ArrayList<Gene>(); 
+		Gene geneFeature = (Gene) featureMapper.getOfType(gene, null, null, "gene");
+		if (geneFeature != null) {
+			logger.info(geneFeature.getClass());
+			logger.info(geneFeature.uniqueName);
+			
+			geneFeature.transcripts = featureMapper.transcripts(geneFeature, exons);
+			logger.info(geneFeature.transcripts);
+			
+			for (Transcript t : geneFeature.transcripts) {
+				logger.info(t.uniqueName);
+			}
+			
+			 
+			l.add(geneFeature);
+			
+		}
+		
+		
+		return l;
+		
+		//return featuresMapper.pubs(features);
+	}
 	
+	@ResourceDescription("Return a gene's transcripts")
+	@RequestMapping(method=RequestMethod.GET, value="/get")
+	public List<LocatedFeature> get(@RequestParam(value="feature") String feature, @RequestParam(value="type") String type) {
+		List<LocatedFeature> l = new ArrayList<LocatedFeature>(); 
+		LocatedFeature resultFeature = featureMapper.getOfType(feature, null, null, type);
+		if (resultFeature != null) {
+			logger.info(resultFeature.getClass());
+			logger.info(resultFeature.uniqueName);
+			
+			
+			l.add(resultFeature);
+			
+		}
+		
+		return l;
+		
+		//return featuresMapper.pubs(features);
+	}
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <hazelcast>
+    <max-size-per-jvm>1000</max-size-per-jvm>
     <group>
         <name>crawl</name>
         <password>crawl</password>

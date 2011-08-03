@@ -14,6 +14,7 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
+import org.elasticsearch.index.query.xcontent.XContentQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.genedb.crawl.elasticsearch.Connection;
 import org.genedb.crawl.json.JsonIzer;
@@ -217,6 +218,16 @@ public abstract class ElasticSearchBaseMapper {
 		return null;
 	}
 	
+	protected <T extends Object> List<T> getAllMatches(String indexName, String fieldName, XContentQueryBuilder query, Class<T> cls) {
+	    
+	    SearchResponse response = connection.getClient().prepareSearch(indexName)
+	            .setQuery(query)
+	            .execute()
+	            .actionGet();
+	        
+	        return getAllMatches(response, cls);
+	}
+	
 	protected <T extends Object> List<T> getAllMatches(String indexName, String fieldName, String value, Class<T> cls) {
 		
 		FieldQueryBuilder regionQuery = 
@@ -224,6 +235,7 @@ public abstract class ElasticSearchBaseMapper {
 		
 		SearchResponse response = connection.getClient().prepareSearch(indexName)
 			.setQuery(regionQuery)
+			.setSize(Integer.MAX_VALUE)
 			.execute()
 			.actionGet();
 		

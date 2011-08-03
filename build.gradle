@@ -14,6 +14,7 @@ version = '0.1'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
+logging.captureStandardOutput LogLevel.INFO
 
 // load properties from the specified config file
 Properties props = new Properties()
@@ -42,6 +43,7 @@ repositories {
     mavenRepo urls: ["http://repository.jboss.org/maven2"]
     
     mavenRepo urls: ["http://www.ebi.ac.uk/~maven/m2repo"]
+    //mavenRepo urls: ["http://www.biojava.org/download/maven/"]
     
     mavenRepo urls: ["http://repository.springsource.com/maven/bundles/release"]
     mavenRepo urls: ["http://repository.springsource.com/maven/bundles/external"]
@@ -87,7 +89,8 @@ dependencies {
 	// note that this information is matched up to jars in the local repository by the use of naming convention assumptions
 	// as well as some trial and error by ivy
 	compile group: 'net.sf', name: 'sam', version: '1.45', ext: 'jar'
-	compile group: 'org.sanger', name: 'artemis', version: 'v13.1.1', ext:'jar'
+	compile group: 'org.sanger', name: 'artemis', version: 'v13.2.1', ext:'jar'
+    compile group: 'org.biojava', name: 'biojava', version: '1.6', ext:'jar'
 	
 	// does not currently work with eclipse target
     // compile fileTree(dir: 'lib/local', includes: ['**.jar'])
@@ -247,7 +250,7 @@ war.doFirst{
 		if (proc.exitValue() > 1) throw new Exception (proc.err.text)
 	
 		println "Cloning Web-Artemis into " + tmpResourcesPath + webArtemisClonePath
-		gitClone('https://github.com/sanger-pathogens/Web-Artemis.git', file(tmpResourcesPath))
+		gitClone(webArtemisGitUri, webArtemisGitBranch, file(tmpResourcesPath))
 		
 		String ws = "/" + props["deploy.name"];
 		
@@ -255,7 +258,7 @@ war.doFirst{
 		String html =   new File(indexFileName).getText();
 		
 		String toReplace = "{'directory':'.', 'source':'Pf3D7_01', 'start':'1', 'bases':'8000', 'showFeatureList':true, 'start': '1', 'zoomMaxRatio':'1.'});";
-		String with = "{webService:'${ws}', 'directory':'.', 'source':'Pf3D7_01', 'start':'1', 'bases':'8000', 'showFeatureList':true, 'start': '1', 'zoomMaxRatio':'1.'});";
+		String with = "{webService:'${ws}', 'directory':'.', 'source':'${webArtemisInitialChromosome}', 'start':'1', 'bases':'8000', 'showFeatureList':true, 'start': '1', 'zoomMaxRatio':'1.'});";
 		
 		println("Attempting to replace \n ${toReplace} \nwith \n ${with}");
 		String replaced = html.replace(toReplace, with); 
@@ -323,9 +326,11 @@ task wrapper(type: Wrapper) {
 /**
  * Makes a git clone.
  */
-def gitClone(String url, File dir) {
+def gitClone(String url, String branch, File dir) {
 	dir.mkdirs()
-	def proc = ['git','clone', url].execute(['GIT_SSL_NO_VERIFY=true'], dir)
+    def exec = ['git','clone', url, '-b', branch]
+    println exec
+	def proc = exec.execute(['GIT_SSL_NO_VERIFY=true'], dir)
 	proc.waitFor()
 	if (proc.exitValue() > 1) throw new Exception (proc.err.text)
 }

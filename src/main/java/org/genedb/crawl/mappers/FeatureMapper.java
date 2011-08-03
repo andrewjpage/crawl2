@@ -7,6 +7,9 @@ import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.FeatureProperty;
+import org.genedb.crawl.model.Gene;
+import org.genedb.crawl.model.LocatedFeature;
+import org.genedb.crawl.model.Transcript;
 
 public interface FeatureMapper {
 	
@@ -22,5 +25,13 @@ public interface FeatureMapper {
 	List<Coordinates> coordinates(Feature feature);
 	
 	void delete(Feature feature);
+	
+	LocatedFeature getOfType(
+			@Param("uniqueName") String uniqueName,
+			@Param("organism_id") String organism_id,
+			@Param("name") String name,
+			@Param("type") String type);
+	
+	List<Transcript> transcripts(@Param("gene") Gene gene, @Param("exons") boolean exons);
 	
 }
