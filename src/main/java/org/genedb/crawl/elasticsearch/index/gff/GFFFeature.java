@@ -50,7 +50,7 @@ public class GFFFeature {
 			if (text.equals("+")) {
 				return 1;
 			} else if (text.equals("-")) {
-				return 2;
+				return -1;
 			}
 			return 0;
 		}
@@ -204,6 +204,8 @@ public class GFFFeature {
 		
 		public void put (String key, String obj) {
 			
+		    key = key.toLowerCase();
+		    
 			if (obj == null || obj.length() == 0) {
 				return;
 			}
@@ -231,7 +233,7 @@ public class GFFFeature {
 				map.put(key, obj);
 				
 				// attempt to store an ID for this feature.
-				if (key.equals("ID")) {
+				if (key.equals("id")) {
 					if (this.feature != null) {
 						this.feature.id = obj;
 					}

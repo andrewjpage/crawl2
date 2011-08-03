@@ -6,8 +6,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.genedb.crawl.model.Exon;
+import org.genedb.crawl.model.Gene;
+
 import org.genedb.crawl.model.MappedVCFRecord;
 import org.genedb.crawl.model.Sequence;
+import org.genedb.crawl.model.Transcript;
+
+import uk.ac.sanger.artemis.io.Range;
+import uk.ac.sanger.artemis.io.RangeVector;
+import uk.ac.sanger.artemis.sequence.Bases;
+import uk.ac.sanger.artemis.util.OutOfRangeException;
 
 
 public abstract class VariantReaderAdapter {
@@ -37,23 +46,100 @@ public abstract class VariantReaderAdapter {
 		return records;
 	}
 	
+	@SuppressWarnings("unchecked")
+    public List<CDSFeature> genesToCDSFeature(
+	        List<Gene> genes, 
+	        Sequence regionSequence) {
+	    
+	    List<CDSFeature> cdsFeatures = new ArrayList<CDSFeature>();
+        
+	    logger.info("Genes : " + genes.size());
+	    
+        for (Gene gene : genes) {
+            
+            //logger.info(gene.uniqueName);
+            
+            for (Transcript t : gene.transcripts) {
+                
+                boolean isFwd = ( gene.strand > 0) ? true : false;
+                RangeVector rv = new RangeVector();
+                
+                int min = Integer.MAX_VALUE;
+                int max = 0;
+                
+                StringBuilder bases = new StringBuilder();
+                
+                for (Exon e : t.exons) {
+                    try {
+                        
+                        rv.add(new Range(e.fmin, e.fmax));
+                        bases.append(regionSequence.dna.subSequence(e.fmin, e.fmax));
+                        
+                        if (e.fmin < min) {
+                            min = e.fmin;
+                        }
+                        if (e.fmax > max) {
+                            max = e.fmax;
+                        }
+                        
+                    } catch (OutOfRangeException e1) {
+                        throw new RuntimeException(e1);
+                    }
+                }
+                
+                String b = bases.toString();
+                
+                if (! isFwd) 
+                    b = Bases.reverseComplement(b);
+                
+                CDSFeature cdsFeature = new CDSFeature(isFwd, rv, min + 1, max, b);
+                cdsFeatures.add(cdsFeature);
+                
+            }
+            
+        }
+        
+        logger.info("CDSFeatures : " + cdsFeatures.size());
+        
+        assert(cdsFeatures.size() >= genes.size());
+        
+        return cdsFeatures;
+	}
+	
 	public List<MappedVCFRecord> query(
 			String region, 
 			int start, 
 			int end, 
-			List<GeneFeature> genes, 
-			VariantFilterOptions options, 
-			Sequence regionSequence) throws IOException {
+			List<CDSFeature> cdsFeatures, 
+			VariantFilterOptions options) throws IOException {
 		List<MappedVCFRecord> records = new ArrayList<MappedVCFRecord>();
 		
-		logger.info("BEGIN QUERY " + region + ":" + start + "-" + end);
+		
+		//logger.info("BEGIN QUERY " + region + ":" + start + "-" + end);
+		
+		logger.info(
+	              String.format(
+	              "FILTER\t%s-%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+	              start, 
+	              end,
+	              options.isEnabled(VariantFilterOption.SHOW_SYNONYMOUS), 
+	              options.isEnabled(VariantFilterOption.SHOW_NON_SYNONYMOUS), 
+	              options.isEnabled(VariantFilterOption.SHOW_DELETIONS), 
+	              options.isEnabled(VariantFilterOption.SHOW_INSERTIONS), 
+	              options.isEnabled(VariantFilterOption.SHOW_MULTI_ALLELES), 
+	              options.isEnabled(VariantFilterOption.SHOW_NON_OVERLAPPINGS),
+	              options.isEnabled(VariantFilterOption.SHOW_NON_VARIANTS)));
+		
+		//logger.info(options);
 		
 		VCFRecord record;
 		while((record = abstractReader.getNextRecord(region, start, end)) != null) {
-			logger.info(record);
-			VCFRecordAdapter recordAdapter = new VCFRecordAdapter(record, regionSequence);
-			if (showRecord(recordAdapter, genes, options, record.getPos(), regionSequence)) {
-				records.add(processRecord(recordAdapter));
+
+			//logger.info(record);
+			
+			if (showRecord(record, cdsFeatures, options, record.getPos())) {
+				records.add(processRecord(record));
+
 			} else {
 				logger.warn("not showing " + record.getPos());
 			}
@@ -62,18 +148,20 @@ public abstract class VariantReaderAdapter {
 		return records;
 	}
 	
+	
+	
+	
 	public List<String> getSeqNames() {
 		return Arrays.asList(abstractReader.getSeqNames());
 	}
 	
 	
 	protected boolean showRecord(
-			VCFRecordAdapter record, 
-			List<GeneFeature> genes, 
+			VCFRecord record, 
+			List<CDSFeature> cdsFeatures, 
 			VariantFilterOptions options, 
-			int basePosition,
-			Sequence regionSequence) {
-
+			int basePosition) {
+		
 		if (!options.isEnabled(VariantFilterOption.SHOW_DELETIONS) //.showDeletions
 				&& record.getAlt().isDeletion(isVcf_v4()))
 			return false;
@@ -83,14 +171,15 @@ public abstract class VariantReaderAdapter {
 			return false;
 
 		if (!options.isEnabled(VariantFilterOption.SHOW_NON_OVERLAPPINGS) //.showNonOverlappings
-				&& ! record.isOverlappingFeature(genes, basePosition))
+				&& ! VCFview.isOverlappingFeature(cdsFeatures, basePosition))
 			return false;
 
 		if (!options.isEnabled(VariantFilterOption.SHOW_NON_VARIANTS) /*.showNonVariants*/ && record.getAlt().isNonVariant())
 			return false;
-		short isSyn = record.isSynonymous(genes, basePosition);
+
+		short isSyn = record.getSynFlag(cdsFeatures, basePosition);
+		logger.info("ISSYNONYMOUS\t"+record.getPos() +"\t" + isSyn);
 		
-		record.markAsNewStop = false;
 		if (options.isEnabled(VariantFilterOption.MARK_NEW_STOPS) //.markNewStops
 				&& !record.getAlt().isDeletion(isVcf_v4())
 				&& !record.getAlt().isInsertion(isVcf_v4())
@@ -98,7 +187,7 @@ public abstract class VariantReaderAdapter {
 				&& record.getRef().length() == 1) {
 
 			if (isSyn == 2)
-				record.markAsNewStop = true;
+				record.setMarkAsNewStop(true);
 		}
 
 		if ((!options.isEnabled(VariantFilterOption.SHOW_SYNONYMOUS) /*.showSynonymous*/ || !options.isEnabled(VariantFilterOption.SHOW_NON_SYNONYMOUS) /*.showNonSynonymous*/)
@@ -120,11 +209,11 @@ public abstract class VariantReaderAdapter {
 		
 	}
 	
-	protected MappedVCFRecord processRecord (VCFRecordAdapter record) {
+	protected MappedVCFRecord processRecord (VCFRecord record) {
 		
 		MappedVCFRecord mappedRecord = new MappedVCFRecord();
 		
-		mappedRecord.markAsNewStop = record.markAsNewStop;
+		mappedRecord.markAsNewStop = record.isMarkAsNewStop();
 		
 		mappedRecord.chrom = record.getChrom();
 		mappedRecord.pos = record.getPos();

@@ -7,11 +7,15 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.genedb.crawl.CrawlErrorType;
+import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.bam.BioDataFileStore;
 import org.genedb.crawl.bam.BioDataFileStoreInitializer;
+import org.genedb.crawl.mappers.FeatureMapper;
 import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.mappers.OrganismsMapper;
+import org.genedb.crawl.model.CrawlError;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.MappedSAMSequence;
@@ -25,7 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import uk.ac.sanger.artemis.components.variant.GeneFeature;
+import org.genedb.crawl.model.Gene;
+
 import uk.ac.sanger.artemis.components.variant.VariantFilterOption;
 import uk.ac.sanger.artemis.components.variant.VariantFilterOptions;
 
@@ -43,6 +48,9 @@ public class VariantController extends BaseQueryController {
 	
 	@Autowired
 	private OrganismsMapper organismsMapper;
+	
+	@Autowired
+	private FeatureMapper featureMapper;
 	
 	@Autowired
 	public void setInitializer(BioDataFileStoreInitializer initializer) {
@@ -87,26 +95,19 @@ public class VariantController extends BaseQueryController {
 			@RequestParam("sequence") String sequence, 
 			@RequestParam("start") int start, 
 			@RequestParam("end") int end,
-			@RequestParam(value="filter", required=false) Integer filter) throws IOException {
-		return doQuery(fileID,sequence,start,end,filter);
-	}
-	
-	@ResourceDescription("Queries a region of a variant file, passing a list of VariantFilterOption filters as a parameter. Current valid values are SHOW_SYNONYMOUS, SHOW_NON_SYNONYMOUS, SHOW_DELETIONS, SHOW_INSERTIONS, SHOW_MULTI_ALLELES, SHOW_NON_OVERLAPPINGS, SHOW_NON_VARIANTS, MARK_NEW_STOPS.")
-	@RequestMapping(method=RequestMethod.GET, value={"/queryWithFilters", "/queryWithFilters.*"})
-	public List<MappedVCFRecord> queryWithFilters(
-			@RequestParam("fileID") int fileID, 
-			@RequestParam("sequence") String sequence, 
-			@RequestParam("start") int start, 
-			@RequestParam("end") int end,
-			@RequestParam(value="filters", required=true) List<String> filters) throws IOException {
-		Integer filter = null;
-		if (filters.size() > 0) {
-			filter = 0;
-			for (String f : filters) {
-				VariantFilterOption option = VariantFilterOption.valueOf(f);
-				filter += option.index();			
-			}
-		}
+			@RequestParam(value="filter", required=false) Integer filter,
+			@RequestParam(value="filters", required=false) List<String> filters) throws IOException, CrawlException {
+	    
+	    if (filter == null && filters != null) {
+	        if (filters.size() > 0) {
+	            filter = 0;
+	            for (String f : filters) {
+	                VariantFilterOption option = VariantFilterOption.valueOf(f);
+	                filter += option.index();           
+	            }
+	        }
+	    }
+	    
 		return doQuery(fileID,sequence,start,end,filter);
 	}
 	
@@ -121,14 +122,19 @@ public class VariantController extends BaseQueryController {
 		logger.info(String.format("sequence name supplied: %s, alignment sequence name used: %s, reference sequence name used: %s", sequence, alignmentName, referenceName));
 		
 		Sequence regionSequence = regionsMapper.sequence(referenceName);
-		List<GeneFeature> geneFeatures = getGenesAt(referenceName, start, end, regionsMapper); 
+		List<Gene> geneFeatures = getGenesAt(referenceName, start, end, regionsMapper, featureMapper);
 		
-		return variantStore.getFile(fileID).getReader().query(alignmentName, start, end, geneFeatures, options, regionSequence);
+		return variantStore.getFile(fileID).getReader().query(
+		        alignmentName, 
+		        start, 
+		        end, 
+		        variantStore.getFile(fileID).getReader().genesToCDSFeature(geneFeatures, regionSequence), 
+		        options);
 	}
 	
-	public static List<GeneFeature> getGenesAt(String sequence, int start, int end, RegionsMapper regionsMapper) {
+	public static List<Gene> getGenesAt(String sequence, int start, int end, RegionsMapper regionsMapper, FeatureMapper featureMapper) {
 		
-		List<GeneFeature> geneFeatures = new ArrayList<GeneFeature>(); 
+		List<Gene> geneFeatures = new ArrayList<Gene>(); 
 		
 		LocationBoundaries boundaries = regionsMapper.locationsMinAndMaxBoundaries(sequence, start, end, false, geneTypes);
 		
@@ -136,8 +142,8 @@ public class VariantController extends BaseQueryController {
 			return geneFeatures;
 		}
 		
-		logger.info(boundaries);
-		logger.info(boundaries.start + " --- " + boundaries.end);
+		
+		logger.info(sequence + " : " + boundaries.start + " --- " + boundaries.end);
 		
 		List<LocatedFeature> features = regionsMapper.locations(sequence, boundaries.start, boundaries.end, false, geneTypes);
 		
@@ -146,8 +152,18 @@ public class VariantController extends BaseQueryController {
 		}
 		
 		for (LocatedFeature feature : features) {
-			logger.debug("feature??" + feature.uniqueName + " " + feature.region + ":" + feature.fmin + ":" + feature.fmax);
-			geneFeatures.add(new GeneFeature(feature, regionsMapper));
+			
+			Gene gene = new Gene();
+			gene.fmin = feature.fmin;
+			gene.fmax = feature.fmax;
+			gene.strand = feature.strand;
+			gene.phase = feature.phase;
+			gene.region = feature.region;
+			
+			gene.uniqueName = feature.uniqueName;
+			gene.transcripts = featureMapper.transcripts(gene, true);
+			
+			geneFeatures.add(gene);
 		}
 		return geneFeatures;
 	}

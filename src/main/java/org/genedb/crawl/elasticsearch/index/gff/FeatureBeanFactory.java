@@ -36,8 +36,6 @@ public class FeatureBeanFactory {
 		
 		GFFFeature gffFeature = new GFFFeature(line);
 		
-		logger.info("Generating Feature :" + gffFeature.id);
-		
 		feature = new LocatedFeature();
 		feature.organism_id = organism.ID;
 		
@@ -56,6 +54,7 @@ public class FeatureBeanFactory {
 		feature.coordinates = new ArrayList<Coordinates>();
 		feature.coordinates.add(coordinates);
 		coordinates.region = gffFeature.seqid;
+		coordinates.toplevel = true;
 		if (gffFeature.phase != null) {
 			coordinates.phase = gffFeature.phase.getPhase();
 			coordinates.strand = gffFeature.strand.getStrandInt();
@@ -132,7 +131,7 @@ public class FeatureBeanFactory {
 					
 					}
 					
-				} else if (key.equals("gO")) {
+				} else if (key.equals("go")) {
 					
 					
 					Cvterm cvterm = null;
@@ -216,14 +215,20 @@ public class FeatureBeanFactory {
 				
 				//logger.debug(key + ":" + value);
 				
-				if ( key.equals("Derives_from") || key.equals("Parent") || key.equals("Part_of") )  {
+				if ( key.equals("derives_from") || key.equals("parent") || key.equals("part_of") )  {
 					
+				    
 					feature.parent = stringValue;
-					feature.parentRelationshipType = key;
 					
-					logger.trace(String.format("Adding %s as a parent of %s.", stringValue, feature.uniqueName));
+					if (key.equals("parent")) {
+					    feature.parentRelationshipType = "part_of";
+					} else {
+					    feature.parentRelationshipType = key;
+					}
+					
+					logger.trace(String.format("Adding %s as a parent of %s, relationship %s.", stringValue, feature.uniqueName, key));
 				
-				} else if (key.equals("Dbxref")) {	
+				} else if (key.equals("dbxref")) {	
 					
 					String[] refs = stringValue.split(",");
 					for (String ref : refs) {
@@ -262,7 +267,7 @@ public class FeatureBeanFactory {
 					
 					//logger.error("feature.timelastmodified  " + feature.timelastmodified );
 				
-				} else if (key.equals("isObsolete")) {
+				} else if (key.equals("isobsolete")) {
 					
 					feature.isObsolete = Boolean.parseBoolean(stringValue);
 				

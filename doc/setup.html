@@ -597,6 +597,22 @@ The alignments and variants arrays are used to define SAM/BAM and VCF/BCF next g
 
 <pre><code>./gradlew -Pconfig=resource-elasticsearch-local.properties -PpullWebArtemis=true war</code></pre>
 
+<h4 id="webartemis extra">Extra Web-Artemis cloning parameters.</h4>
+
+<P>If you have your own checkout and branch of Web-Artemis, or if you want to change the default chromosome, these extra parameters can help : </P>
+
+<pre><code>
+gradle -Pconfig=resource-elasticsearch-local.properties -PpullWebArtemis=true \
+    -PwebArtemisGitUri=/Users/gv1/git/Web-Artemis/ \
+    -PwebArtemisGitBranch=extra_excludes \
+    -PwebArtemisInitialChromosome=FM211187  \
+    jettyRunWar 
+</code></pre>
+
+<P>Where webArtemisGitUri is the uri to the checkout, webArtemisGitBranch is the branch you want to clone, and 
+webArtemisInitialChromosome lets you set the starting chromosome.</P>
+
+
 <h3  id="jetty">Testing the war using Jetty-runner </h3>
 
 <P>This can be used to run crawler without having to configure a servlet container. This is not good for production use. Only use it for testing.</P>

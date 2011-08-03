@@ -20,7 +20,17 @@ public class JsonIzer {
 	
 	private ObjectMapper mapper;
 	
-	private static JsonIzer inst;
+	//private static JsonIzer inst;
+	
+	public boolean isPretty() {
+        return pretty;
+    }
+
+    public void setPretty(boolean pretty) {
+        this.pretty = pretty;
+    }
+
+    private boolean pretty = false;
 	
 //	public static final JsonIzer getJsonIzer() {
 //		if (inst == null) {
@@ -88,6 +98,7 @@ public class JsonIzer {
 	}
 	
 	
+	
 	public String toJson(Object object) throws IOException {
 		
 		JsonFactory jFact = new JsonFactory();
@@ -95,6 +106,8 @@ public class JsonIzer {
 		StringWriter writer = new StringWriter();
 		
 		JsonGenerator jGen = jFact.createJsonGenerator(writer);
+		if (pretty)
+		    jGen.useDefaultPrettyPrinter();
 		
 		mapper.writeValue(jGen, object);
 		

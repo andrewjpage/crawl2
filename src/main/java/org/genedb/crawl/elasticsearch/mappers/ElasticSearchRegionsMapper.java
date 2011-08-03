@@ -80,11 +80,11 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		
 		RangeQueryBuilder startLowerThanRequested = 
 			QueryBuilders.rangeQuery("fmin")
-				.lte(start);
+				.lt(start);
 		
 		RangeQueryBuilder endHigherThanRequested = 
 			QueryBuilders.rangeQuery("fmax")
-				.gte(end);
+				.gt(end);
 		
 		// (fmin <= start) && (end <= fmax)
 		BoolQueryBuilder spansBothSides = 
@@ -290,6 +290,7 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			.execute()
 			.actionGet();
 		
+		jsonIzer.setPretty(true);
 		logger.info(toString(builder.internalBuilder()));
 		
 		
