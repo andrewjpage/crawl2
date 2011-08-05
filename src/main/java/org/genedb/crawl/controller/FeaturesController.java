@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.jws.WebService;
+
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
@@ -19,7 +21,6 @@ import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.Gene;
-import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.HierarchicalFeature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/features")
 @ResourceDescription("Feature related queries")
+@WebService(serviceName="features")
 public class FeaturesController extends BaseQueryController {
 	
 	private static Logger logger = Logger.getLogger(FeaturesController.class);
@@ -64,10 +66,14 @@ public class FeaturesController extends BaseQueryController {
 	@RequestMapping(method=RequestMethod.GET, value="/hierarchy")
 	public List<HierarchicalFeature> hierarchy( 
 			@RequestParam("features") List<String> features, 
-			@RequestParam(value="root_on_genes", defaultValue="false", required=false) boolean root_on_genes,
+			@RequestParam(value="root_on_genes", defaultValue="false", required=false) Boolean root_on_genes,
 			@RequestParam(value="relationships", required=false) String[] relationships) throws CrawlException {
 		
-		if (relationships == null) {
+	    // JAX-WS does not know about defaultValue
+	    if (root_on_genes == null)
+	        root_on_genes = false;
+	    
+		if (relationships == null || relationships.length < 1) {
 			relationships = defaultRelationshipTypes;
 		}
 		

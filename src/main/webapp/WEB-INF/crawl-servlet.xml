@@ -4,8 +4,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:oxm="http://www.springframework.org/schema/oxm" xmlns:mvc="http://www.springframework.org/schema/mvc"
-
-
+    
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
 	   http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
        http://www.springframework.org/schema/context 
@@ -13,7 +14,12 @@
        http://www.springframework.org/schema/oxm 
        http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd
        http://www.springframework.org/schema/mvc
-       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+       
+       http://cxf.apache.org/jaxws 
+       http://cxf.apache.org/schemas/jaxws.xsd
+       
+       ">
 
 
 	<context:property-placeholder location="classpath:project.properties" />
@@ -62,5 +68,38 @@
         context:component-scan URLs -->
 	<mvc:annotation-driven />
     <mvc:resources mapping="/**" location="/resources/**" />
+    
+    
+    <import resource="classpath:META-INF/cxf/cxf.xml" />
+    <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+    
+    <jaxws:endpoint 
+      id="organismsControllerBean" 
+      implementor="#organismsController" 
+      address="/organisms" />
+    
+    <jaxws:endpoint 
+      id="featuresControllerBean" 
+      implementor="#featuresController" 
+      address="/features" />
+    
+    <jaxws:endpoint 
+      id="regionsControllerBean" 
+      implementor="#regionsController" 
+      address="/regions" />
+    
+    <jaxws:endpoint 
+      id="variantsControllerBean" 
+      implementor="#variantController" 
+      address="/variants" />
+    
+    <jaxws:endpoint 
+      id="samsControllerBean" 
+      implementor="#samController" 
+      address="/sams" />
+
+
+    
     
 </beans>

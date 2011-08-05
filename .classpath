@@ -17,6 +17,7 @@
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-jdbc/jars/spring-jdbc-3.0.5.RELEASE.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.jdbc/jars/org.springframework.jdbc-3.0.5.RELEASE.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.codehaus.jackson/jackson-mapper-asl/jars/jackson-mapper-asl-1.7.5.jar" exported="true"/>
+	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/com.sun.jersey/jersey-core/bundles/jersey-core-1.8.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-analyzers/jars/lucene-analyzers-3.1.0.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.beans/jars/org.springframework.beans-3.0.5.RELEASE.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.codehaus.jackson/jackson-xc/jars/jackson-xc-1.7.5.jar" exported="true"/>
@@ -49,6 +50,7 @@
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.elasticsearch/elasticsearch/jars/elasticsearch-0.16.0.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.apache.lucene/lucene-memory/jars/lucene-memory-3.1.0.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/spring-context/jars/spring-context-3.0.5.RELEASE.jar" exported="true"/>
+	<classpathentry kind="lib" path="/Users/gv1/git/crawl2/lib/local/biojava-1.6.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/org.springframework/org.springframework.transaction/jars/org.springframework.transaction-3.0.5.RELEASE.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/.gradle/cache/com.hazelcast/hazelcast/jars/hazelcast-1.9.3.jar" exported="true"/>
 	<classpathentry kind="lib" path="/Users/gv1/git/crawl2/lib/local/artemis-v13.2.1.jar" exported="true"/>
