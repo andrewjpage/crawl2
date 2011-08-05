@@ -3,6 +3,9 @@ package org.genedb.crawl.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.bam.BioDataFileStoreInitializer;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @ResourceDescription("Provides methods for SAM/BAM alignment querying.")
 @RequestMapping("/sams")
+@WebService(serviceName="sams")
 public class SamController extends BaseQueryController {
 
 	private Sam sam = new Sam();
@@ -33,6 +37,7 @@ public class SamController extends BaseQueryController {
 	private OrganismsMapper organismsMapper;
 
 	@Autowired
+	@WebMethod(exclude=true)
 	public void setBioDataFileStoreInitializer(
 			BioDataFileStoreInitializer initializer) {
 		sam.setAlignmentStore(initializer.getAlignments());

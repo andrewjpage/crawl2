@@ -3,11 +3,12 @@ package org.genedb.crawl.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+
 import org.apache.log4j.Logger;
-import org.genedb.crawl.CrawlErrorType;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.bam.BioDataFileStore;
@@ -15,7 +16,6 @@ import org.genedb.crawl.bam.BioDataFileStoreInitializer;
 import org.genedb.crawl.mappers.FeatureMapper;
 import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.mappers.OrganismsMapper;
-import org.genedb.crawl.model.CrawlError;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.MappedSAMSequence;
@@ -37,6 +37,7 @@ import uk.ac.sanger.artemis.components.variant.VariantFilterOptions;
 @Controller
 @ResourceDescription("Provides methods for VCF/BCF variant querying.")
 @RequestMapping("/variants")
+@WebService(serviceName="variants")
 public class VariantController extends BaseQueryController {
 	
 	private static Logger logger = Logger.getLogger(VariantController.class);
@@ -53,6 +54,7 @@ public class VariantController extends BaseQueryController {
 	private FeatureMapper featureMapper;
 	
 	@Autowired
+	@WebMethod(exclude=true)
 	public void setInitializer(BioDataFileStoreInitializer initializer) {
 		variantStore=initializer.getVariants();
 	}
@@ -132,6 +134,7 @@ public class VariantController extends BaseQueryController {
 		        options);
 	}
 	
+	@WebMethod(exclude=true)
 	public static List<Gene> getGenesAt(String sequence, int start, int end, RegionsMapper regionsMapper, FeatureMapper featureMapper) {
 		
 		List<Gene> geneFeatures = new ArrayList<Gene>(); 

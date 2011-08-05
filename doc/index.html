@@ -128,7 +128,9 @@ to Crawl services, so can be used to explore the data they hold.
 
 <P>and setting it up on this or another web-server.</P>
 
-<h2 id="services">Services</h2>
+
+
+<h2 id="services">REST Services</h2>
 
 <P>Metadata about each service can be accessed at : </P>
 
@@ -191,6 +193,55 @@ to Crawl services, so can be used to explore the data they hold.
     <li><a href="./variants/queryWithFilters?fileID=0&sequence=S_pneumoniae_Spanish_23F.dna&start=1&end=10000000&filters=SHOW_SYNONYMOUS&filters=SHOW_NON_SYNONYMOUS&filters=SHOW_DELETIONS&filters=SHOW_INSERTIONS&filters=SHOW_MULTI_ALLELES&filters=SHOW_NON_OVERLAPPINGS&filters=SHOW_NON_VARIANTS&filters=MARK_NEW_STOPS">Querying a variant file, using string filters.</a></li>
 </ul>
 
+<h2 id="soap services">SOAP Services</h2>
+
+<P>As an alternative to the RESTful approach, Crawl also publishes SOAP services too.</P>
+
+<P>These <a title="SOAP services" href="soap/"> services, and their WSDLS, are described here</a> in more detail. </P>
+
+<P>All the same Crawl RESTful resources are available as SOAP endpoints too. What follows is a simple python program illustrating how to use them.</P> 
+
+<pre><code>
+# first you must "easy_install suds"
+
+import suds
+from suds.client import Client
+
+wsdl = "http://localhost:8080/services/soap/%s?wsdl"
+
+organisms = Client(wsdl % "organisms")
+regions = Client(wsdl % "regions")
+features = Client(wsdl % "features")
+
+print organisms
+print regions
+print features
+
+
+first_organism = organisms.service.listOrganisms()[0]
+print first_organism
+
+# get the Pfalciparum organism
+pfalciparum = organisms.service.getByString('Pfalciparum')[0]
+print pfalciparum
+
+# get the first region in Pfalciparum
+first_pfalciparum_region = regions.service.inorganism(pfalciparum._commonName)[0]
+print first_pfalciparum_region
+
+# extract the first gene from all the regions in Pfalciparum
+for region in regions.service.inorganism(pfalciparum._commonName):
+    genes = regions.service.locations(region._uniqueName, 1, 1000)
+    if len(genes) > 0 :
+        gene = genes[0]
+        print gene
+        print features.service.hierarchy(genes[0]._uniqueName )
+
+
+
+</code></pre>
+
+
 <script>
 
 $(document).ready(function() {
@@ -198,6 +249,8 @@ $(document).ready(function() {
 });
 
 </script>
+
+
 
 </body>
 

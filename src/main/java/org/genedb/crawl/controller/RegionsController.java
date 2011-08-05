@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.jws.WebService;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.CrawlException;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/regions")
 @ResourceDescription("Provides queries related to large genomic regions such as chromosomes or contigs")
+@WebService(serviceName="regions")
 public class RegionsController extends BaseQueryController {
 	
 	private Logger logger = Logger.getLogger(RegionsController.class);
@@ -109,18 +111,22 @@ public class RegionsController extends BaseQueryController {
 			@RequestParam("region") String region, 
 			@RequestParam(value="start",required=false) Integer start, 
 			@RequestParam(value="end", required=false) Integer end, 
-			@RequestParam(value="exclude", defaultValue="true") boolean exclude,
+			@RequestParam(value="exclude", defaultValue="true") Boolean exclude,
 			@RequestParam(value="types", required=false) @ResourceDescription("A list of features types to exclude or include.") List<String> types
 			) throws CrawlException {
 		
+	    
+	    
+	    // the JAX-WS endpoint won't think to use default value, so we must assign them manually
+	    if (exclude == null)
+	        exclude = true;
 		
-		if (start == null) {
+		if (start == null) 
 			start = 0;
-		}
 		
-		if (end == null) {
+		if (end == null) 
 			end = regionsMapper.sequence(region).dna.length();
-		}
+		
 		
 		// logger.info(String.format("Getting locations for %s.", region));
 		// trying to speed up the boundary query by determining the types in advance
@@ -139,8 +145,8 @@ public class RegionsController extends BaseQueryController {
 			geneTypes.add("pseudogene");
 		}
 		
-		
-//        logger.info("Gene Types " + geneTypes);
+		logger.info(String.format("%s %d-%d %s", region, start,end,exclude));
+        logger.info("Gene Types " + geneTypes);
         
         int actualStart = start;
         int actualEnd = end;
@@ -157,7 +163,7 @@ public class RegionsController extends BaseQueryController {
         
 		logger.debug( String.format("Locating on %s : %s-%s (%s)", region, actualStart, actualEnd, exclude));
 		
-		return regionsMapper.locations(region, actualStart, actualEnd, exclude, types);
+		return regionsMapper.locations(region, actualStart, actualEnd, exclude, new ArrayList<String>(geneTypes));
 //		results.actual_end = actualEnd;
 //		results.actual_start = actualStart;
 //		

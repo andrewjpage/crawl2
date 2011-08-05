@@ -3,7 +3,9 @@ package org.genedb.crawl.model;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 
+@XmlType(name="TheCoordinates")
 public class Coordinates implements Serializable {
 	
 	@XmlAttribute(required=true)

@@ -25,6 +25,10 @@ props.load(new FileInputStream(config))
 def tmpResourcesPath = 'tmp/rootContent/resources/'
 def webArtemisClonePath = 'Web-Artemis'
 
+configurations {
+    jaxws
+}
+
 repositories {
 	
 	
@@ -39,10 +43,13 @@ repositories {
 	// bad to depend on maven central
 	//    mavenRepo urls: ["http://repository.sonatype.org/content/repositories/central"]
     mavenRepo urls: ["http://oss.sonatype.org/content/repositories/releases"]
+    mavenRepo urls: ["http://repo.gradle.org/gradle/repo"]
     mavenRepo urls: ["http://download.java.net/maven/2"]
+    
     mavenRepo urls: ["http://repository.jboss.org/maven2"]
     
     mavenRepo urls: ["http://www.ebi.ac.uk/~maven/m2repo"]
+    mavenRepo urls: ["https://repository.apache.org/content/groups/public/"]
     //mavenRepo urls: ["http://www.biojava.org/download/maven/"]
     
     mavenRepo urls: ["http://repository.springsource.com/maven/bundles/release"]
@@ -50,7 +57,7 @@ repositories {
     mavenRepo urls: ["http://repository.springsource.com/maven/bundles/milestone"]
     //mavenRepo urls: ["http://repository.springsource.com/maven/bundles/snapshot"]
     
-	
+	// never use this!
     mavenCentral()
 }
 
@@ -83,6 +90,13 @@ dependencies {
     compile group: "org.springframework", name:"org.springframework.jdbc", version:"3.0.5.RELEASE"
     
     compile group: 'org.mybatis', name: 'mybatis-spring', version:'1.0.0'
+    
+    // used for runnin wsgen
+    jaxws 'com.sun.xml.ws:jaxws-tools:2.1.4'
+    
+    // used for soap services
+    compile group: 'org.apache.cxf', name: 'cxf-rt-frontend-jaxws', version: '2.2.6'
+    compile group: 'org.apache.cxf', name: 'cxf-rt-transports-http', version: '2.2.6'
     
     compile group: 'uk.ac.ebi.das', name:'jdas', version: '1.0.1'
 	
@@ -194,11 +208,63 @@ task install(dependsOn: 'jar') << {
 
 
 
+
+
 /*
  * WAR building and deployment.
  */
 
 war.doFirst{
+    
+    
+//    println configurations.compile
+//    
+//    println (configurations.compile).asPath
+//    println sourceSets.main.java.srcDirs
+//    println configurations.compile.asPath
+    
+    /*
+     * wsgen -verbose -d build/classes/main \
+     *  -cp build/classes/main:build/libs/org.springframework.web-3.0.5.RELEASE.jar:build/libs/org.springframework.beans-3.0.5.RELEASE.jar:build/libs/org.springframework.context-3.0.5.RELEASE.jar \
+     *  org.genedb.crawl.controller.FeaturesControlle
+     * */
+    
+    ant {
+     verbose=true
+       taskdef(
+         name:'wsgen',
+         classname:'com.sun.tools.ws.ant.WsGen',
+         classpath: (configurations.jaxws + configurations.compile ).asPath)
+       wsgen(
+         keep:true,
+         destdir: 'build/classes/main',
+         sei:'org.genedb.crawl.controller.FeaturesController',
+         classpath: 'build/classes/main:' + configurations.compile.asPath)
+       wsgen(
+           keep:true,
+           destdir: 'build/classes/main',
+           sei:'org.genedb.crawl.controller.OrganismsController',
+           classpath: 'build/classes/main:' + configurations.compile.asPath)
+       wsgen(
+           keep:true,
+           destdir: 'build/classes/main',
+           sei:'org.genedb.crawl.controller.RegionsController',
+           classpath: 'build/classes/main:' + configurations.compile.asPath)
+//       wsgen(
+//           keep:true,
+//           destdir: 'build/classes/main',
+//           sei:'org.genedb.crawl.controller.SamController',
+//           classpath: 'build/classes/main:' + configurations.compile.asPath)
+//       wsgen(
+//           keep:true,
+//           destdir: 'build/classes/main',
+//           sei:'org.genedb.crawl.controller.VariantController',
+//           classpath: 'build/classes/main:' + configurations.compile.asPath)
+    }
+    
+    
+    
+    
     resourceType = props["resource.type"]
     ant.copy (
         file:'etc/config/crawl-' + resourceType + '.xml', 
@@ -274,12 +340,15 @@ war.doFirst{
 	
 }
 
+
+
 war {
     webInf { from 'tmp/WEB-INF' } 
     baseName = props["deploy.name"]
 	archiveName = props["deploy.name"] + ".war"
 	from 'tmp/rootContent/'
 }
+
 
 
 task deploy(dependsOn: 'war') << {
