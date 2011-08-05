@@ -92,7 +92,7 @@ dependencies {
     compile group: 'org.mybatis', name: 'mybatis-spring', version:'1.0.0'
     
     // used for runnin wsgen
-    jaxws 'com.sun.xml.ws:jaxws-tools:2.1.4'
+    //jaxws 'com.sun.xml.ws:jaxws-tools:2.1.4'
     
     // used for soap services
     compile group: 'org.apache.cxf', name: 'cxf-rt-frontend-jaxws', version: '2.2.6'
@@ -229,38 +229,38 @@ war.doFirst{
      *  org.genedb.crawl.controller.FeaturesControlle
      * */
     
-    ant {
-     verbose=true
-       taskdef(
-         name:'wsgen',
-         classname:'com.sun.tools.ws.ant.WsGen',
-         classpath: (configurations.jaxws + configurations.compile ).asPath)
-       wsgen(
-         keep:true,
-         destdir: 'build/classes/main',
-         sei:'org.genedb.crawl.controller.FeaturesController',
-         classpath: 'build/classes/main:' + configurations.compile.asPath)
-       wsgen(
-           keep:true,
-           destdir: 'build/classes/main',
-           sei:'org.genedb.crawl.controller.OrganismsController',
-           classpath: 'build/classes/main:' + configurations.compile.asPath)
-       wsgen(
-           keep:true,
-           destdir: 'build/classes/main',
-           sei:'org.genedb.crawl.controller.RegionsController',
-           classpath: 'build/classes/main:' + configurations.compile.asPath)
+//    ant {
+//     verbose=true
+//       taskdef(
+//         name:'wsgen',
+//         classname:'com.sun.tools.ws.ant.WsGen',
+//         classpath: (configurations.jaxws + configurations.compile ).asPath)
+//       wsgen(
+//         keep:true,
+//         destdir: 'build/classes/main',
+//         sei:'org.genedb.crawl.controller.FeaturesController',
+//         classpath: 'build/classes/main:' + configurations.compile.asPath)
 //       wsgen(
 //           keep:true,
 //           destdir: 'build/classes/main',
-//           sei:'org.genedb.crawl.controller.SamController',
+//           sei:'org.genedb.crawl.controller.OrganismsController',
 //           classpath: 'build/classes/main:' + configurations.compile.asPath)
 //       wsgen(
 //           keep:true,
 //           destdir: 'build/classes/main',
-//           sei:'org.genedb.crawl.controller.VariantController',
+//           sei:'org.genedb.crawl.controller.RegionsController',
 //           classpath: 'build/classes/main:' + configurations.compile.asPath)
-    }
+////       wsgen(
+////           keep:true,
+////           destdir: 'build/classes/main',
+////           sei:'org.genedb.crawl.controller.SamController',
+////           classpath: 'build/classes/main:' + configurations.compile.asPath)
+////       wsgen(
+////           keep:true,
+////           destdir: 'build/classes/main',
+////           sei:'org.genedb.crawl.controller.VariantController',
+////           classpath: 'build/classes/main:' + configurations.compile.asPath)
+//    }
     
     
     
