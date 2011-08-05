@@ -358,7 +358,21 @@ task deploy(dependsOn: 'war') << {
     }
 }
 
-
+// use this for generating a list of jars to add to the repo in lib/local ...
+task copyLibs << {
+    def newFiles = []
+    for(file in configurations.compile) {
+        String fileName = file.getPath()
+        if (! fileName.contains("/lib/local/")) {
+            newFiles.add(fileName)
+        }
+    }
+    
+    copy {
+        from files(newFiles)
+        into "lib/local"
+    }
+}
 
 
 /*
