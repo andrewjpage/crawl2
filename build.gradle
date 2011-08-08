@@ -35,10 +35,17 @@ repositories {
 	// a local repository for jars that are not available from online ones
 	flatDir name: 'localRepository', dirs: 'lib/local'
 	
-	// commented out - let's see if we can get away without having to maintain this.
-    // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/jboss/"] 
-    // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"]
-    // mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/java.net-m2"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/jboss/"] 
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/java.net-m2"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/central/"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/ApacheReleases/"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/ApachePublic/"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/apache-snapshots/"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/codehaus-snapshots/"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/spring-external/"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/spring-release/"]
+    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/Gradle/"]
     
 	// bad to depend on maven central
 	//    mavenRepo urls: ["http://repository.sonatype.org/content/repositories/central"]
@@ -49,7 +56,7 @@ repositories {
     mavenRepo urls: ["http://repository.jboss.org/maven2"]
     
     mavenRepo urls: ["http://www.ebi.ac.uk/~maven/m2repo"]
-    mavenRepo urls: ["https://repository.apache.org/content/groups/public/"]
+    mavenRepo urls: ["http://repository.apache.org/content/groups/public/"]
     //mavenRepo urls: ["http://www.biojava.org/download/maven/"]
     
     mavenRepo urls: ["http://repository.springsource.com/maven/bundles/release"]
