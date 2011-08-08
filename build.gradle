@@ -281,6 +281,9 @@ war.doFirst{
 	
 	new File("tmp/WEB-INF/classes/").mkdirs()
 	
+    if (props["hazelcast"] != null)
+        hazelcast = props["hazelcast"]
+    
 	ant.copy (
 		file: hazelcast,
 		toFile:'tmp/WEB-INF/classes/hazelcast.xml',
