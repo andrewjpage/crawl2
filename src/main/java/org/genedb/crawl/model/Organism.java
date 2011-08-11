@@ -1,8 +1,11 @@
 package org.genedb.crawl.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 public class Organism implements Serializable {
 	
@@ -20,5 +23,9 @@ public class Organism implements Serializable {
 	public String name;
 	@XmlAttribute
 	public Integer ID;
+	
+	@XmlElement(name="property", required=false)
+    @XmlElementWrapper(name="properties")
+    public List<Property> properties;
 	
 }

@@ -64,7 +64,7 @@
        
     </select>
     
-    <resultMap id="properties" type="org.genedb.crawl.model.FeatureProperty">
+    <resultMap id="properties" type="org.genedb.crawl.model.Property">
         <result property="name" column="propname"/> 
         <result property="value" column="value"/> 
         <result property="rank" column="rank"/>

@@ -36,27 +36,27 @@ public class Feature implements Serializable {
 	
 	@XmlElement(name="synonym", required=false)
 	@XmlElementWrapper(name="synonyms")
-	public List<Synonym> synonyms = new ArrayList<Synonym>();
+	public List<Synonym> synonyms;
 	
 	@XmlElement(name="coordinate", required=false)
 	@XmlElementWrapper(name="coordinates")
-	public List<Coordinates> coordinates = new ArrayList<Coordinates>();
+	public List<Coordinates> coordinates;
 	
 	@XmlElement(name="property", required=false)
 	@XmlElementWrapper(name="properties")
-	public List<FeatureProperty> properties  = new ArrayList<FeatureProperty>();
+	public List<Property> properties;
 	
 	@XmlElement(name="pub", required=false)
 	@XmlElementWrapper(name="pubs")
-	public List<Pub> pubs = new ArrayList<Pub>();
+	public List<Pub> pubs;
 	
 	@XmlElement(name="dbxref", required=false)
 	@XmlElementWrapper(name="dbxrefs")
-	public List<Dbxref> dbxrefs  = new ArrayList<Dbxref>();
+	public List<Dbxref> dbxrefs;
 	
 	@XmlElement(name="change", required=false)
 	@XmlElementWrapper(name="changes")
-	public List<Change> changes  = new ArrayList<Change>();
+	public List<Change> changes;
 	
 	@XmlElement(required=false)
 	public Date timelastmodified;
@@ -113,14 +113,14 @@ public class Feature implements Serializable {
 	
 	@XmlElement(name="relationship", required=false)
 	@XmlElementWrapper(name="relationships")
-	public List<FeatureRelationship> relationships = new ArrayList<FeatureRelationship>();
+	public List<FeatureRelationship> relationships;
 	
 	@XmlElement(required=false)
 	public Organism organism;
 	
 	@XmlElement(name="orthologue", required=false)
 	@XmlElementWrapper(name="orthologues")
-	public List<Orthologue> orthologues  = new ArrayList<Orthologue>();
+	public List<Orthologue> orthologues;
 	
 	@XmlElement(name="analysisFeature", required=false)
 	public AnalysisFeature analysisFeature;

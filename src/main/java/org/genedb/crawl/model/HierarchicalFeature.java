@@ -20,4 +20,7 @@ public class HierarchicalFeature extends Feature {
 	@XmlAttribute
 	public String relationshipType;
 	
+	@XmlAttribute
+    public String type;
+	
 }

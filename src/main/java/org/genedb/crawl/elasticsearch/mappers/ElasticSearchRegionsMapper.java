@@ -26,7 +26,7 @@ import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
-import org.genedb.crawl.model.FeatureProperty;
+import org.genedb.crawl.model.Property;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.Sequence;
@@ -311,9 +311,9 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 			LocatedFeature feature = this.getFeatureFromJson(source);
 			
 			// we only want to return colour
-			List<FeatureProperty> fps = new ArrayList<FeatureProperty>();
+			List<Property> fps = new ArrayList<Property>();
 			if (feature.properties != null) {
-				for (FeatureProperty prop : feature.properties) {
+				for (Property prop : feature.properties) {
 					if (prop.name.equals("colour")) {
 						fps.add(prop);
 					}

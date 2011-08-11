@@ -4,9 +4,9 @@ package org.genedb.crawl.mappers;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
-import org.genedb.crawl.CrawlException;
+
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.OrganismProp;
+import org.genedb.crawl.model.Property;
 
 public interface OrganismsMapper {
 	
@@ -14,6 +14,7 @@ public interface OrganismsMapper {
 	Organism getByID(@Param("ID") int ID) ;
 	Organism getByTaxonID(@Param("taxonID") String taxonID) ;
 	Organism getByCommonName(@Param("commonName") String commonName) ;
-	OrganismProp getOrganismProp(@Param("ID") int ID, @Param("cv") String cv, @Param("cvterm") String cvterm);
+	Property getOrganismProp(@Param("organism") Organism organism, @Param("cv") String cv, @Param("cvterm") String cvterm);
+	List<Property> getOrganismProps(@Param("organism") Organism organism, @Param("cv") String cv);
 	
 }

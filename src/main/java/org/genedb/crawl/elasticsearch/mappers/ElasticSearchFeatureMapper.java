@@ -21,7 +21,7 @@ import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Exon;
 import org.genedb.crawl.model.Feature;
-import org.genedb.crawl.model.FeatureProperty;
+import org.genedb.crawl.model.Property;
 import org.genedb.crawl.model.Gene;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Transcript;
@@ -64,7 +64,7 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 	}
 
 	@Override
-	public List<FeatureProperty> properties(Feature feature) {
+	public List<Property> properties(Feature feature) {
 		return feature.properties;
 	}
 

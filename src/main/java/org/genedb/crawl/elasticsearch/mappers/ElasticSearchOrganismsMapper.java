@@ -2,6 +2,7 @@ package org.genedb.crawl.elasticsearch.mappers;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -10,7 +11,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.xcontent.QueryBuilders;
 import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.OrganismProp;
+import org.genedb.crawl.model.Property;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -65,10 +66,33 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 	}
 
 	
-	public OrganismProp getOrganismProp(int ID, String cv, String cvterm) {
-		// TODO Auto-generated method stub
+	public Property getOrganismProp(Organism organism, String cv, String cvterm) {
+	    if (organism.properties == null)
+	        return null;
+	    
+	    for (Property property : organism.properties) {
+	        
+	        if (! property.name.equals(cvterm))
+	            continue;
+	        
+	        if (cv == null || property.type.name.equals(cv))
+	            return property;
+	        
+	    }
 		return null;
 	}
+	
+	@Override
+    public List<Property> getOrganismProps(Organism organism, String cv) {
+	    if (cv == null)
+	        return organism.properties;
+        List<Property> properties = new ArrayList<Property>();
+        for (Property property : organism.properties) {
+            if (property.type.name.equals(cv))
+                properties.add(property);
+        }
+        return properties;
+    }
 	
 	public void createOrUpdate(Organism organism) {
 		
@@ -102,6 +126,9 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 		
 		
 	}
+
+
+    
 
 
 }
