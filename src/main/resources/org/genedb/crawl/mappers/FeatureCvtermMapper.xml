@@ -4,6 +4,8 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="org.genedb.crawl.mappers.FeatureCvtermMapper">
     
+    <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/>
+    
     <select id="featureCvTermPubs" resultMap="featureCvTermPubsResults">
     
         SELECT 
@@ -37,7 +39,7 @@
     
     <select id="featureCvTermDbxrefs" resultMap="featureCvTermDbxrefsResults" >
         
-        SELECT dbxref.accession as accession, db.name as database
+        SELECT dbxref.accession as accession, db.name as database, db.urlprefix, db.url
             FROM feature_cvterm
             JOIN feature_cvterm_dbxref ON feature_cvterm.feature_cvterm_id = feature_cvterm_dbxref.feature_cvterm_id
             JOIN dbxref ON feature_cvterm_dbxref.dbxref_id = dbxref.dbxref_id
@@ -49,9 +51,27 @@
     <resultMap id="featureCvTermDbxrefsResults" type="org.genedb.crawl.model.Dbxref">
        <result property="database" column="database"/> 
        <result property="accession" column="accession"/> 
+       <result property="urlprefix" column="urlprefix"/>
+       <result property="url" column="url"/> 
     </resultMap>
     
+    <!-- 
     
+    "select count(f) from FeatureCvTerm fct, Feature f" +
+                //" where f.organism=:organism and fct.feature = f and fct.cvTerm.name = :name",
+                " where fct.feature = f and f.organism=:organism and fct.cvTerm.name = :name ",
+                new String[]{"name", "organism"},
+                new Object[]{name, o}); -->
+    
+    
+    <select id="countInOrganism" resultType="Integer">
+        SELECT count(*) FROM feature
+            JOIN feature_cvterm ON feature.feature_id = feature_cvterm.feature_id
+            JOIN cvterm ON feature_cvterm.cvterm_id = cvterm.cvterm_id AND cvterm.name = #{cvterm}
+            JOIN cv ON cvterm.cv_id = cv.cv_id AND cv.name = #{cv}
+        WHERE 
+            feature.organism_id = ${organism.ID}
+    </select>
     
     
 </mapper>

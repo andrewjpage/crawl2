@@ -11,4 +11,10 @@ public class Dbxref implements Serializable {
 	
 	@XmlAttribute
 	public String accession;
+	
+	@XmlAttribute
+    public String urlprefix;
+	
+	@XmlAttribute
+    public String url;
 }

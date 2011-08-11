@@ -38,7 +38,10 @@ public class Cvterm implements Serializable {
 	public List<Pub> pubs;
 
 	@XmlAttribute(required=false)
-	public Integer cvterm_id; 
+	public Integer cvterm_id;
+	
+	@XmlAttribute(required=false)
+    public Integer count;
 	
 	public void addPub(Pub pub) {
 		if (pubs == null) {
@@ -46,6 +49,7 @@ public class Cvterm implements Serializable {
 		}
 		pubs.add(pub);
 	}
+	
 	
 	
 }

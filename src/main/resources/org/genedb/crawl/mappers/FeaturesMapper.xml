@@ -319,7 +319,14 @@
            c.name as cv, 
            fcp.value as prop, 
            fcpct.name as type_name, 
-           fcpc.name as type_cv
+           fcpc.name as type_cv,
+           ( SELECT count(*) FROM feature
+		            JOIN feature_cvterm ON feature.feature_id = feature_cvterm.feature_id
+		            JOIN cvterm ON feature_cvterm.cvterm_id = cvterm.cvterm_id AND cvterm.name = ct.name
+		            JOIN cv ON cvterm.cv_id = cv.cv_id AND cv.name = c.name
+		        WHERE 
+		            feature.organism_id = f.organism_id) 
+		      as count
 		FROM feature f
 			JOIN feature_cvterm fc ON f.feature_id = fc.feature_id
 			JOIN cvterm ct ON fc.cvterm_id = ct.cvterm_id
@@ -342,6 +349,7 @@
             <result property="accession" column="accession"/>
             <result property="is_not" column="is_not"/> 
             <result property="name" column="cvterm"/>
+            <result property="count" column="count"/>
             <association property="cv" javaType="org.genedb.crawl.model.Cv">
                 <result property="name" column="cv"/>
             </association>
