@@ -17,7 +17,6 @@ Feature
 FeatureCollection
 FeatureGenes
 FeatureGenesList
-FeatureProperty
 FeatureRelationship
 HierarchicalFeature
 HierarchicalFeatureList
@@ -37,8 +36,8 @@ MappedVCFRecord
 MappedVariantBase
 Organism
 OrganismList
-OrganismProp
 Orthologue
+Property
 Pub
 RegionsInOrganism
 Resource

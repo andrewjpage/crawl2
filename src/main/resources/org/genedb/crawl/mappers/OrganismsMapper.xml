@@ -37,17 +37,29 @@
         WHERE o.common_name = #{commonName}
   </select>
   
-  <select id="getOrganismProp" resultType="org.genedb.crawl.model.OrganismProp" >
-    SELECT op.value as value 
+  <select id="getOrganismProp" resultMap="org.genedb.crawl.mappers.FeatureMapper.properties" >
+    SELECT op.value as value , cv.name as type_name, op.rank as rank, cvterm.name as propname
         FROM organismprop op
         JOIN organism o ON op.organism_id = o.organism_id
         JOIN cvterm ON op.type_id = cvterm_id
         JOIN cv ON cvterm.cv_id = cv.cv_id
-        WHERE op.organism_id = #{ID}
+        WHERE op.organism_id = #{organism.ID}
         
-        <if test="cvterm != null" >
-            AND cvterm.name = #{cvterm}
+        AND cvterm.name = #{cvterm}
+        
+        <if test="cv != null" >
+            AND cv.name = #{cv}
         </if>
+        
+  </select>
+  
+  <select id="getOrganismProps" resultMap="org.genedb.crawl.mappers.FeatureMapper.properties"  >
+    SELECT op.value as value , cv.name as type_name, op.rank as rank, cvterm.name as propname
+        FROM organismprop op
+        JOIN organism o ON op.organism_id = o.organism_id
+        JOIN cvterm ON op.type_id = cvterm_id
+        JOIN cv ON cvterm.cv_id = cv.cv_id
+        WHERE op.organism_id = #{organism.ID}
         
         <if test="cv != null" >
             AND cv.name = #{cv}

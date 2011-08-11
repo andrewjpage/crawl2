@@ -13,7 +13,7 @@ import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.mappers.OrganismsMapper;
 
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.OrganismProp;
+import org.genedb.crawl.model.Property;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -80,9 +80,23 @@ public class OrganismsController extends BaseQueryController {
 		return addProps(list);
 	}
 	
+	@ResourceDescription(value="Get an organism property", type="Organism")
+    @RequestMapping(method=RequestMethod.GET, value="/property")
+	public Property property(@RequestParam("organism") String organism, @RequestParam("term") String term, @RequestParam(value="cv", required=false) String cv) {
+	    Organism o = this.getOrganism(organismsMapper, organism);
+	    return organismsMapper.getOrganismProp(o, cv, term);
+	}
+	
+	@ResourceDescription(value="Get an organism property", type="Organism")
+    @RequestMapping(method=RequestMethod.GET, value="/properties")
+    public List<Property> properties(@RequestParam("organism") String organism, @RequestParam(value="cv", required=false) String cv) {
+        Organism o = this.getOrganism(organismsMapper, organism);
+        return organismsMapper.getOrganismProps(o, cv);
+    }
+	
 	private List<Organism> addProps(List<Organism> list) {
 		for (Organism organism : list) {
-			OrganismProp prop = organismsMapper.getOrganismProp(organism.ID, "genedb_misc", "translationTable");
+			Property prop = organismsMapper.getOrganismProp(organism, "genedb_misc", "translationTable");
 			if (prop != null) {
 				organism.translation_table = Integer.parseInt(prop.value);
 			}

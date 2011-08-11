@@ -14,7 +14,7 @@ import org.genedb.crawl.model.Cv;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Dbxref;
 import org.genedb.crawl.model.Feature;
-import org.genedb.crawl.model.FeatureProperty;
+import org.genedb.crawl.model.Property;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Orthologue;
@@ -66,7 +66,7 @@ public class FeatureBeanFactory {
 		type.name = gffFeature.type;
 		feature.type = type;
 		
-		feature.properties = new ArrayList<FeatureProperty>();
+		feature.properties = new ArrayList<Property>();
 		
 		for (Entry<String, Object> entry : gffFeature.attributes.map.entrySet()) {
 			
@@ -198,7 +198,7 @@ public class FeatureBeanFactory {
 								
 								logger.debug(String.format("Subattribute %s : %s.", subattr.getKey(), (String) subattr.getValue()));
 								
-								FeatureProperty fp = new FeatureProperty();
+								Property fp = new Property();
 								fp.name = key + "." + subattr.getKey();
 								fp.value = (String) subattr.getValue();
 								
@@ -274,10 +274,13 @@ public class FeatureBeanFactory {
 				} else if (key.equals("translation")) {
 					
 					feature.residues = stringValue;
+				
+				} else if (key.equals("translation")) {
+				    
 					
 				} else {
 					
-					FeatureProperty fp = new FeatureProperty();
+					Property fp = new Property();
 					fp.name = key;
 					fp.value = stringValue;
 					

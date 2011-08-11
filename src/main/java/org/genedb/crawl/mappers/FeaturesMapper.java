@@ -25,8 +25,6 @@ public interface FeaturesMapper {
 	
 	List<Feature> properties(@Param("features") List<String> features, @Param("types") List<String> types );
 	
-	
-	
 	List<Feature> pubs (@Param("features") List<String> features);
 	List<Feature> dbxrefs (@Param("features") List<String> features);
 	List<Feature> terms (@Param("features") List<String> features, @Param("cvs") List<String> cvs);

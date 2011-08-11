@@ -20,7 +20,7 @@ import uk.ac.ebi.das.jdas.exceptions.ValidationException;
 import uk.ac.ebi.das.jdas.schema.entryPoints.SEGMENT;
 
 import org.genedb.crawl.model.Feature;
-import org.genedb.crawl.model.FeatureProperty;
+import org.genedb.crawl.model.Property;
 import org.genedb.crawl.modelling.RegionFeatureBuilder;
 
 
@@ -103,9 +103,9 @@ public class DASIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 				
 				
 				
-				feature.properties =new ArrayList<FeatureProperty>();
+				feature.properties =new ArrayList<Property>();
 				
-				FeatureProperty prop = new FeatureProperty();
+				Property prop = new Property();
 				prop.name = "comment";
 				prop.value = String.format("Pulled in from %s/%s/%s", url, source, segment.getId());
 				

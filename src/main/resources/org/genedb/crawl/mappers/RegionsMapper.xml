@@ -118,7 +118,7 @@
         <result property="name" column="type"/>
     </association>
     
-    <collection property="properties" ofType="org.genedb.crawl.model.FeatureProperty"> 
+    <collection property="properties" ofType="org.genedb.crawl.model.Property"> 
         <result property="name" column="propname"/> 
         <result property="value" column="value"/> 
     </collection>

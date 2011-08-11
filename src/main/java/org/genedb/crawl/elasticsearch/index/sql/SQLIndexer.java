@@ -21,7 +21,7 @@ import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.model.OrganismProp;
+import org.genedb.crawl.model.Property;
 import org.genedb.crawl.model.Sequence;
 import org.genedb.crawl.modelling.LocatedFeatureUtil;
 
@@ -154,8 +154,8 @@ public class SQLIndexer {
 		
 		organism_ids.add(o.ID);
 		
-		OrganismProp taxon = organismMapper.getOrganismProp(o.ID, "genedb_misc", "taxonId");
-		OrganismProp translation_table = organismMapper.getOrganismProp(o.ID, "genedb_misc", "translationTable");
+		Property taxon = organismMapper.getOrganismProp(o, "genedb_misc", "taxonId");
+		Property translation_table = organismMapper.getOrganismProp(o, "genedb_misc", "translationTable");
 		
 		logger.debug("Setting organism " + o.common_name);
 		
