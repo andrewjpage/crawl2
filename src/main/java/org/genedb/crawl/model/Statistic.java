@@ -6,8 +6,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 public class Statistic {
 	
 	@XmlAttribute
-	String name;
+	public String name;
 	
 	@XmlAttribute
-	Integer value;
+	public Integer value;
 }

@@ -139,5 +139,7 @@ public class Feature implements Serializable {
 	@XmlElement(required=false)
 	public String relationship;
 	
+	@XmlElement(required=false)
+    public Integer count;
 	
 }
