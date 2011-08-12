@@ -9,11 +9,10 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.xcontent.QueryBuilders;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.genedb.crawl.mappers.FeaturesMapper;
 import org.genedb.crawl.model.BlastPair;
-import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;

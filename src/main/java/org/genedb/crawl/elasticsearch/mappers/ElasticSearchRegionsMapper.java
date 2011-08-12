@@ -2,9 +2,10 @@ package org.genedb.crawl.elasticsearch.mappers;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -14,12 +15,11 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
-import org.elasticsearch.index.query.xcontent.BoolQueryBuilder;
-import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
-import org.elasticsearch.index.query.xcontent.QueryBuilders;
-import org.elasticsearch.index.query.xcontent.RangeQueryBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.FieldQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.genedb.crawl.mappers.RegionsMapper;
@@ -360,7 +360,23 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		
 		return features;
 	}
-
+	
+	public Feature getInfo(String uniqueName, String name, Integer organism_id) {
+	    
+	    Map<String,String> map = new HashMap<String,String>();
+	    map.put("uniqueName", uniqueName);
+	    
+	    if (name != null)
+	        map.put("name", name);
+	    
+	    if (organism_id != null)
+	        map.put("organism_id", String.valueOf(organism_id));
+	    
+	    return this.getFirstMatch(connection.getIndex(), connection.getRegionType(), map, LocatedFeature.class);
+	    
+	}
+	
+	
 	@Override
 	public Sequence sequence(String region) {
 		
@@ -540,7 +556,8 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	public void createOrUpdate(Feature feature) {
 		this.createOrUpdate(connection.getIndex(), connection.getRegionType(), feature.uniqueName, feature);
 	}
-
+    
+    
 
 
 
