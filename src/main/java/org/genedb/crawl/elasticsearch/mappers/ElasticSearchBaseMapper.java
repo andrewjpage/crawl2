@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
@@ -12,9 +13,13 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.xcontent.FieldQueryBuilder;
-import org.elasticsearch.index.query.xcontent.QueryBuilders;
-import org.elasticsearch.index.query.xcontent.XContentQueryBuilder;
+
+import org.elasticsearch.index.query.BoolQueryBuilder;
+
+
+import org.elasticsearch.index.query.FieldQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.genedb.crawl.elasticsearch.Connection;
 import org.genedb.crawl.json.JsonIzer;
@@ -177,6 +182,27 @@ public abstract class ElasticSearchBaseMapper {
 		return copy;
 	}
 	
+	protected <T extends Object> T getFirstMatch(String indexName, String typeName, Map<String, String> fieldNamesAndValues, Class<T> cls) {
+	    
+		logger.info(String.format("Fetching index %s, type %s, field %s, value %s, casting to %s.", indexName, typeName, fieldNamesAndValues, cls.getName()));
+		
+		BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
+		for (String key : fieldNamesAndValues.keySet())  {
+		    String value = fieldNamesAndValues.get(key);
+		    FieldQueryBuilder fieldQuery = QueryBuilders.fieldQuery(key, value);
+		    booleanQuery.must(fieldQuery);
+		}
+		
+		SearchResponse response = connection.getClient()
+			.prepareSearch(indexName)
+			.setTypes(typeName)
+			.setQuery(booleanQuery)
+			.execute()
+			.actionGet();
+		
+		return getFirstMatch( response, cls);
+		
+	}
 	
 	protected <T extends Object> T getFirstMatch(String indexName, String typeName, String fieldName, String value, Class<T> cls) {
 		
@@ -218,7 +244,7 @@ public abstract class ElasticSearchBaseMapper {
 		return null;
 	}
 	
-	protected <T extends Object> List<T> getAllMatches(String indexName, String fieldName, XContentQueryBuilder query, Class<T> cls) {
+	protected <T extends Object> List<T> getAllMatches(String indexName, String fieldName, QueryBuilder query, Class<T> cls) {
 	    
 	    SearchResponse response = connection.getClient().prepareSearch(indexName)
 	            .setQuery(query)

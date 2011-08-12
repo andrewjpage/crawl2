@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.xcontent.QueryBuilders;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Property;

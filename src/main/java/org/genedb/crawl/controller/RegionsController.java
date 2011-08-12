@@ -297,6 +297,24 @@ public class RegionsController extends BaseQueryController {
 		return sequences;
 	}
 	
+	@RequestMapping(method=RequestMethod.GET, value="getRegionInfo")
+	@ResourceDescription("Returns the region's information.")
+	public Feature getInfo( 
+			@RequestParam(value="uniqueName") String uniqueName, 
+			@RequestParam(value="name", required=false) String name,
+			@RequestParam(value="organism", required=false) String organism) throws CrawlException {
+		
+		Integer organism_id = null;
+		if (organism != null) {
+		    Organism o = getOrganism(organismsMapper, organism);
+		    if (o != null)
+		        organism_id = o.ID;
+		}
+		
+		return regionsMapper.getInfo(uniqueName, name, organism_id);
+
+	}
+	
 	@RequestMapping(method=RequestMethod.GET, value="inorganism")
 	@ResourceDescription("Returns the regions in an organism.")
 	public List<Feature> inorganism( 

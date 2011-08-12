@@ -11,6 +11,8 @@ import org.genedb.crawl.model.Sequence;
 
 public interface RegionsMapper {
 	
+    Feature getInfo(@Param("uniqueName") String uniqueName, @Param("name") String name, @Param("organism_id") Integer organism_id);
+    
 	public LocationBoundaries locationsMinAndMaxBoundaries(
 			@Param("region") String region, 
 			@Param("start") int start, 

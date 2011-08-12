@@ -13,11 +13,11 @@ import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.index.AbstractIndexComponent;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.query.QueryParsingException;
-import org.elasticsearch.index.query.xcontent.QueryParseContext;
-import org.elasticsearch.index.query.xcontent.XContentQueryParser;
+import org.elasticsearch.index.query.QueryParseContext;
+import org.elasticsearch.index.query.QueryParser;
 
 public class RegexQueryParser extends AbstractIndexComponent
-		implements XContentQueryParser {
+		implements QueryParser {
 
 	@Inject protected RegexQueryParser(Index index, Settings indexSettings) {
 		super(index, indexSettings);
