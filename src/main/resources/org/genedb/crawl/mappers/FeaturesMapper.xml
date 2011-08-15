@@ -278,7 +278,10 @@
 		    feature.uniquename as uniqueName,
 		    feature.name as name,
 		    dbxref.accession as accession,
-		    db.name as database
+		    db.name as database,
+		    db.urlprefix, 
+		    db.url,
+            db.description
 		FROM feature
 		JOIN feature_dbxref ON feature_dbxref.feature_id = feature.feature_id
 		JOIN dbxref ON dbxref.dbxref_id = feature_dbxref.dbxref_id
@@ -289,7 +292,10 @@
 		    feature.uniquename as uniqueName,
 		    feature.name as name,
 		    dbxref.accession as accession,
-		    db.name as database
+		    db.name as database,
+		    db.urlprefix, 
+            db.url,
+            db.description
 		FROM feature
 		JOIN dbxref ON dbxref.dbxref_id = feature.dbxref_id
 		JOIN db ON db.db_id = dbxref.db_id
@@ -304,6 +310,9 @@
          <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref"> 
             <result property="database" column="database"/> 
             <result property="accession" column="accession"/> 
+            <result property="urlprefix" column="urlprefix"/>
+            <result property="url" column="url"/> 
+            <result property="description" column="description"/> 
         </collection>
     </resultMap>
     
