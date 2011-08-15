@@ -51,7 +51,7 @@ fi
 
 if [[ -z $CRAWL_JAVA_SETTINGS ]]
 then
-    export CRAWL_JAVA_SETTINGS="-Xmx1500m"
+    export CRAWL_JAVA_SETTINGS="-Xmx2000m"
 fi
 
 if [ $# -lt 1 ]; then

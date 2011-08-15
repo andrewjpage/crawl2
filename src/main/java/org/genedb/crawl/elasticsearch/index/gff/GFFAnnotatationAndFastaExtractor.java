@@ -3,31 +3,20 @@ package org.genedb.crawl.elasticsearch.index.gff;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
-import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
-import org.genedb.crawl.modelling.LocatedFeatureUtil;
 import org.genedb.crawl.modelling.RegionFeatureBuilder;
 
 public class GFFAnnotatationAndFastaExtractor {
 
     private static Logger             logger      = Logger.getLogger(GFFAnnotatationAndFastaExtractor.class);
-    ElasticSearchFeatureMapper        featureMapper;
-    ElasticSearchRegionsMapper        regionsMapper;
 
-    List<RegionFeatureBuilder>        sequences   = new ArrayList<RegionFeatureBuilder>();
     
     //Set<String> features = new HashSet<String>();
     //Map<String, String>       features    = new HashMap<String, LocatedFeature>();
@@ -36,8 +25,7 @@ public class GFFAnnotatationAndFastaExtractor {
 
     public GFFAnnotatationAndFastaExtractor(BufferedReader buf, Organism organism, ElasticSearchFeatureMapper featureMapper, ElasticSearchRegionsMapper regionsMapper) throws IOException {
 
-        this.featureMapper = featureMapper;
-        this.regionsMapper = regionsMapper;
+        List<RegionFeatureBuilder>        sequences   = new ArrayList<RegionFeatureBuilder>();
 
         try {
 
@@ -87,7 +75,7 @@ public class GFFAnnotatationAndFastaExtractor {
 
                     }
                     
-                    createOrUpdate(feature);
+                    createOrUpdate(feature,featureMapper);
                     //featureMapper.waitForStatus(EnumSet.of(ClusterHealthStatus.GREEN, ClusterHealthStatus.YELLOW));
 
                 } else {
@@ -246,7 +234,7 @@ public class GFFAnnotatationAndFastaExtractor {
 //            createOrUpdate(feature);
 //    }
 
-    private void createOrUpdate(LocatedFeature feature) {
+    private void createOrUpdate(LocatedFeature feature, ElasticSearchFeatureMapper featureMapper) {
         logger.info(info(feature));
         featureMapper.createOrUpdate(feature);
     }
