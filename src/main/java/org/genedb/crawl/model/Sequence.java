@@ -5,7 +5,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name="TheSequence")
-public class Sequence implements Serializable {
+public class Sequence extends Feature implements Serializable {
 	public Integer start;
 	public Integer end;
 	public Integer length;

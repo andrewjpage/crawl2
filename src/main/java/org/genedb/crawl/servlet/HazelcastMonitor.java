@@ -2,6 +2,7 @@ package org.genedb.crawl.servlet;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,9 +19,9 @@ public class HazelcastMonitor implements InstanceListener {
     private Logger logger = Logger.getLogger(HazelcastMonitor.class);
     private EntryMonitor<Object,Object> entryMonitor = new EntryMonitor<Object,Object>();
     private int time = 300000;
-    Map<String,Timer> timers = new HashMap<String,Timer>();
+    private Map<String,Timer> timers = new HashMap<String,Timer>();
     
-    private void logEvent(InstanceEvent event) {
+    private void instanceEvent(InstanceEvent event) {
         logger.info(String.format("%s %s %s", event.getEventType(), event.getInstanceType(), event.getInstance()));
     }
     
@@ -30,10 +31,11 @@ public class HazelcastMonitor implements InstanceListener {
     
     @Override
     public void instanceCreated(InstanceEvent event) {
-        logEvent(event);
+        instanceEvent(event);
         
         final String id = getId(event);
-        logger.info("map id? '" + id + "'");
+        
+        stats(id);
         
         Hazelcast.getMap(id).addEntryListener(entryMonitor, false);
         
@@ -48,13 +50,31 @@ public class HazelcastMonitor implements InstanceListener {
 
     @Override
     public void instanceDestroyed(InstanceEvent event) {
-        logEvent(event);
-        String id = getId(event);
-        Hazelcast.getMap(id).removeEntryListener(entryMonitor);
-        timers.remove(id);
+        instanceEvent(event);
+        clearTimer(getId(event));
     }
     
-    void stats(String mapName) {
+    public void clear() {
+        logger.warn("Clearing monitors");
+        for (Entry<String,Timer> entry : timers.entrySet()) {
+            clearTimer(entry.getKey());
+        }
+        timers = new HashMap<String,Timer>();
+    }
+    
+    private void clearTimer(String id) {
+        logger.warn("Clearing monitors for " + id);
+        Timer timer = timers.get(id);
+        timer.cancel();
+        timer.purge();
+        logger.warn("timer purged");
+        
+        // attempting to remove the listener in this way stalls tomcat shutdown.
+        // Hazelcast.getMap(id).removeEntryListener(entryMonitor);
+        // logger.warn("listener removed");
+    }
+    
+    private void stats(String mapName) {
         logger.info(String.format("%s (%s):\n%s\n%s\n%s",
                 mapName,
                 Hazelcast.getMap(mapName).size(),
@@ -65,29 +85,29 @@ public class HazelcastMonitor implements InstanceListener {
 
     class EntryMonitor<K, V> implements EntryListener<K, V> {
 
-        private void logEvent(EntryEvent<K, V> event) {
-            logger.info(String.format("%s %s", event.getEventType(), event.getKey()));
+        private void entryEvent(EntryEvent<K, V> event) {
+            logger.info(String.format("%s %s", event.getEventType(), event.getName()));
         }
 
         @Override
         public void entryAdded(EntryEvent<K, V> event) {
-            logEvent(event);
+            entryEvent(event);
         }
 
         @Override
         public void entryEvicted(EntryEvent<K, V> event) {
-            logEvent(event);
+            entryEvent(event);
 
         }
 
         @Override
         public void entryRemoved(EntryEvent<K, V> event) {
-            logEvent(event);
+            entryEvent(event);
         }
 
         @Override
         public void entryUpdated(EntryEvent<K, V> event) {
-            logEvent(event);
+            entryEvent(event);
         }
 
     }

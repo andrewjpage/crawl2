@@ -21,6 +21,7 @@ import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
 import org.genedb.crawl.json.JsonIzer;
 import org.genedb.crawl.model.Gene;
+import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.MappedVCFRecord;
 import org.genedb.crawl.model.Sequence;
 import org.genedb.crawl.model.Variant;
@@ -28,6 +29,7 @@ import org.genedb.crawl.model.Variant;
 import uk.ac.sanger.artemis.components.variant.VariantFilterOption;
 import uk.ac.sanger.artemis.components.variant.VariantFilterOptions;
 import uk.ac.sanger.artemis.components.variant.VariantReaderAdapter;
+import uk.ac.sanger.artemis.util.OutOfRangeException;
 import junit.framework.TestCase;
 
 public class VariantTest extends TestCase {
@@ -84,7 +86,7 @@ public class VariantTest extends TestCase {
 	}
 	*/
 	
-	public void testBCFLocal() throws IOException, SecurityException, IllegalArgumentException, ParseException, NoSuchFieldException, IllegalAccessException {
+	public void testBCFLocal() throws IOException, SecurityException, IllegalArgumentException, ParseException, NoSuchFieldException, IllegalAccessException, OutOfRangeException {
         String gffFile = "./src/test/resources/data/Streptococcus_pneumoniae_ATCC_700669_v1.gff";
         String variantFile= "./src/test/resources/data/4882_6_10_variant.bcf";
         
@@ -99,8 +101,8 @@ public class VariantTest extends TestCase {
         runQueryDirectly(variantFile,sequenceNameInVCF,start,end);
         
         startIndex();
-        List<Gene> geneFeatures = buildIndex(gffFile, organism, region, start, end);
-        logger.info("how many gene features? " + geneFeatures.size());
+        List<LocatedFeature> exonFeatures = buildIndex(gffFile, organism, region, start, end);
+        logger.info("how many gene features? " + exonFeatures.size());
         
         ElasticSearchRegionsMapper regionsMapper = builder.getRegionsMapper();
         Sequence regionSequence = regionsMapper.sequence(region);
@@ -110,7 +112,7 @@ public class VariantTest extends TestCase {
         VariantReaderAdapter vreader = VariantReaderAdapter.getReader(variantFile);
         
         logger.info("generating cds features");
-        List<CDSFeature> cdsFeatures = vreader.genesToCDSFeature(geneFeatures, regionSequence);
+        List<CDSFeature> cdsFeatures = vreader.makeCDSFeatures(exonFeatures, regionSequence);
         logger.info("how many cds features? " + cdsFeatures.size());
         
         
@@ -229,7 +231,7 @@ public class VariantTest extends TestCase {
 	
 	
 	
-	private List<Gene> buildIndex (
+	private List<LocatedFeature> buildIndex (
 	        String gffFile, 
 	        String organism, 
 	        String region, 
@@ -257,14 +259,14 @@ public class VariantTest extends TestCase {
 		//String sequence = region;
 		
 //		Sequence regionSequence = regionsMapper.sequence(sequence);
-		List<Gene> geneFeatures = VariantController.getGenesAt(region, start, end, regionsMapper, featureMapper);
+		List<LocatedFeature> features = VariantController.getExons(region, start, end, regionsMapper, featureMapper);
 		
 //		
-		for (Gene f : geneFeatures) {
+		for (LocatedFeature f : features) {
 			logger.info("gene : " + f.uniqueName + " / "  + f.region+ ":" + f.fmin + "-" + f.fmax);
 		}
 		
-		return geneFeatures;
+		return features;
 //		
 //		//VariantFilterOptions opts = new VariantFilterOptions(EnumSet.allOf(VariantFilterOption.class));
 //		logger.info(opts);

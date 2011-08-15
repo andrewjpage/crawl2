@@ -37,11 +37,7 @@
   </select>
   
   
-  <select id="getRegionInfo" resultMap="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult" >
-      SELECT feature_id, organism_id, uniqueName, f.name, type.name as type 
-      FROM feature f
-      WHERE <include refid="org.genedb.crawl.mappers.FeatureMapper.featureSelector"/>  
-  </select>
+  
   
   
   <select id="locations" resultMap="locations" >
