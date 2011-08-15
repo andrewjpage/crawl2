@@ -3,12 +3,16 @@ package uk.ac.sanger.artemis.components.variant;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.model.Exon;
 import org.genedb.crawl.model.Gene;
 
+import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.MappedVCFRecord;
 import org.genedb.crawl.model.Sequence;
 import org.genedb.crawl.model.Transcript;
@@ -47,6 +51,84 @@ public abstract class VariantReaderAdapter {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public List<CDSFeature> makeCDSFeatures(List<LocatedFeature> features, Sequence regionSequence) throws OutOfRangeException {
+	    List<CDSFeature> cdsFeatures = new ArrayList<CDSFeature>();
+	    
+	    Map<String, List<LocatedFeature>> parented = new HashMap<String,List<LocatedFeature>>();
+	    
+	    for (LocatedFeature feature : features) {
+	        
+	        if (! feature.type.name.equals("exon"))
+	            continue;
+	        
+	        if (feature.parent != null && feature.parentRelationshipType.equals("part_of")) {
+	            if (parented.get(feature.parent) ==  null)
+	                parented.put(feature.parent, new ArrayList<LocatedFeature>());
+	            parented.get(feature.parent).add(feature);
+	        }
+	        
+	        cdsFeatures.add(makeCDSFeature(feature,regionSequence));
+	        
+	    }
+	    
+	    for (Entry<String,List<LocatedFeature>> parentedFeatures : parented.entrySet()) {
+	        cdsFeatures.add(
+	                makeCDSFeature(parentedFeatures.getValue(), regionSequence));
+	    }
+	    
+	    return cdsFeatures;
+	}
+	
+	// TODO currently assumes they are in the correct order!
+	@SuppressWarnings("unchecked")
+	private CDSFeature makeCDSFeature(List<LocatedFeature> features, Sequence regionSequence) throws OutOfRangeException {
+	    
+	    StringBuilder bases = new StringBuilder();
+	    RangeVector rv = new RangeVector();
+	    
+	    boolean isFwd = ( features.get(0).strand > 0) ? true : false;
+	    
+	    int min = Integer.MAX_VALUE;
+        int max = 0;
+	    
+	    for (LocatedFeature feature : features) {
+	        
+	        rv.add(new Range(feature.fmin, feature.fmax));
+            bases.append(regionSequence.dna.subSequence(feature.fmin, feature.fmax));
+            
+            if (feature.fmin < min) {
+                min = feature.fmin;
+            }
+            if (feature.fmax > max) {
+                max = feature.fmax;
+            }
+            
+	    }
+	    
+	    String b = bases.toString();
+        
+        if (! isFwd) 
+            b = Bases.reverseComplement(b);
+        
+        CDSFeature cdsFeature = new CDSFeature(isFwd, rv, min + 1, max, b);
+	    
+	    return cdsFeature;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private CDSFeature makeCDSFeature(LocatedFeature feature, Sequence regionSequence) throws OutOfRangeException {
+	    boolean isFwd = ( feature.strand > 0) ? true : false;
+        RangeVector rv = new RangeVector();
+        rv.add(new Range(feature.fmin, feature.fmax));
+        String bases = regionSequence.dna.substring(feature.fmin, feature.fmax);
+        if (! isFwd) 
+            bases = Bases.reverseComplement(bases);
+        CDSFeature cdsFeature = new CDSFeature(isFwd, rv, feature.fmin + 1, feature.fmax, bases);
+        return cdsFeature;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Deprecated
     public List<CDSFeature> genesToCDSFeature(
 	        List<Gene> genes, 
 	        Sequence regionSequence) {

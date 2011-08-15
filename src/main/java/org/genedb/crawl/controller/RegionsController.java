@@ -297,7 +297,7 @@ public class RegionsController extends BaseQueryController {
 		return sequences;
 	}
 	
-	@RequestMapping(method=RequestMethod.GET, value="getRegionInfo")
+	@RequestMapping(method=RequestMethod.GET, value="getInfo")
 	@ResourceDescription("Returns the region's information.")
 	public Feature getInfo( 
 			@RequestParam(value="uniqueName") String uniqueName, 
