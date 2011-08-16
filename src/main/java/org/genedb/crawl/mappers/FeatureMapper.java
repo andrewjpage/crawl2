@@ -28,7 +28,7 @@ public interface FeatureMapper {
 	
 	LocatedFeature getOfType(
 			@Param("uniqueName") String uniqueName,
-			@Param("organism_id") String organism_id,
+			@Param("organism_id") Integer organism_id,
 			@Param("name") String name,
 			@Param("type") String type);
 	

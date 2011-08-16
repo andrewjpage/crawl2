@@ -93,9 +93,10 @@ public class MapperUtil {
 			HierarchicalFeature hf = new HierarchicalFeature();
 			
 			hf.relationship = relation.relationship_type;
-			hf.relationshipType = relation.type;
+			//hf.relationshipType = relation.type;
 			hf.uniqueName = relation.uniqueName;
 			hf.name = relation.name;
+			hf.type = relation.type;
 			
 			if (searchType == HierarchicalSearchType.CHILDREN) {
 				feature.children.add(hf);
