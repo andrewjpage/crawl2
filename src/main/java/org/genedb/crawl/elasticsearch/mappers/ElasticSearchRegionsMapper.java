@@ -32,6 +32,8 @@ import org.genedb.crawl.model.LocationBoundaries;
 import org.genedb.crawl.model.Sequence;
 import org.springframework.stereotype.Component;
 
+import com.hazelcast.core.Hazelcast;
+
 @Component
 public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implements RegionsMapper {
 
@@ -380,7 +382,12 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	@Override
 	public Sequence sequence(String region) {
 		
-		Sequence sequence = new Sequence();
+	    Sequence sequence = (Sequence) Hazelcast.getMap("regions").get(region);
+	    
+	    if (sequence != null) 
+	        return sequence;
+	    
+		sequence = new Sequence();
 		sequence.dna = "";
 		sequence.length = 0;
 		sequence.organism_id = -1;
@@ -410,6 +417,8 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		} catch (Exception e) {
 			logger.error(e);
 		} 
+		
+		Hazelcast.getMap("regions").put(region, sequence);
 		
 		return sequence;
 		
