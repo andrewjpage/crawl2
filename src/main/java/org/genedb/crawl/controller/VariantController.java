@@ -89,8 +89,7 @@ public class VariantController extends BaseQueryController {
 		return variantStore.listforsequence(sequence);
 	}
 	
-	// we need to get the gene and pseudo gene features in this request to make sure that the proper boundaries are calculated
-	private static final List<String> geneTypes = Arrays.asList(new String[]{"gene", "pseudogene", "exon"});
+	
 	
 	@ResourceDescription("Queries a region of a variant file.")
 	@RequestMapping(method=RequestMethod.GET, value={"/query", "/query.*"})
@@ -115,6 +114,7 @@ public class VariantController extends BaseQueryController {
 		return doQuery(fileID,sequence,start,end,filter);
 	}
 	
+	
 	private List<MappedVCFRecord> doQuery(int fileID, String sequence, int start, int end, Integer filter) throws IOException, OutOfRangeException {
 		VariantFilterOptions options = new VariantFilterOptions(filter);
 		
@@ -137,14 +137,15 @@ public class VariantController extends BaseQueryController {
 	}
 	
 	
+	// we need to get the gene and pseudo gene features in this request to make sure that the proper boundaries are calculated
+	// they will then be ignored by makeCDSFeatures()
+    private static final List<String> geneTypes = Arrays.asList(new String[]{"gene", "pseudogene", "exon"});
+    
+	@WebMethod(exclude=true)
 	public static List<LocatedFeature> getExons(String sequence, int start, int end, RegionsMapper regionsMapper, FeatureMapper featureMapper) {
-	    
 	    LocationBoundaries boundaries = regionsMapper.locationsMinAndMaxBoundaries(sequence, start, end, false, geneTypes);
-	    
 	    List<LocatedFeature> features = regionsMapper.locations(sequence, boundaries.start, boundaries.end, false, geneTypes);
-	    
 	    return features;
-	    
 	}
 	
 //	@WebMethod(exclude=true)
