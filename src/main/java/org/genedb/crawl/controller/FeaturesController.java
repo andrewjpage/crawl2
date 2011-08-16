@@ -18,6 +18,7 @@ import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.mappers.MapperUtil.HierarchicalSearchType;
 import org.genedb.crawl.model.BlastPair;
+import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.Gene;
@@ -96,6 +97,9 @@ public class FeaturesController extends BaseQueryController {
 			
 			HierarchicalFeature hf = new HierarchicalFeature();
 			hf.uniqueName = feature;
+			
+			Feature f = featureMapper.getOfType(feature, null, null, null);
+			hf.type = f.type.name;
 			
 			MapperUtil.searchForRelations(featuresMapper, hf, relationshipTypes, HierarchicalSearchType.CHILDREN);
 			MapperUtil.searchForRelations(featuresMapper, hf, relationshipTypes, HierarchicalSearchType.PARENTS);
@@ -274,20 +278,34 @@ public class FeaturesController extends BaseQueryController {
 	}
 	
 	@ResourceDescription("Return a gene's transcripts")
-	@RequestMapping(method=RequestMethod.GET, value="/get")
-	public List<LocatedFeature> get(@RequestParam(value="feature") String feature, @RequestParam(value="type") String type) {
-		List<LocatedFeature> l = new ArrayList<LocatedFeature>(); 
-		LocatedFeature resultFeature = featureMapper.getOfType(feature, null, null, type);
-		if (resultFeature != null) {
-			logger.info(resultFeature.getClass());
-			logger.info(resultFeature.uniqueName);
-			
-			
-			l.add(resultFeature);
-			
+	@RequestMapping(method=RequestMethod.GET, value="/getInfo")
+	public LocatedFeature getInfo(
+	        @RequestParam(value="feature") String feature, 
+	        @RequestParam(value="organism",required=false) String organism, 
+	        @RequestParam(value="name",required=false) String name, 
+	        @RequestParam(value="type",required=false) String type) {
+		
+		
+		Integer organism_id =  null;
+		if (organism != null) {
+		    Organism o = this.getOrganism(organismsMapper, organism);
+		    if (o != null) 
+		        organism_id = o.ID;
 		}
 		
-		return l;
+		LocatedFeature resultFeature = featureMapper.getOfType(feature, organism_id, name, type);
+		resultFeature.coordinates = featureMapper.coordinates(resultFeature);
+		
+		if (resultFeature.coordinates != null && resultFeature.coordinates.size() > 0) {
+		    Coordinates c = resultFeature.coordinates.get(0);
+		    resultFeature.fmin = c.fmin;
+		    resultFeature.fmax = c.fmax;
+		    resultFeature.region = c.region;
+		    resultFeature.phase = c.phase;
+		    resultFeature.strand = c.strand;
+		}
+		
+		return resultFeature;
 		
 		//return featuresMapper.pubs(features);
 	}

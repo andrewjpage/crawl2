@@ -282,13 +282,16 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 	
 
 	@Override
-	public LocatedFeature getOfType(String uniqueName, String organism_id,
+	public LocatedFeature getOfType(String uniqueName, Integer organism_id,
 			String name, String type) {
 		
 	    BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
         
         booleanQuery.must(QueryBuilders.fieldQuery("uniqueName", uniqueName));
-        booleanQuery.must(QueryBuilders.fieldQuery("type.name", type));
+        
+        if (type != null) {
+            booleanQuery.must(QueryBuilders.fieldQuery("type.name", type));
+        }
 	    
 	    if (organism_id != null) {
             booleanQuery.must(QueryBuilders.fieldQuery("organism_id", organism_id));

@@ -27,7 +27,7 @@
             f.name,
             type.name as type 
         FROM feature f
-        JOIN cvterm type ON type.cvterm_id = f.type_id and type.name = #{type}
+        JOIN cvterm type ON type.cvterm_id = f.type_id <if test="type != null"> and type.name = #{type} </if> 
         WHERE <include refid="featureSelector"/> 
     </select>
     
