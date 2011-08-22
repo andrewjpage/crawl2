@@ -146,17 +146,7 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		return isOverlapOnRegion;
 	}
 	
-	public static String toString(ToXContent tmp) {
-	       try {
-	           return
-	           tmp.toXContent(JsonXContent.unCachedContentBuilder(),
-	        		   ToXContent.EMPTY_PARAMS).
-	                   prettyPrint().
-	                   string();
-	       } catch (Exception ex) {
-	           return "<ERROR:" + ex.getMessage() + ">";
-	       }
-	   }
+	
 	
 	@Override
 	public LocationBoundaries locationsMinAndMaxBoundaries(String region,

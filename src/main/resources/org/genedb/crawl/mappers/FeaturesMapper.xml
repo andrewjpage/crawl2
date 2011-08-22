@@ -318,6 +318,7 @@
     
     <select id="terms" resultMap="cvtermsList" >
        SELECT 
+           fc.feature_cvterm_id,
            f.uniquename as uniqueName,
            f.name as name,
            fc.feature_cvterm_id as feature_cvterm_id, 
@@ -358,14 +359,14 @@
             <result property="accession" column="accession"/>
             <result property="is_not" column="is_not"/> 
             <result property="name" column="cvterm"/>
-            <result property="count" column="count"/>
+            <result property="count" column="count"/> 
             <association property="cv" javaType="org.genedb.crawl.model.Cv">
                 <result property="name" column="cv"/>
             </association>
             <collection property="props" ofType="org.genedb.crawl.model.CvtermProp">
                 <result property="value" column="prop"/>
                 <association property="type" resultMap="type" />
-            </collection> 
+            </collection>  
             <collection property="pubs" ofType="org.genedb.crawl.model.Pub" select="org.genedb.crawl.mappers.FeatureCvtermMapper.featureCvTermPubs" column="feature_cvterm_id"  />
             <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" select="org.genedb.crawl.mappers.FeatureCvtermMapper.featureCvTermDbxrefs" column="feature_cvterm_id"  /> 
         </collection>
