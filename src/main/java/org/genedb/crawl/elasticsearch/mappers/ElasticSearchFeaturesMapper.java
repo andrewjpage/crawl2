@@ -4,7 +4,6 @@ package org.genedb.crawl.elasticsearch.mappers;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 
 import org.apache.log4j.Logger;
@@ -222,8 +221,7 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 
 	@Override
 	public List<Feature> pubs(List<String> features) {
-		// TODO Auto-generated method stub
-		return null;
+	    return fetchAndCopy(connection.getIndex(), connection.getFeatureType(), features,  new String[]{"uniqueName", "pubs"});
 	}
 
 	@Override
@@ -311,6 +309,12 @@ public class ElasticSearchFeaturesMapper extends ElasticSearchBaseMapper impleme
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public List<LocatedFeature> locations(String region) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     
 }

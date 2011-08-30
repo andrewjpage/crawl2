@@ -8,10 +8,10 @@ public class FeatureRelationship {
 	@XmlAttribute
 	public Integer feature_relationship_id;
 	
-	@XmlElement
+	@XmlElement(name="child", required=false)
 	public Feature subject;
 	
-	@XmlElement
+	@XmlElement(name="parent", required=false)
 	public Feature object;
 	
 	@XmlAttribute

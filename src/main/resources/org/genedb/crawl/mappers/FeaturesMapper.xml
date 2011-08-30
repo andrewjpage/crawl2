@@ -136,6 +136,28 @@
         
     </resultMap>
     
+    <select id="locations" resultMap="org.genedb.crawl.mappers.RegionsMapper.locations">
+        SELECT
+            f.uniqueName as uniqueName,
+            f.organism_id, 
+            type.name as type,
+            #{region} as region,
+            fl.fmin, 
+            fl.fmax,
+            fl.strand,
+            fl.phase,
+            f.is_obsolete,
+
+            fl.is_fmin_partial,
+            fl.is_fmax_partial
+
+      FROM feature f
+
+      JOIN cvterm type ON f.type_id = type.cvterm_id
+      JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id =
+          (select feature_id from feature where uniqueName = #{region} ) )
+    </select>
+    
   
     <select id="featuresLike" resultType="org.genedb.crawl.model.Feature" >
         

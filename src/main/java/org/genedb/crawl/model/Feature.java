@@ -115,6 +115,12 @@ public class Feature implements Serializable {
 	@XmlElementWrapper(name="relationships")
 	public List<FeatureRelationship> relationships;
 	
+	@XmlElement(name="parents")
+	public List<FeatureRelationship> parents;
+	
+	@XmlElement(name="children")
+	public List<FeatureRelationship> children;
+	
 	@XmlElement(required=false)
 	public Organism organism;
 	

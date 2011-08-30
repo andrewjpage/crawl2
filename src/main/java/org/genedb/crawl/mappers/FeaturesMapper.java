@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.HierarchyGeneFetchResult;
 import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.Statistic;
@@ -19,6 +20,8 @@ public interface FeaturesMapper {
 	List<HierarchyGeneFetchResult> getGeneForFeature(@Param("features") List<String> features );
 	List<HierarchyRelation> getRelationshipsParents(@Param("feature") String feature, @Param("relationships") List<Cvterm> relationships );
 	List<HierarchyRelation> getRelationshipsChildren(@Param("feature") String feature, @Param("relationships") List<Cvterm> relationships );
+	
+	
 	
 	List<Feature> coordinates(@Param("features") List<String> features, @Param("region") String region );
 	List<Feature> synonyms(@Param("features") List<String> features, @Param("types") List<String> types );
@@ -76,5 +79,12 @@ public interface FeaturesMapper {
 		@Param("end2") int end2, 
 		@Param("length") Integer length, 
 		@Param("normscore") Double normscore);
+	
+    // this method should return any features that are located on regular features
+    // e.g. orthologues, but also domains...
+    // TODO think about whether this is better implemented with a less chado-ish
+	// interface - e.g. feature/domains
+	// we already have features/orthologues done this way
+	public List<LocatedFeature> locations(@Param("region") String region);
 	
 }

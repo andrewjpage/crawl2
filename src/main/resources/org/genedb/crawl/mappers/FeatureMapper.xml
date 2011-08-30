@@ -116,8 +116,8 @@
              <result property="value" column="prop"/>
              <association property="type" resultMap="org.genedb.crawl.mappers.FeaturesMapper.type" />
          </collection> 
-         <collection property="pubs" ofType="org.genedb.crawl.model.Pub" select="org.gmod.cat.FeatureCvtermMapper.featureCvTermPubs" column="feature_cvterm_id"  />
-         <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" select="org.gmod.cat.FeatureCvtermMapper.featureCvTermDbxrefs" column="feature_cvterm_id"  /> 
+         <collection property="pubs" ofType="org.genedb.crawl.model.Pub" select="org.genedb.crawl.mappers.FeatureCvtermMapper.featureCvTermPubs" column="feature_cvterm_id"  />
+         <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" select="org.genedb.crawl.mappers.FeatureCvtermMapper.featureCvTermDbxrefs" column="feature_cvterm_id"  /> 
     </resultMap>
     
     <sql id="coordinateSelector">
@@ -175,8 +175,81 @@
        <result property="toplevel" column="toplevel"/>  
     </resultMap>
     
+    <select id="synonyms" resultType="org.genedb.crawl.model.Synonym" >
+        SELECT synonym.name as synonym, 
+            cvterm.name as synonymtype, 
+            feature_synonym.is_current as is_current
+            FROM feature_synonym 
+            JOIN feature ON feature.feature_id = feature_synonym.feature_id 
+            JOIN synonym ON feature_synonym.synonym_id = synonym.synonym_id
+            JOIN cvterm ON synonym.type_id = cvterm.cvterm_id
+            WHERE feature.uniquename = #{uniqueName} 
+    </select>
     
+    <select id="pubs" resultType="org.genedb.crawl.model.Pub" >
+        SELECT 
+            pub.uniquename,
+            split_part(pub.uniquename, ':', 1) as database,
+            split_part(pub.uniquename, ':', 2) as accession
+        FROM feature
+        JOIN feature_pub ON feature_pub.feature_id = feature.feature_id
+        JOIN pub on pub.pub_id = feature_pub.pub_id
+        WHERE feature.uniquename = #{uniqueName}
+    </select>
     
+    <sql id="relationships">
+        
+            relationship_type.name as type
+            
+        FROM feature subject
+        
+        JOIN feature_relationship fr ON fr.subject_id = subject.feature_id 
+            and fr.type_id IN 
+              <foreach item="cvterm" index="index" collection="relationships" open="(" separator="," close=")">#{cvterm.cvterm_id}</foreach>
+        
+        JOIN feature object ON fr.object_id = object.feature_id
+        
+        JOIN cvterm relationship_type ON fr.type_id = relationship_type.cvterm_id
+        JOIN cvterm subject_type ON subject.type_id = subject_type.cvterm_id
+        JOIN cvterm object_type ON object.type_id = object_type.cvterm_id
+    </sql>
+    
+    <select id="parents" resultMap="relationships" >
+    SELECT 
+            object.uniquename as object_uniquename,
+            object_type.name as object_type,
+            <include refid="relationships"/>
+            
+        WHERE subject.uniquename = #{feature.uniqueName}  
+    </select>
+    
+    <select id="children" resultMap="relationships" >
+    SELECT 
+            subject.uniquename as subject_uniquename,
+            subject_type.name as subject_type,
+            <include refid="relationships"/>
+            
+        WHERE object.uniquename = #{feature.uniqueName}  
+    </select>
+  
+  <resultMap type="org.genedb.crawl.model.FeatureRelationship" id="relationships">
+    <association property="subject" javaType="org.genedb.crawl.model.Feature" >
+    	<result column="subject_uniquename" property="uniqueName" />
+    	<association property="type" javaType="org.genedb.crawl.model.Cvterm">
+            <result column="subject_type" property="name" />
+        </association>
+    </association>
+    <association property="object" javaType="org.genedb.crawl.model.Feature" >
+        <result column="object_uniquename" property="uniqueName" />
+        <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+            <result column="object_type" property="name" />
+        </association> 
+    </association>
+    <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+        <result column="type" property="name" />
+    </association>
+  </resultMap>
+  
     
     
     <sql id="featureSelector">

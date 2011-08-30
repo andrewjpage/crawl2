@@ -10,6 +10,15 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 
 public class Cvterm implements Serializable {
 	
+    public Cvterm() {}
+    public Cvterm(String name) {
+        this.name = name;
+    }
+    public Cvterm(String name,String cv) {
+        this.name = name;
+        this.cv = new Cv();
+        this.cv.name = cv;
+    }
 	
 	public Cv cv;
 	

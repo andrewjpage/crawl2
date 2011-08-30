@@ -1,13 +1,12 @@
 package org.genedb.crawl.elasticsearch.mappers;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.action.index.IndexRequestBuilder;
@@ -21,9 +20,13 @@ import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Exon;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.FeatureRelationship;
+import org.genedb.crawl.model.HierarchyRelation;
 import org.genedb.crawl.model.Property;
 import org.genedb.crawl.model.Gene;
 import org.genedb.crawl.model.LocatedFeature;
+import org.genedb.crawl.model.Pub;
+import org.genedb.crawl.model.Synonym;
 import org.genedb.crawl.model.Transcript;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +36,7 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 	private Logger logger = Logger.getLogger(ElasticSearchFeatureMapper.class);
 	
 	@Override
-	public Feature get(String uniqueName, String organism_id, String name) {
+	public Feature get(String uniqueName, String name, Integer organism_id) {
 		
 	    BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
 	    
@@ -77,6 +80,11 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 	public List<Coordinates> coordinates(Feature feature) {
 		return feature.coordinates;
 	}
+	
+	@Override
+    public List<Pub> pubs(Feature feature) {
+        return feature.pubs;
+    }
 	
 //	public void createOrUpdate(ElasticSequence sequence) {
 //		
@@ -321,6 +329,132 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
         
         return (LocatedFeature) features.get(0);
 	}
+
+    @Override
+    public List<Synonym> synonyms(Feature feature) {
+        
+        //String resultFeatureJson = this.getFromElastic(connection.getIndex(), connection.getFeatureType(), feature.uniqueName, new String[] {"synonyms"} );
+        //Feature resultFeature = this.getFeatureFromJson(resultFeatureJson);
+        
+        return feature.synonyms;
+        
+    }
+    
+    
+    private Set<String> ofType(List<Cvterm> ofType) {
+        Set<String> types = new HashSet<String>();
+        if (ofType != null) {
+            for (Cvterm type : ofType) {
+                types.add(type.name);
+            }
+        }
+        return types;
+    }
+    
+    // TODO - untested
+    @Override
+    public List<FeatureRelationship> parents(Feature feature,List<Cvterm> relationships) {
+        Set<String> types = this.ofType(relationships);
+        List<FeatureRelationship> parents = new ArrayList<FeatureRelationship>();
+        
+        try {
+            LocatedFeature f = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(connection.getIndex(), connection.getFeatureType(), feature.uniqueName), LocatedFeature.class);
+            
+            if (f.parent == null || f.parentRelationshipType == null) {
+                return parents;
+            }
+            
+            if (types.size() > 0 && (! types.contains(f.parentRelationshipType))) 
+                return parents;
+            
+            LocatedFeature p = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(connection.getIndex(), connection.getFeatureType(), f.parent), LocatedFeature.class);
+            
+            
+            if (p != null) {
+                FeatureRelationship r = new FeatureRelationship();
+                // parents are objects
+                r.object = p;
+                r.type = new Cvterm(f.parentRelationshipType);
+                parents.add(r);
+            }
+                
+            
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return parents;
+    }
+    
+    // TODO - untested
+    @Override
+    public List<FeatureRelationship> children(Feature feature,List<Cvterm> relationships) {
+        
+        Set<String> types = this.ofType(relationships);
+        List<FeatureRelationship> children = new ArrayList<FeatureRelationship>();
+        
+        try {
+            
+            
+            //String escaped = LUCENE_PATTERN.matcher(feature.uniqueName).replaceAll(REPLACEMENT_STRING);
+            
+            // Using a standard term query was retrieving matches that had the same prefix
+            // SearchRequestBuilder srb = connection.getClient().prepareSearch(index).setQuery (QueryBuilders.fieldQuery("parent", escaped));
+            
+            // this is the closest I think I can get to an exact match query...
+            // by encapsulating the query in quotes, and making sure the phrase slop is 0
+            
+            String queryString = String.format("parent:\"%s\"", this.escape(feature.uniqueName));
+            logger.debug(queryString);
+            
+            SearchResponse response = 
+                connection.getClient()          
+                .prepareSearch(connection.getIndex())
+                .setTypes(connection.getFeatureType())
+                .setQuery (QueryBuilders.queryString(queryString).phraseSlop(0))
+                .execute()
+                .actionGet();
+            
+            
+            for (SearchHit hit : response.getHits()) {
+                
+                try {
+                    LocatedFeature child = (LocatedFeature) jsonIzer.fromJson(hit.sourceAsString(), LocatedFeature.class);
+                    
+                    logger.info(" - " + child.uniqueName + " parent: " + child.parent);
+                    
+                    // make sure we only exact matches
+                    if (! child.parent.equals(feature.uniqueName)) {
+                         logger.warn("       SKIPPING");
+                         continue;
+                    }
+                    
+                    if (types.size() > 0 && (! types.contains(child.parentRelationshipType)) ) 
+                        continue;
+                    
+                    FeatureRelationship r = new FeatureRelationship();
+                    // children are subjects
+                    r.subject = child;
+                    r.type = new Cvterm(child.parentRelationshipType);
+                    
+                    children.add(r);
+                    
+                    
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        
+        
+        return children;
+    }
+
+    
 
 	
 //	public static String getIndex() {

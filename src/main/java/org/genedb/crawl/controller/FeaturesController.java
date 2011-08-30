@@ -21,6 +21,7 @@ import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.FeatureRelationship;
 import org.genedb.crawl.model.Gene;
 import org.genedb.crawl.model.HierarchicalFeature;
 import org.genedb.crawl.model.LocatedFeature;
@@ -294,19 +295,179 @@ public class FeaturesController extends BaseQueryController {
 		}
 		
 		LocatedFeature resultFeature = featureMapper.getOfType(feature, organism_id, name, type);
-		resultFeature.coordinates = featureMapper.coordinates(resultFeature);
 		
-		if (resultFeature.coordinates != null && resultFeature.coordinates.size() > 0) {
-		    Coordinates c = resultFeature.coordinates.get(0);
-		    resultFeature.fmin = c.fmin;
-		    resultFeature.fmax = c.fmax;
-		    resultFeature.region = c.region;
-		    resultFeature.phase = c.phase;
-		    resultFeature.strand = c.strand;
-		}
+		summarise(resultFeature);
 		
 		return resultFeature;
 		
 		//return featuresMapper.pubs(features);
 	}
+	
+	private void summarise (Feature resultFeature) {
+	    
+	    resultFeature.coordinates = featureMapper.coordinates(resultFeature);
+        
+	    // TODO - this might need to be fixed to work with non-LocatedFeature instances
+	    if (resultFeature instanceof LocatedFeature 
+	            && resultFeature.coordinates != null 
+	            && resultFeature.coordinates.size() > 0) {
+            LocatedFeature locatedFeature = (LocatedFeature) resultFeature;
+            Coordinates c = locatedFeature.coordinates.get(0);
+            locatedFeature.fmin = c.fmin;
+            locatedFeature.fmax = c.fmax;
+            locatedFeature.region = c.region;
+            locatedFeature.phase = c.phase;
+            locatedFeature.strand = c.strand;
+	        
+	    }
+	    
+        resultFeature.properties = featureMapper.properties(resultFeature);
+        resultFeature.terms = featureMapper.terms(resultFeature);
+        resultFeature.synonyms = featureMapper.synonyms(resultFeature);
+        resultFeature.pubs = featureMapper.pubs(resultFeature);
+        
+	}
+	
+	private Feature getFeature(String uniqueName, String name, String organism) {
+	    Integer organism_id =  null;
+	    
+        if (organism != null) {
+            Organism o = this.getOrganism(organismsMapper, organism);
+            if (o != null) 
+                organism_id = o.ID;
+        }
+        
+        Feature resultFeature = featureMapper.get(uniqueName, name, organism_id);
+        
+        return resultFeature;
+	}
+	
+	
+	@RequestMapping(method=RequestMethod.GET, value="/parents")
+    public List<FeatureRelationship> parents( 
+            @RequestParam("feature") String featureUniqueName, 
+            @RequestParam(value="organism",required=false) String organism, 
+            @RequestParam(value="name",required=false) String name,
+            @RequestParam(value="relationships", required=false) String[] relationships) throws CrawlException {
+	    
+	    if (relationships == null || relationships.length < 1) 
+            relationships = defaultRelationshipTypes;
+        
+        List<Cvterm> relationshipTerms = getRelationshipTypes(Arrays.asList(relationships), terms);
+        Feature feature = getFeature(featureUniqueName, name, organism);
+        return featureMapper.parents(feature, relationshipTerms);
+	}
+	
+	@RequestMapping(method=RequestMethod.GET, value="/children")
+    public List<FeatureRelationship> children( 
+            @RequestParam("feature") String featureUniqueName, 
+            @RequestParam(value="organism",required=false) String organism, 
+            @RequestParam(value="name",required=false) String name,
+            @RequestParam(value="relationships", required=false) String[] relationships) throws CrawlException {
+        
+        if (relationships == null || relationships.length < 1) 
+            relationships = defaultRelationshipTypes;
+        
+        List<Cvterm> relationshipTerms = getRelationshipTypes(Arrays.asList(relationships), terms);
+        Feature feature = getFeature(featureUniqueName, name, organism);
+        return featureMapper.children(feature, relationshipTerms);
+    }
+	
+	
+	@ResourceDescription("Returns the hierarchy of a feature (i.e. the parent/child relationship graph), but routed on the feature itself (rather than Gene).")
+    @RequestMapping(method=RequestMethod.GET, value="/hierarchyNew")
+    public Feature geneHierarchy( 
+            @RequestParam("feature") String featureUniqueName, 
+            @RequestParam(value="organism",required=false) String organism, 
+            @RequestParam(value="name",required=false) String name,
+            @RequestParam(value="relationships", required=false) String[] relationships,
+            @RequestParam(value="includeSummaries", required=false) Boolean includeSummaries
+            ) throws CrawlException {
+        
+        
+        if (relationships == null || relationships.length < 1) {
+            relationships = defaultRelationshipTypes;
+        }
+        
+        if (includeSummaries == null)
+            includeSummaries = true;
+        
+        List<Cvterm> ofType = getRelationshipTypes(Arrays.asList(relationships), terms);
+        
+        Feature feature = getFeature(featureUniqueName, name, organism);
+        
+        Feature hierarchyRoot = hierarchyRoot(feature, ofType);
+        
+        if (hierarchyRoot == null)
+            hierarchyRoot = feature;
+        
+        getDescendants(hierarchyRoot, ofType, includeSummaries);
+        
+        return hierarchyRoot;
+        
+    }
+	
+	public Feature geneSummary(@RequestParam("feature") String featureUniqueName, 
+            @RequestParam(value="organism",required=false) String organism, 
+            @RequestParam(value="name",required=false) String name) {
+	    
+	    List<Cvterm> ofType = getRelationshipTypes(Arrays.asList(defaultRelationshipTypes), terms);
+        
+        Feature feature = getFeature(featureUniqueName, name, organism);
+        
+        Feature hierarchyRoot = hierarchyRoot(feature, ofType);
+        
+        if (hierarchyRoot == null)
+            hierarchyRoot = feature;
+        
+        getDescendants(hierarchyRoot, ofType, false);
+        
+        return hierarchyRoot;
+        
+	    
+	    
+	}
+	
+	private Feature hierarchyRoot(Feature currentFeature, List<Cvterm> ofType) {
+	    
+	    if (currentFeature.type.name.equals("gene") || currentFeature.type.name.equals("pseudogene"))
+	        return currentFeature;
+	    
+	    List<FeatureRelationship> parents = featureMapper.parents(currentFeature, ofType);
+	    
+	    for (FeatureRelationship parent : parents) {
+	        // parents are objects
+            Feature root = hierarchyRoot(parent.object, ofType);
+            
+            if (root != null) {
+                return root;
+            }
+            
+        }
+	    
+	    return null;
+	}
+	
+	private void getDescendants(Feature feature, List<Cvterm> ofType, boolean includeSummaries) {
+	    
+	    feature.children = featureMapper.children(feature, ofType);
+	    if (includeSummaries)
+	        summarise(feature);
+	    
+	    if (feature.children == null)
+	        return;
+	    
+	    for (FeatureRelationship relationship : feature.children) {
+	        // children are subjects
+	        getDescendants(relationship.subject, ofType, includeSummaries);
+	    }
+	    
+	}
+	
+
+    @ResourceDescription("Return features located on features")
+	@RequestMapping(method=RequestMethod.GET, value="/locations")
+    public List<LocatedFeature> locations(@RequestParam("feature") String  feature ) {
+        return this.featuresMapper.locations(feature);
+    }
 }

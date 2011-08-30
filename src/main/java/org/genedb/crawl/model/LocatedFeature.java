@@ -1,5 +1,7 @@
 package org.genedb.crawl.model;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
 public class LocatedFeature extends Feature {
@@ -27,5 +29,7 @@ public class LocatedFeature extends Feature {
 	
 	public Boolean fmin_partial;
 	public Boolean fmax_partial;
+	
+	
 	
 }
