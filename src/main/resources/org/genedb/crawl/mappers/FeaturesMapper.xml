@@ -394,63 +394,70 @@
         </collection>
     </resultMap>
     
-    
-    <select id="orthologues" resultMap="orthologues">
+    <sql id="orthologues">
         SELECT 
-		    f.uniquename as uniqueName,
-		    f.name as name, 
-		    orthof.uniquename as ortho,
-		    orthof.name as orthoname,
-		    orthof.feature_id as ortho_feature_id,
-		    orthotype.name as orthotype,
-		    relationshiptype.name as relationship,
-		    o.genus,
-		    o.species,
-		    op.value as taxonID
-		    
-		FROM feature f
-		JOIN feature_relationship fr ON f.feature_id = fr.subject_id 
-		    AND fr.type_id in 
-		        (select cvterm.cvterm_id 
-		            from cvterm 
-		            join cv 
-		            on cvterm.cv_id = cvterm.cv_id 
-		            where cv.name = 'sequence' 
-		            and (cvterm.name = 'orthologous_to' or cvterm.name = 'paralogous_to'))
-		JOIN feature orthof ON fr.object_id = orthof.feature_id
-		JOIN cvterm orthotype ON orthof.type_id = orthotype.cvterm_id
-		JOIN cvterm relationshiptype ON fr.type_id = relationshiptype.cvterm_id
-		LEFT JOIN organism o on orthof.organism_id = o.organism_id
-		LEFT JOIN organismprop op on o.organism_id = op.organism_id 
-		    AND op.type_id = 
-		    (select cvterm.cvterm_id 
-		        from cvterm 
-		        join cv 
-		        on cvterm.cv_id = cvterm.cv_id 
-		        where cv.name = 'genedb_misc' 
-		        and cvterm.name = 'taxonId')
+            f.uniquename as uniqueName,
+            f.name as name, 
+            orthof.uniquename as ortho,
+            orthof.name as orthoname,
+            orthof.feature_id as ortho_feature_id,
+            orthotype.name as orthotype,
+            relationshiptype.name as relationship,
+            o.genus,
+            o.species,
+            op.value as taxonID
+            
+        FROM feature f
+        JOIN feature_relationship fr ON f.feature_id = fr.subject_id 
+            AND fr.type_id in 
+                (select cvterm.cvterm_id 
+                    from cvterm 
+                    join cv 
+                    on cvterm.cv_id = cvterm.cv_id 
+                    where cv.name = 'sequence' 
+                    and (cvterm.name = 'orthologous_to' or cvterm.name = 'paralogous_to'))
+        JOIN feature orthof ON fr.object_id = orthof.feature_id
+        JOIN cvterm orthotype ON orthof.type_id = orthotype.cvterm_id
+        JOIN cvterm relationshiptype ON fr.type_id = relationshiptype.cvterm_id
+        LEFT JOIN organism o on orthof.organism_id = o.organism_id
+        LEFT JOIN organismprop op on o.organism_id = op.organism_id 
+            AND op.type_id = 
+            (select cvterm.cvterm_id 
+                from cvterm 
+                join cv 
+                on cvterm.cv_id = cvterm.cv_id 
+                where cv.name = 'genedb_misc' 
+                and cvterm.name = 'taxonId')
+    </sql>
+    
+    <select id="orthologues" resultMap="orthologues_feature_list">
+        
+        <include refid="orthologues"/>
 		
 		WHERE f.uniquename in <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach>
 		        
     </select>
     
-    <resultMap id="orthologues" type="org.genedb.crawl.model.Feature" >
-         <result property="uniqueName" column="uniqueName"/>
-         <result property="name" column="name"/>
-         <collection property="orthologues" ofType="org.genedb.crawl.model.Orthologue">
-            <result property="uniqueName" column="ortho"/>
-            <result property="name" column="orthoname"/>
-            <result property="orthologyType" column="orthotype"/>
-            <!--<association property="organism" javaType="org.genedb.crawl.model.Organism" >
-                <result property="genus" column="genus"/>
-                <result property="species" column="species"/>
-                <result property="taxonID" column="taxonID"/>
-            </association>
-            <association property="type" javaType="org.genedb.crawl.model.Cvterm" >
-                <result property="name" column="orthotype"/>
-            </association>
-            --><collection property="products" ofType="java.lang.String" select="products" column="ortho_feature_id" />
-         </collection> 
+    <resultMap id="orthologues" type="org.genedb.crawl.model.Orthologue" >
+        <result property="uniqueName" column="ortho"/>
+        <result property="name" column="orthoname"/>
+        <result property="orthologyType" column="orthotype"/>
+        <association property="organism" javaType="org.genedb.crawl.model.Organism" >
+            <result property="genus" column="genus"/>
+            <result property="species" column="species"/>
+            <result property="taxonID" column="taxonID"/>
+        </association>
+        <collection property="products" ofType="java.lang.String" select="org.genedb.crawl.mappers.FeaturesMapper.products" column="ortho_feature_id" />
+        <collection property="cluster" ofType="org.genedb.crawl.model.Feature" select="clusters" column="ortho_feature_id" />
+        <collection property="analysisFeature" ofType="org.genedb.crawl.model.Feature" select="clusters_analysis" column="ortho_feature_id" />
+    </resultMap>
+    
+    <resultMap id="orthologues_feature_list" type="org.genedb.crawl.model.Feature" >
+        <result property="uniqueName" column="uniqueName"/>
+        <result property="name" column="name"/>
+         
+        <collection property="orthologues" resultMap="orthologues" />
+         
     </resultMap>
     
     <select id="products" resultType="java.lang.String">
@@ -463,25 +470,23 @@
     <select id="clusters" resultMap="clusters" >
         SELECT
 			f.uniquename AS cluster_name,
+			f.feature_id,
 			cv_f.name AS cluster_cvterm,
 			f1.uniquename AS subject,
 			cv_fr.name AS orthologous_relationship,
 			common_name AS subject_organism,
 			cv_f1.name AS subject_type,
-			rawscore, normscore, significance, identity, 
-			a.analysis_id,
-			a.name as analysis_name, 
-			description, 
-			program, programversion, algorithm, sourcename, sourceversion,sourceuri, timeexecuted,
+			
 			organism.genus as subject_genus,
 			organism.species as subject_species,
 			organismprop.value as subject_taxonID
 			
 			FROM feature f
 			
+			
+			
 			LEFT JOIN feature_relationship fr ON  f.feature_id=fr.object_id
-			LEFT JOIN analysisfeature af ON f.feature_id=af.feature_id
-			LEFT JOIN analysis a ON af.analysis_id=a.analysis_id
+			
 			LEFT JOIN feature f1 ON f1.feature_id=subject_id
 			LEFT JOIN organism ON f1.organism_id=organism.organism_id
 			
@@ -491,14 +496,36 @@
 			LEFT JOIN cvterm AS cv_fr ON cv_fr.cvterm_id=fr.type_id
 			LEFT JOIN cvterm AS cv_f  ON cv_f.cvterm_id=f.type_id
 			
-			WHERE f.uniquename IN <foreach item="item" index="index" collection="features" open="(" separator="," close=")">#{item}</foreach>
-			AND (cv_fr.name='orthologous_to' OR cv_fr.name='paralogous_to')
+			WHERE f.feature_id = #{feature_id}
+			AND (cv_fr.name='orthologous_to' OR cv_fr.name='paralogous_to') 
+			AND cv_f.name = 'protein_match'
 			
     </select>
     
-    <resultMap id="clusters" type="org.genedb.crawl.model.Feature">
-        <result property="uniqueName" column="cluster_name"/>
-         <association property="analysisFeature" javaType="org.genedb.crawl.model.AnalysisFeature">
+    <select id="clusters_analysis" resultMap="clusters_analysis" >
+        SELECT
+            
+            rawscore, normscore, significance, identity, 
+            a.analysis_id,
+            a.name as analysis_name, 
+            description, 
+            program, programversion, algorithm, sourcename, sourceversion,sourceuri, timeexecuted
+            
+            FROM feature f
+            
+            
+            LEFT JOIN analysisfeature af ON f.feature_id=af.feature_id
+            LEFT JOIN analysis a ON af.analysis_id=a.analysis_id
+            
+            LEFT JOIN cvterm AS cv_f  ON cv_f.cvterm_id=f.type_id
+            
+            WHERE f.feature_id = #{feature_id}
+            AND cv_f.name = 'protein_match'
+            
+    </select>
+    
+   
+    <resultMap id="clusters_analysis" type="org.genedb.crawl.model.AnalysisFeature">
             <result property="normscore" column="normscore" />
             <result property="rawscore" column="rawscore" />
             <result property="significance" column="significance" />
@@ -518,11 +545,10 @@
                 <result property="timeexecuted" column="timeexecuted"/>
                 
              </collection>
-             
-         </association>
-          
-          
-         <collection property="orthologues" ofType="org.genedb.crawl.model.Feature">
+    </resultMap>
+    
+    <resultMap id="clusters" type="org.genedb.crawl.model.Feature">
+        
             <result property="uniqueName" column="subject"/>
             <result property="relationship" column="orthologous_relationship"/>
              <association property="organism" javaType="org.genedb.crawl.model.Organism" >
@@ -533,7 +559,8 @@
             <association property="type" javaType="org.genedb.crawl.model.Cvterm">
                 <result property="name" column="subject_type"/>
             </association>
-          </collection>
+            <collection property="products" ofType="java.lang.String" select="org.genedb.crawl.mappers.FeaturesMapper.products" column="feature_id" />
+        
          
     </resultMap>
     

@@ -18,10 +18,12 @@ import org.elasticsearch.search.SearchHit;
 import org.genedb.crawl.mappers.FeatureMapper;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
+import org.genedb.crawl.model.Dbxref;
 import org.genedb.crawl.model.Exon;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.FeatureRelationship;
 import org.genedb.crawl.model.HierarchyRelation;
+import org.genedb.crawl.model.Orthologue;
 import org.genedb.crawl.model.Property;
 import org.genedb.crawl.model.Gene;
 import org.genedb.crawl.model.LocatedFeature;
@@ -452,6 +454,24 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
         
         
         return children;
+    }
+
+    @Override
+    public List<LocatedFeature> domains(Feature feature) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Dbxref> dbxrefs(Feature feature) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Orthologue> orthologues(Feature feature) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     

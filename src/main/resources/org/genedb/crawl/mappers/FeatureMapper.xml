@@ -302,5 +302,118 @@
         </collection>
     </resultMap>
     
+    
+    <select id="domains" resultMap="domains" >
+        SELECT
+			f.uniqueName as uniqueName,
+			f.feature_id,
+			f.organism_id, 
+			type.name as type,
+			#{uniqueName} as region,
+			fl.fmin, 
+			fl.fmax,
+			fl.strand,
+			fl.phase,
+			f.is_obsolete,
+			
+			fl.is_fmin_partial,
+			fl.is_fmax_partial
+			      
+			
+
+      FROM feature f
+
+      JOIN cvterm type ON f.type_id = type.cvterm_id
+      JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id =
+          (select feature_id from feature where uniqueName = #{uniqueName} ) )
+      
+          
+    </select>
+    
+    <resultMap type="org.genedb.crawl.model.LocatedFeature" id="domains">
+	    <result property="uniqueName" column="uniqueName"/>
+	    <result property="feature_id" column="feature_id"/>
+	    <result property="organism_id" column="organism_id"/>
+	    <result property="isObsolete" column="is_obsolete"/>
+	    <result property="strand" column="strand"/>
+	    <result property="phase" column="phase"/>
+	    <result property="region" column="region"/>
+	    <result property="fmin" column="fmin"/>
+	    <result property="fmax" column="fmax"/>
+	    <result property="parent" column="parent"/>
+	    <result property="parentRelationshipType" column="parent_relationship_type"/>
+	    <result property="fmin_partial" column="is_fmin_partial"/>
+	    <result property="fmax_partial" column="is_fmax_partial"/>
+        
+	    <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+	        <result property="name" column="type"/>
+	    </association>
+	    
+	    <collection property="properties" ofType="org.genedb.crawl.model.Property"> 
+	        <result property="name" column="propname"/> 
+	        <result property="value" column="value"/> 
+	    </collection>
+
+	    <collection property="dbxrefs" select="dbxrefs" column="feature_id"></collection>
+
+	    <!-- <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" >
+	       <result property="accession" column="accession"/>
+	       <result property="version" column="version"/>
+	       <result property="database" column="database"/>
+	       <result property="url" column="url"/>
+	       <result property="urlprefix" column="urlprefix"/>
+	       <result property="description" column="description"/>
+	    </collection> -->
+
+    </resultMap>
+  
+    <select id="dbxrefs" resultMap="dbxrefs" >
+        
+        SELECT 
+            feature.uniquename as uniqueName,
+            feature.name as name,
+            dbxref.accession as accession,
+            db.name as database,
+            db.urlprefix, 
+            db.url,
+            db.description
+        FROM feature
+        JOIN feature_dbxref ON feature_dbxref.feature_id = feature.feature_id
+        JOIN dbxref ON dbxref.dbxref_id = feature_dbxref.dbxref_id
+        JOIN db ON db.db_id = dbxref.db_id
+        WHERE feature.feature_id = #{feature_id}
+        UNION
+        SELECT 
+            feature.uniquename as uniqueName,
+            feature.name as name,
+            dbxref.accession as accession,
+            db.name as database,
+            db.urlprefix, 
+            db.url,
+            db.description
+        FROM feature
+        JOIN dbxref ON dbxref.dbxref_id = feature.dbxref_id
+        JOIN db ON db.db_id = dbxref.db_id
+        WHERE feature.feature_id = #{feature_id}
+        
+    </select>  
+  
+    
+    <resultMap id="dbxrefs" type="org.genedb.crawl.model.Dbxref">
+            <result property="database" column="database"/> 
+            <result property="accession" column="accession"/> 
+            <result property="urlprefix" column="urlprefix"/>
+            <result property="url" column="url"/> 
+            <result property="description" column="description"/> 
+    </resultMap>
+    
+    
+    <select id="orthologues" resultMap="org.genedb.crawl.mappers.FeaturesMapper.orthologues">
+       <include refid="org.genedb.crawl.mappers.FeaturesMapper.orthologues"/>
+        
+        WHERE f.feature_id = #{feature_id} 
+                
+    </select>
+    
 
 </mapper>

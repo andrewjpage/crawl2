@@ -54,6 +54,10 @@ public class Feature implements Serializable {
 	@XmlElementWrapper(name="dbxrefs")
 	public List<Dbxref> dbxrefs;
 	
+	@XmlElement(name="domain", required=false)
+    @XmlElementWrapper(name="domains")
+    public List<LocatedFeature> domains;
+	
 	@XmlElement(name="change", required=false)
 	@XmlElementWrapper(name="changes")
 	public List<Change> changes;

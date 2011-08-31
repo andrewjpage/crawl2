@@ -20,4 +20,7 @@ public class Dbxref implements Serializable {
 	
 	@XmlAttribute
     public String description;
+	
+	@XmlAttribute
+    public String version;
 }
