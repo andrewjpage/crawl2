@@ -16,7 +16,7 @@ import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Dbxref;
 import org.genedb.crawl.model.Feature;
-import org.genedb.crawl.model.FeatureRelationship;
+
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +34,17 @@ public class FeatureController extends BaseQueryController{
     
     @Autowired
     public FeaturesMapper  featuresMapper;
+    
     @Autowired
     public FeatureMapper   featureMapper;
+    
     @Autowired
     public TermsMapper     terms;
+    
     @Autowired
     public OrganismsMapper organismsMapper;
-    public String[]        defaultRelationshipTypes;
+    
+    private String[] defaultRelationshipTypes = new String[] {"part_of", "derives_from"};
 
     @ResourceDescription("Return a gene's transcripts")
     @RequestMapping(method=RequestMethod.GET, value="/info") // , "/{organism}/{uniqueName}/", "/{organism}/{type}/{uniqueName}", "/{organism}/{type}/{uniqueName}/{name}"
@@ -122,7 +126,7 @@ public class FeatureController extends BaseQueryController{
     
     
     @RequestMapping(method=RequestMethod.GET, value="/parents")
-    public List<FeatureRelationship> parents( 
+    public List<Feature> parents( 
             @RequestParam("feature") String featureUniqueName, 
             @RequestParam(value="organism",required=false) String organism, 
             @RequestParam(value="name",required=false) String name,
@@ -137,7 +141,7 @@ public class FeatureController extends BaseQueryController{
     }
     
     @RequestMapping(method=RequestMethod.GET, value="/children")
-    public List<FeatureRelationship> children( 
+    public List<Feature> children( 
             @RequestParam("feature") String featureUniqueName, 
             @RequestParam(value="organism",required=false) String organism, 
             @RequestParam(value="name",required=false) String name,
@@ -155,7 +159,7 @@ public class FeatureController extends BaseQueryController{
     @ResourceDescription("Returns the hierarchy of a feature (i.e. the parent/child relationship graph), but routed on the feature itself (rather than Gene).")
     @RequestMapping(method=RequestMethod.GET, value="/hierarchy")
     public Feature hierarchy( 
-            @RequestParam("feature") String featureUniqueName, 
+            @RequestParam("uniqueName") String uniqueName, 
             @RequestParam(value="organism",required=false) String organism, 
             @RequestParam(value="name",required=false) String name,
             @RequestParam(value="relationships", required=false) String[] relationships,
@@ -172,7 +176,7 @@ public class FeatureController extends BaseQueryController{
         
         List<Cvterm> ofType = getRelationshipTypes(Arrays.asList(relationships), terms);
         
-        Feature feature = getFeature(featureUniqueName, name, organism);
+        Feature feature = getFeature(uniqueName, name, organism);
         
         Feature hierarchyRoot = getAncestorGene(feature, ofType);
         
@@ -211,11 +215,11 @@ public class FeatureController extends BaseQueryController{
         if (currentFeature.type.name.equals("gene") || currentFeature.type.name.equals("pseudogene"))
             return currentFeature;
         
-        List<FeatureRelationship> parents = featureMapper.parents(currentFeature, ofType);
+        List<Feature> parents = featureMapper.parents(currentFeature, ofType);
         
-        for (FeatureRelationship parent : parents) {
+        for (Feature parent : parents) {
             // parents are objects
-            Feature root = getAncestorGene(parent.object, ofType);
+            Feature root = getAncestorGene(parent, ofType);
             
             if (root != null) {
                 return root;
@@ -235,9 +239,9 @@ public class FeatureController extends BaseQueryController{
         if (feature.children == null)
             return;
         
-        for (FeatureRelationship relationship : feature.children) {
+        for (Feature child : feature.children) {
             // children are subjects
-            getDescendants(relationship.subject, ofType, includeSummaries);
+            getDescendants(child, ofType, includeSummaries);
         }
         
     }

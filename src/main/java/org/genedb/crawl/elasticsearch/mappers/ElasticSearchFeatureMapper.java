@@ -355,9 +355,9 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
     
     // TODO - untested
     @Override
-    public List<FeatureRelationship> parents(Feature feature,List<Cvterm> relationships) {
+    public List<Feature> parents(Feature feature,List<Cvterm> relationships) {
         Set<String> types = this.ofType(relationships);
-        List<FeatureRelationship> parents = new ArrayList<FeatureRelationship>();
+        List<Feature> parents = new ArrayList<Feature>();
         
         try {
             LocatedFeature f = (LocatedFeature) jsonIzer.fromJson(this.getFromElastic(connection.getIndex(), connection.getFeatureType(), feature.uniqueName), LocatedFeature.class);
@@ -373,11 +373,16 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
             
             
             if (p != null) {
-                FeatureRelationship r = new FeatureRelationship();
+                //                FeatureRelationship r = new FeatureRelationship();
+                //                r.object = p;
+                //                r.type = new Cvterm(f.parentRelationshipType);
+                //                parents.add(r);
+                
                 // parents are objects
-                r.object = p;
-                r.type = new Cvterm(f.parentRelationshipType);
-                parents.add(r);
+                p.relationshipType = new Cvterm(f.parentRelationshipType);
+                parents.add(p);
+                
+                
             }
                 
             
@@ -391,10 +396,10 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
     
     // TODO - untested
     @Override
-    public List<FeatureRelationship> children(Feature feature,List<Cvterm> relationships) {
+    public List<Feature> children(Feature feature,List<Cvterm> relationships) {
         
         Set<String> types = this.ofType(relationships);
-        List<FeatureRelationship> children = new ArrayList<FeatureRelationship>();
+        List<Feature> children = new ArrayList<Feature>();
         
         try {
             
@@ -435,12 +440,14 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
                     if (types.size() > 0 && (! types.contains(child.parentRelationshipType)) ) 
                         continue;
                     
-                    FeatureRelationship r = new FeatureRelationship();
-                    // children are subjects
-                    r.subject = child;
-                    r.type = new Cvterm(child.parentRelationshipType);
+                    //                    FeatureRelationship r = new FeatureRelationship();
+                    //                    r.subject = child;
+                    //                    r.type = new Cvterm(child.parentRelationshipType);
                     
-                    children.add(r);
+                 // children are subjects
+                    child.relationshipType = new Cvterm(child.parentRelationshipType);
+                    
+                    children.add(child);
                     
                     
                 } catch (Exception e) {

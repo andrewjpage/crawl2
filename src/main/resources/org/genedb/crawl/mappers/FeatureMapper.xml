@@ -199,7 +199,7 @@
     
     <sql id="relationships">
         
-            relationship_type.name as type
+            relationship_type.name as relationship_type
             
         FROM feature subject
         
@@ -216,8 +216,9 @@
     
     <select id="parents" resultMap="relationships" >
     SELECT 
-            object.uniquename as object_uniquename,
-            object_type.name as object_type,
+            object.uniquename,
+            object.feature_id,
+            object_type.name as type,
             <include refid="relationships"/>
             
         WHERE subject.uniquename = #{feature.uniqueName}  
@@ -225,14 +226,44 @@
     
     <select id="children" resultMap="relationships" >
     SELECT 
-            subject.uniquename as subject_uniquename,
-            subject_type.name as subject_type,
+            subject.uniquename,
+            subject.feature_id,
+            subject_type.name as type,
             <include refid="relationships"/>
             
         WHERE object.uniquename = #{feature.uniqueName}  
     </select>
+
+	<resultMap type="org.genedb.crawl.model.Feature" id="relationships">
+		
+		<result column="uniqueName" property="uniqueName" />
+		<result column="feature_id" property="feature_id" />
+		<association property="type" javaType="org.genedb.crawl.model.Cvterm">
+			<result column="type" property="name" />
+		</association>
+		<association property="relationshipType" javaType="org.genedb.crawl.model.Cvterm">
+			<result column="relationship_type" property="name" />
+		</association>
+		
+	</resultMap>
+	
+	
+    
+	
   
-  <resultMap type="org.genedb.crawl.model.FeatureRelationship" id="relationships">
+  <!-- <resultMap type="org.genedb.crawl.model.Feature" id="parents">
+  <association property="object" javaType="org.genedb.crawl.model.Feature" >
+        <result column="object_uniquename" property="uniqueName" />
+        <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+            <result column="object_type" property="name" />
+        </association> 
+    </association>
+    <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+        <result column="type" property="name" />
+    </association>
+  </resultMap> -->
+  
+  <!-- <resultMap type="org.genedb.crawl.model.FeatureRelationship" id="relationships">
     <association property="subject" javaType="org.genedb.crawl.model.Feature" >
     	<result column="subject_uniquename" property="uniqueName" />
     	<association property="type" javaType="org.genedb.crawl.model.Cvterm">
@@ -248,7 +279,7 @@
     <association property="type" javaType="org.genedb.crawl.model.Cvterm">
         <result column="type" property="name" />
     </association>
-  </resultMap>
+  </resultMap> -->
   
     
     

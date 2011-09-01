@@ -46,7 +46,7 @@ public interface FeatureMapper {
 	
 	List<Transcript> transcripts(@Param("gene") Gene gene, @Param("exons") boolean exons);
 	
-	List<FeatureRelationship> parents(@Param("feature") Feature feature, @Param("relationships") List<Cvterm> relationships);
-	List<FeatureRelationship> children(@Param("feature") Feature feature, @Param("relationships") List<Cvterm> relationships );
+	List<Feature> parents(@Param("feature") Feature feature, @Param("relationships") List<Cvterm> relationships);
+	List<Feature> children(@Param("feature") Feature feature, @Param("relationships") List<Cvterm> relationships );
 	
 }

@@ -120,10 +120,13 @@ public class Feature implements Serializable {
 	public List<FeatureRelationship> relationships;
 	
 	@XmlElement(name="parents")
-	public List<FeatureRelationship> parents;
+	public List<Feature> parents;
 	
 	@XmlElement(name="children")
-	public List<FeatureRelationship> children;
+	public List<Feature> children;
+	
+	@XmlElement
+	public Cvterm relationshipType;
 	
 	@XmlElement(required=false)
 	public Organism organism;
