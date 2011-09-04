@@ -178,7 +178,9 @@ public class FeatureController extends BaseQueryController{
         
         Feature feature = getFeature(uniqueName, name, organism);
         
+        
         Feature hierarchyRoot = getAncestorGene(feature, ofType);
+        hierarchyRoot.organism = this.organismsMapper.getByID(hierarchyRoot.organism_id);
         
         if (hierarchyRoot == null)
             hierarchyRoot = feature;
