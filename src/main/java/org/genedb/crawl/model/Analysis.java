@@ -1,12 +1,13 @@
 package org.genedb.crawl.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
 
 
-public class Analysis {
+public class Analysis implements Serializable {
 	
 	@XmlAttribute
 	public Integer analysis_id;

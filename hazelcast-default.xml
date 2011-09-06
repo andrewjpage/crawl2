@@ -78,5 +78,12 @@
         <eviction-percentage>25</eviction-percentage>
         <merge-policy>hz.ADD_NEW_ENTRY</merge-policy>
     </map>
-
+    <map name="org.genedb.crawl.mappers.FeatureMapper">
+        <backup-count>0</backup-count>
+        <eviction-policy>LFU</eviction-policy>
+        <max-size policy="cluster_wide_map_size">1000</max-size>
+        <eviction-percentage>25</eviction-percentage>
+        <merge-policy>hz.ADD_NEW_ENTRY</merge-policy>
+    </map>
+    
 </hazelcast>

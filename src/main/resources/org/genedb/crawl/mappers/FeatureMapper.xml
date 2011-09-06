@@ -4,6 +4,8 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="org.genedb.crawl.mappers.FeatureMapper">  
     
+    <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/>
+    
     <select id="get" resultMap="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult" >
         SELECT 
             feature_id, 
