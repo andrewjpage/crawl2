@@ -3,24 +3,19 @@ package org.genedb.crawl.model;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 public class Dbxref implements Serializable {
 	
-	@XmlAttribute
-	public String database;
+	@XmlElement
+	public Db db;
 	
 	@XmlAttribute
 	public String accession;
 	
 	@XmlAttribute
-    public String urlprefix;
-	
-	@XmlAttribute
-    public String url;
+    public String version;
 	
 	@XmlAttribute
     public String description;
-	
-	@XmlAttribute
-    public String version;
 }

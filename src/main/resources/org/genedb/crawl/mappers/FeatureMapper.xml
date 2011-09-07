@@ -364,9 +364,13 @@
 			f.is_obsolete,
 			
 			fl.is_fmin_partial,
-			fl.is_fmax_partial
-			      
+			fl.is_fmax_partial,
 			
+			rawscore, normscore, significance, identity, 
+            a.analysis_id,
+            a.name as analysis_name, 
+            description, 
+            program, programversion, algorithm, sourcename, sourceversion,sourceuri, timeexecuted
 
       FROM feature f
 
@@ -374,6 +378,8 @@
       JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id =
           (select feature_id from feature where uniqueName = #{uniqueName} ) )
       
+      LEFT JOIN analysisfeature af on af.feature_id = f.feature_id
+      LEFT JOIN analysis a on a.analysis_id = af.analysis_id
           
     </select>
     
@@ -391,7 +397,10 @@
 	    <result property="parentRelationshipType" column="parent_relationship_type"/>
 	    <result property="fmin_partial" column="is_fmin_partial"/>
 	    <result property="fmax_partial" column="is_fmax_partial"/>
-        
+
+	    <association property="analysisFeature" resultMap="org.genedb.crawl.mappers.FeaturesMapper.clusters_analysis" />
+	    
+
 	    <association property="type" javaType="org.genedb.crawl.model.Cvterm">
 	        <result property="name" column="type"/>
 	    </association>
@@ -420,10 +429,11 @@
             feature.uniquename as uniqueName,
             feature.name as name,
             dbxref.accession as accession,
+            dbxref.description as description,
             db.name as database,
             db.urlprefix, 
             db.url,
-            db.description
+            db.description as db_description
         FROM feature
         JOIN feature_dbxref ON feature_dbxref.feature_id = feature.feature_id
         JOIN dbxref ON dbxref.dbxref_id = feature_dbxref.dbxref_id
@@ -434,10 +444,11 @@
             feature.uniquename as uniqueName,
             feature.name as name,
             dbxref.accession as accession,
+            dbxref.description as description,
             db.name as database,
             db.urlprefix, 
             db.url,
-            db.description
+            db.description as db_description
         FROM feature
         JOIN dbxref ON dbxref.dbxref_id = feature.dbxref_id
         JOIN db ON db.db_id = dbxref.db_id
@@ -447,11 +458,14 @@
   
     
     <resultMap id="dbxrefs" type="org.genedb.crawl.model.Dbxref">
-            <result property="database" column="database"/> 
-            <result property="accession" column="accession"/> 
-            <result property="urlprefix" column="urlprefix"/>
-            <result property="url" column="url"/> 
+            <result property="accession" column="accession"/>
             <result property="description" column="description"/> 
+            <association property="db" javaType="org.genedb.crawl.model.Db">
+                <result property="name" column="database"/> 
+            	<result property="urlprefix" column="urlprefix" />
+            	<result property="url" column="url" />
+            	<result property="description" column="db_description" />
+            </association>
     </resultMap>
     
     

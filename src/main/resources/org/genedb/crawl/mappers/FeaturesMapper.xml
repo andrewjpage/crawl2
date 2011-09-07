@@ -300,10 +300,11 @@
 		    feature.uniquename as uniqueName,
 		    feature.name as name,
 		    dbxref.accession as accession,
+		    dbxref.description,
 		    db.name as database,
 		    db.urlprefix, 
 		    db.url,
-            db.description
+            db.description as db_description
 		FROM feature
 		JOIN feature_dbxref ON feature_dbxref.feature_id = feature.feature_id
 		JOIN dbxref ON dbxref.dbxref_id = feature_dbxref.dbxref_id
@@ -314,10 +315,11 @@
 		    feature.uniquename as uniqueName,
 		    feature.name as name,
 		    dbxref.accession as accession,
+		    dbxref.description,
 		    db.name as database,
 		    db.urlprefix, 
             db.url,
-            db.description
+            db.description as db_description
 		FROM feature
 		JOIN dbxref ON dbxref.dbxref_id = feature.dbxref_id
 		JOIN db ON db.db_id = dbxref.db_id
@@ -329,12 +331,9 @@
     <resultMap id="dbxrefsList" type="org.genedb.crawl.model.Feature">
         <result property="uniqueName" column="uniqueName"/>
         <result property="name" column="name"/>
-         <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref"> 
-            <result property="database" column="database"/> 
-            <result property="accession" column="accession"/> 
-            <result property="urlprefix" column="urlprefix"/>
-            <result property="url" column="url"/> 
-            <result property="description" column="description"/> 
+        <collection property="dbxrefs"
+        	ofType="org.genedb.crawl.model.Dbxref" 
+        	resultMap="org.genedb.crawl.mappers.FeatureMapper.dbxref">
         </collection>
     </resultMap>
     

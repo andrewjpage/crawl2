@@ -37,10 +37,16 @@
     
     
     
-    <select id="featureCvTermDbxrefs" resultMap="featureCvTermDbxrefsResults" >
+    <select id="featureCvTermDbxrefs" resultMap="org.genedb.crawl.mappers.FeatureMapper.dbxrefs" >
         
-        SELECT dbxref.accession as accession, db.name as database, db.urlprefix, db.url
-            FROM feature_cvterm
+        SELECT 
+            dbxref.accession as accession,
+            dbxref.description, 
+            db.name as database, 
+            db.urlprefix, 
+            db.url,
+            db.description as db_description
+        FROM feature_cvterm
             JOIN feature_cvterm_dbxref ON feature_cvterm.feature_cvterm_id = feature_cvterm_dbxref.feature_cvterm_id
             JOIN dbxref ON feature_cvterm_dbxref.dbxref_id = dbxref.dbxref_id
             JOIN db ON dbxref.db_id = db.db_id
@@ -48,12 +54,7 @@
         
     </select>
     
-    <resultMap id="featureCvTermDbxrefsResults" type="org.genedb.crawl.model.Dbxref">
-       <result property="database" column="database"/> 
-       <result property="accession" column="accession"/> 
-       <result property="urlprefix" column="urlprefix"/>
-       <result property="url" column="url"/> 
-    </resultMap>
+   
     
     <!-- 
     
