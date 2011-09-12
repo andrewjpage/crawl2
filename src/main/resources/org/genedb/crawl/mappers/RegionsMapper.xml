@@ -19,10 +19,7 @@
 	   (select feature_id from feature where uniqueName = #{region} )  )
 	JOIN cvterm t ON f.type_id = t.cvterm_id
 	
-	WHERE t.name in 
-	    <foreach item="item" index="index" collection="types" open="(" separator="," close=")"> 
-            #{item} 
-        </foreach> 
+	
 	
 	<![CDATA[
 		AND (
