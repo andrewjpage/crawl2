@@ -47,7 +47,7 @@ public class BioDataFileStore <T extends BioDataFile> {
 		
 		generateMetaFields();
 		assignFileIDs();
-		getReaders();
+		//getReaders();
 	}
 	
 	
@@ -114,11 +114,11 @@ public class BioDataFileStore <T extends BioDataFile> {
 		}
 	}
 	
-	void getReaders() throws IOException {
-		for (BioDataFile file : files) {
-			file.init();
-		}
-	}
+//	void getReaders() throws IOException {
+//		for (BioDataFile file : files) {
+//			file.init();
+//		}
+//	}
 	
 	public T getFile(int fileID) {
 		if (fileID < files.size()) {
