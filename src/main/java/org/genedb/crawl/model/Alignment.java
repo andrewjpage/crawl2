@@ -50,13 +50,18 @@ public class Alignment extends BioDataFile {
             mss.length = ssr.getSequenceLength();
             mss.name = ssr.getSequenceName();
             mss.index = ssr.getSequenceIndex();
+            
+            logger.info(String.format("%s %s %s", mss.name, mss.index, mss.length));
+            
             sequences.add(mss);
         }
 
         reader.close();
         reader = null;
         file = null;
-
+        
+        
+        logger.info("got the sequences, and closed the file");        
     }
 
     @XmlTransient
