@@ -4,7 +4,7 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="org.genedb.crawl.mappers.FeatureMapper">  
     
-    <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/>
+    <!-- <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/> -->
     
     <select id="get" resultMap="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult" >
         SELECT 
@@ -378,7 +378,7 @@
       JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id =
           (select feature_id from feature where uniqueName = #{uniqueName} ) )
       
-      LEFT JOIN analysisfeature af on af.feature_id = f.feature_id
+      LEFT JOIN analysisfeature af on af.feature_id =  fl.feature_id
       LEFT JOIN analysis a on a.analysis_id = af.analysis_id
           
     </select>

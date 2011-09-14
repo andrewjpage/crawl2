@@ -38,6 +38,8 @@ public abstract class VariantReaderAdapter {
 		return new TabixReaderAdapter(url);
 	}
 	
+	public abstract void close() throws IOException;
+	
 	public List<VCFRecord> unFilteredQuery(String region, 
 			int start, 
 			int end) throws IOException {
