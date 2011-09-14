@@ -12,6 +12,7 @@ import org.genedb.crawl.elasticsearch.index.gff.GFFFeature.GFFAttributeMapList;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cv;
 import org.genedb.crawl.model.Cvterm;
+import org.genedb.crawl.model.Db;
 import org.genedb.crawl.model.Dbxref;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.Property;
@@ -234,9 +235,12 @@ public class FeatureBeanFactory {
 					for (String ref : refs) {
 						String[] refSplit = ref.split(":");
 						if (refSplit.length == 2) {
+						    Db db = new Db();
+						    db.name = refSplit[0];
 							Dbxref dbxref = new Dbxref();
-							dbxref.database = refSplit[0];
-							dbxref.accession = refSplit[1];								
+							//dbxref.database = refSplit[0];
+							dbxref.accession = refSplit[1];
+							dbxref.db = db;
 							feature.addDbxref(dbxref);
 						}							
 					}

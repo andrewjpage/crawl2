@@ -4,6 +4,8 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="org.genedb.crawl.mappers.FeatureMapper">  
     
+    <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/>
+    
     <select id="get" resultMap="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult" >
         SELECT 
             feature_id, 
@@ -86,7 +88,16 @@
            c.name as cv, 
            fcp.value as prop, 
            fcpct.name as type_name, 
-           fcpc.name as type_cv
+           fcpc.name as type_cv,
+           
+           ( SELECT count(*) FROM feature
+                    JOIN feature_cvterm ON feature.feature_id = feature_cvterm.feature_id
+                    JOIN cvterm ON feature_cvterm.cvterm_id = cvterm.cvterm_id AND cvterm.name = ct.name
+                    JOIN cv ON cvterm.cv_id = cv.cv_id AND cv.name = c.name
+                WHERE 
+                    feature.organism_id = f.organism_id) 
+              as count
+              
         FROM feature f
             JOIN feature_cvterm fc ON f.feature_id = fc.feature_id
             JOIN cvterm ct ON fc.cvterm_id = ct.cvterm_id
@@ -109,6 +120,7 @@
          <result property="accession" column="accession"/>
          <result property="is_not" column="is_not"/> 
          <result property="name" column="cvterm"/>
+         <result property="count" column="count"/> 
          <association property="cv" javaType="org.genedb.crawl.model.Cv" >
                 <result property="name" column="cv"/>
             </association>
@@ -116,8 +128,8 @@
              <result property="value" column="prop"/>
              <association property="type" resultMap="org.genedb.crawl.mappers.FeaturesMapper.type" />
          </collection> 
-         <!-- <collection property="pubs" ofType="org.genedb.crawl.model.Pub" select="org.gmod.cat.FeatureCvtermMapper.featureCvTermPubs" column="feature_cvterm_id"  />
-         <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" select="org.gmod.cat.FeatureCvtermMapper.featureCvTermDbxrefs" column="feature_cvterm_id"  /> --> 
+         <collection property="pubs" ofType="org.genedb.crawl.model.Pub" select="org.genedb.crawl.mappers.FeatureCvtermMapper.featureCvTermPubs" column="feature_cvterm_id"  />
+         <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" select="org.genedb.crawl.mappers.FeatureCvtermMapper.featureCvTermDbxrefs" column="feature_cvterm_id"  /> 
     </resultMap>
     
     <sql id="coordinateSelector">
@@ -175,8 +187,116 @@
        <result property="toplevel" column="toplevel"/>  
     </resultMap>
     
+    <select id="synonyms" resultType="org.genedb.crawl.model.Synonym" >
+        SELECT synonym.name as synonym, 
+            cvterm.name as synonymtype, 
+            feature_synonym.is_current as is_current
+            FROM feature_synonym 
+            JOIN feature ON feature.feature_id = feature_synonym.feature_id 
+            JOIN synonym ON feature_synonym.synonym_id = synonym.synonym_id
+            JOIN cvterm ON synonym.type_id = cvterm.cvterm_id
+            WHERE feature.uniquename = #{uniqueName} 
+    </select>
     
+    <select id="pubs" resultType="org.genedb.crawl.model.Pub" >
+        SELECT 
+            pub.uniquename,
+            split_part(pub.uniquename, ':', 1) as database,
+            split_part(pub.uniquename, ':', 2) as accession
+        FROM feature
+        JOIN feature_pub ON feature_pub.feature_id = feature.feature_id
+        JOIN pub on pub.pub_id = feature_pub.pub_id
+        WHERE feature.uniquename = #{uniqueName}
+    </select>
     
+    <sql id="relationships">
+        
+            relationship_type.name as relationship_type
+            
+        FROM feature subject
+        
+        JOIN feature_relationship fr ON fr.subject_id = subject.feature_id 
+            and fr.type_id IN 
+              <foreach item="cvterm" index="index" collection="relationships" open="(" separator="," close=")">#{cvterm.cvterm_id}</foreach>
+        
+        JOIN feature object ON fr.object_id = object.feature_id
+        
+        JOIN cvterm relationship_type ON fr.type_id = relationship_type.cvterm_id
+        JOIN cvterm subject_type ON subject.type_id = subject_type.cvterm_id
+        JOIN cvterm object_type ON object.type_id = object_type.cvterm_id
+    </sql>
+    
+    <select id="parents" resultMap="relationships" >
+    SELECT 
+            object.uniquename,
+            object.feature_id,
+            object.organism_id,
+            object_type.name as type,
+            <include refid="relationships"/>
+            
+        WHERE subject.uniquename = #{feature.uniqueName}  
+    </select>
+    
+    <select id="children" resultMap="relationships" >
+    SELECT 
+            subject.uniquename,
+            subject.feature_id,
+            subject.organism_id,
+            subject_type.name as type,
+            <include refid="relationships"/>
+            
+        WHERE object.uniquename = #{feature.uniqueName}  
+    </select>
+
+	<resultMap type="org.genedb.crawl.model.Feature" id="relationships">
+		
+		<result column="uniqueName" property="uniqueName" />
+		<result column="name" property="name" />
+		<result column="feature_id" property="feature_id" />
+		<result column="organism_id" property="organism_id" />
+		<association property="type" javaType="org.genedb.crawl.model.Cvterm">
+			<result column="type" property="name" />
+		</association>
+		<association property="relationshipType" javaType="org.genedb.crawl.model.Cvterm">
+			<result column="relationship_type" property="name" />
+		</association>
+		
+	</resultMap>
+	
+	
+    
+	
+  
+  <!-- <resultMap type="org.genedb.crawl.model.Feature" id="parents">
+  <association property="object" javaType="org.genedb.crawl.model.Feature" >
+        <result column="object_uniquename" property="uniqueName" />
+        <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+            <result column="object_type" property="name" />
+        </association> 
+    </association>
+    <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+        <result column="type" property="name" />
+    </association>
+  </resultMap> -->
+  
+  <!-- <resultMap type="org.genedb.crawl.model.FeatureRelationship" id="relationships">
+    <association property="subject" javaType="org.genedb.crawl.model.Feature" >
+    	<result column="subject_uniquename" property="uniqueName" />
+    	<association property="type" javaType="org.genedb.crawl.model.Cvterm">
+            <result column="subject_type" property="name" />
+        </association>
+    </association>
+    <association property="object" javaType="org.genedb.crawl.model.Feature" >
+        <result column="object_uniquename" property="uniqueName" />
+        <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+            <result column="object_type" property="name" />
+        </association> 
+    </association>
+    <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+        <result column="type" property="name" />
+    </association>
+  </resultMap> -->
+  
     
     
     <sql id="featureSelector">
@@ -228,6 +348,133 @@
             <result property="uniqueName" column="exonUniqueName"/> 
         </collection>
     </resultMap>
+    
+    
+    <select id="domains" resultMap="domains" >
+        SELECT
+			f.uniqueName as uniqueName,
+			f.feature_id,
+			f.organism_id, 
+			type.name as type,
+			#{uniqueName} as region,
+			fl.fmin, 
+			fl.fmax,
+			fl.strand,
+			fl.phase,
+			f.is_obsolete,
+			
+			fl.is_fmin_partial,
+			fl.is_fmax_partial,
+			
+			rawscore, normscore, significance, identity, 
+            a.analysis_id,
+            a.name as analysis_name, 
+            description, 
+            program, programversion, algorithm, sourcename, sourceversion,sourceuri, timeexecuted
+
+      FROM feature f
+
+      JOIN cvterm type ON f.type_id = type.cvterm_id
+      JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id =
+          (select feature_id from feature where uniqueName = #{uniqueName} ) )
+      
+      LEFT JOIN analysisfeature af on af.feature_id = f.feature_id
+      LEFT JOIN analysis a on a.analysis_id = af.analysis_id
+          
+    </select>
+    
+    <resultMap type="org.genedb.crawl.model.LocatedFeature" id="domains">
+	    <result property="uniqueName" column="uniqueName"/>
+	    <result property="feature_id" column="feature_id"/>
+	    <result property="organism_id" column="organism_id"/>
+	    <result property="isObsolete" column="is_obsolete"/>
+	    <result property="strand" column="strand"/>
+	    <result property="phase" column="phase"/>
+	    <result property="region" column="region"/>
+	    <result property="fmin" column="fmin"/>
+	    <result property="fmax" column="fmax"/>
+	    <result property="parent" column="parent"/>
+	    <result property="parentRelationshipType" column="parent_relationship_type"/>
+	    <result property="fmin_partial" column="is_fmin_partial"/>
+	    <result property="fmax_partial" column="is_fmax_partial"/>
+
+	    <association property="analysisFeature" resultMap="org.genedb.crawl.mappers.FeaturesMapper.clusters_analysis" />
+	    
+
+	    <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+	        <result property="name" column="type"/>
+	    </association>
+	    
+	    <collection property="properties" ofType="org.genedb.crawl.model.Property"> 
+	        <result property="name" column="propname"/> 
+	        <result property="value" column="value"/> 
+	    </collection>
+
+	    <collection property="dbxrefs" select="dbxrefs" column="feature_id"></collection>
+
+	    <!-- <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" >
+	       <result property="accession" column="accession"/>
+	       <result property="version" column="version"/>
+	       <result property="database" column="database"/>
+	       <result property="url" column="url"/>
+	       <result property="urlprefix" column="urlprefix"/>
+	       <result property="description" column="description"/>
+	    </collection> -->
+
+    </resultMap>
+  
+    <select id="dbxrefs" resultMap="dbxrefs" >
+        
+        SELECT 
+            feature.uniquename as uniqueName,
+            feature.name as name,
+            dbxref.accession as accession,
+            dbxref.description as description,
+            db.name as database,
+            db.urlprefix, 
+            db.url,
+            db.description as db_description
+        FROM feature
+        JOIN feature_dbxref ON feature_dbxref.feature_id = feature.feature_id
+        JOIN dbxref ON dbxref.dbxref_id = feature_dbxref.dbxref_id
+        JOIN db ON db.db_id = dbxref.db_id
+        WHERE feature.feature_id = #{feature_id}
+        UNION
+        SELECT 
+            feature.uniquename as uniqueName,
+            feature.name as name,
+            dbxref.accession as accession,
+            dbxref.description as description,
+            db.name as database,
+            db.urlprefix, 
+            db.url,
+            db.description as db_description
+        FROM feature
+        JOIN dbxref ON dbxref.dbxref_id = feature.dbxref_id
+        JOIN db ON db.db_id = dbxref.db_id
+        WHERE feature.feature_id = #{feature_id}
+        
+    </select>  
+  
+    
+    <resultMap id="dbxrefs" type="org.genedb.crawl.model.Dbxref">
+            <result property="accession" column="accession"/>
+            <result property="description" column="description"/> 
+            <association property="db" javaType="org.genedb.crawl.model.Db">
+                <result property="name" column="database"/> 
+            	<result property="urlprefix" column="urlprefix" />
+            	<result property="url" column="url" />
+            	<result property="description" column="db_description" />
+            </association>
+    </resultMap>
+    
+    
+    <select id="orthologues" resultMap="org.genedb.crawl.mappers.FeaturesMapper.orthologues">
+       <include refid="org.genedb.crawl.mappers.FeaturesMapper.orthologues"/>
+        
+        WHERE f.feature_id = #{feature_id} 
+                
+    </select>
     
 
 </mapper>

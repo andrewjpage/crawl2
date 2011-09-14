@@ -110,7 +110,7 @@ public class RegionsController extends BaseQueryController {
 			@RequestParam("region") String region, 
 			@RequestParam(value="start",required=false) Integer start, 
 			@RequestParam(value="end", required=false) Integer end, 
-			@RequestParam(value="exclude", defaultValue="true") Boolean exclude,
+			@RequestParam(value="exclude") Boolean exclude,
 			@RequestParam(value="types", required=false) @ResourceDescription("A list of features types to exclude or include.") List<String> types
 			) throws CrawlException {
 		
@@ -137,12 +137,20 @@ public class RegionsController extends BaseQueryController {
         	geneTypes.addAll(types);
         }
         
-		if (! geneTypes.contains("gene")) {
-			geneTypes.add("gene");
-		}
-		if (! geneTypes.contains("pseudogene")) {
-			geneTypes.add("pseudogene");
-		}
+        // boundary calculations must include genes or pseudogenes, so we clone the set
+        Set<String> boundaryTypes = new HashSet<String>(geneTypes);
+        
+        // let's never exclude gene or pseudogenes from boundary calculations, and always include them 
+        if (exclude) {
+            boundaryTypes.remove("gene");
+            boundaryTypes.remove("pseudogene");
+        } else {
+            boundaryTypes.add("gene");
+            boundaryTypes.add("pseudogene");
+        }
+        
+		
+		
 		
 		logger.info(String.format("%s %d-%d %s", region, start,end,exclude));
         logger.info("Gene Types " + geneTypes);
@@ -150,7 +158,9 @@ public class RegionsController extends BaseQueryController {
         int actualStart = start;
         int actualEnd = end;
         
-        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(region, start, end, exclude, new ArrayList<String>(geneTypes));
+        LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(region, start, end, exclude, new ArrayList<String>(boundaryTypes));
+        logger.debug(expandedBoundaries.start);
+        logger.debug(expandedBoundaries.end);
         if (expandedBoundaries != null) {
 			if (expandedBoundaries.start != null && expandedBoundaries.start < start) {
 				actualStart = expandedBoundaries.start;

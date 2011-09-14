@@ -28,4 +28,6 @@ public class LocatedFeature extends Feature {
 	public Boolean fmin_partial;
 	public Boolean fmax_partial;
 	
+	
+	
 }

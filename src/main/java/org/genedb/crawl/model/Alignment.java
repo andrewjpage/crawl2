@@ -34,7 +34,7 @@ public class Alignment extends BioDataFile {
 	private URL bamFileURL;
 	
 	@Override public void init() throws IOException {
-		getReader();
+		// getReader();
 	}
 	
 	@XmlTransient

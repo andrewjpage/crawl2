@@ -83,6 +83,11 @@
       id="featuresControllerBean" 
       implementor="#featuresController" 
       address="/features" />
+      
+      <jaxws:endpoint 
+      id="featureControllerBean" 
+      implementor="#featureController" 
+      address="/feature" />
     
     <jaxws:endpoint 
       id="regionsControllerBean" 

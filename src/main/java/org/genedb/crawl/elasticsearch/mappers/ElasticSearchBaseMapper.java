@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
@@ -13,6 +14,9 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.action.search.SearchRequestBuilder;
+import org.elasticsearch.common.xcontent.ToXContent;
+import org.elasticsearch.common.xcontent.json.JsonXContent;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 
@@ -246,10 +250,11 @@ public abstract class ElasticSearchBaseMapper {
 	
 	protected <T extends Object> List<T> getAllMatches(String indexName, String fieldName, QueryBuilder query, Class<T> cls) {
 	    
-	    SearchResponse response = connection.getClient().prepareSearch(indexName)
-	            .setQuery(query)
-	            .execute()
-	            .actionGet();
+	    SearchRequestBuilder srb = connection.getClient().prepareSearch(indexName).setQuery(query);
+	    
+	    logger.info(toString(srb.internalBuilder()));
+	    
+	    SearchResponse response = srb.execute().actionGet();
 	        
 	        return getAllMatches(response, cls);
 	}
@@ -258,6 +263,8 @@ public abstract class ElasticSearchBaseMapper {
 		
 		FieldQueryBuilder regionQuery = 
 		QueryBuilders.fieldQuery(fieldName, value);
+		
+		
 		
 		SearchResponse response = connection.getClient().prepareSearch(indexName)
 			.setQuery(regionQuery)
@@ -342,6 +349,19 @@ public abstract class ElasticSearchBaseMapper {
 //		}
 //	}
 	
+	
+	public static String toString(ToXContent tmp) {
+        try {
+            return
+            tmp.toXContent(JsonXContent.unCachedContentBuilder(),
+                    ToXContent.EMPTY_PARAMS).
+                    prettyPrint().
+                    string();
+        } catch (Exception ex) {
+            return "<ERROR:" + ex.getMessage() + ">";
+        }
+    }
+	
 	public void waitForStatus(EnumSet<ClusterHealthStatus> acceptableStatuses) {
 		ClusterHealthRequest clusterHealth = new ClusterHealthRequest();
 		ClusterHealthResponse response;
@@ -368,6 +388,17 @@ public abstract class ElasticSearchBaseMapper {
 			}
 		}
 	}
+	
+	
+	protected static final String LUCENE_ESCAPE_CHARS = "[\\\\+\\-\\!\\(\\)\\:\\^\\]\\{\\}\\~\\*\\?]";
+    protected static final Pattern LUCENE_PATTERN = Pattern.compile(LUCENE_ESCAPE_CHARS);
+    protected static final String REPLACEMENT_STRING = "\\\\$0";
+    
+    protected String escape(String value) {
+        String escaped = LUCENE_PATTERN.matcher(value).replaceAll(REPLACEMENT_STRING);
+        logger.info(String.format("%s ... %s", value, escaped));
+        return escaped;
+    }
 	
 	
 }

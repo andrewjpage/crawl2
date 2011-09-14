@@ -20,7 +20,9 @@ import org.genedb.crawl.mappers.MapperUtil.HierarchicalSearchType;
 import org.genedb.crawl.model.BlastPair;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
+import org.genedb.crawl.model.Dbxref;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.FeatureRelationship;
 import org.genedb.crawl.model.Gene;
 import org.genedb.crawl.model.HierarchicalFeature;
 import org.genedb.crawl.model.LocatedFeature;
@@ -247,7 +249,7 @@ public class FeaturesController extends BaseQueryController {
 		return featuresMapper.blastPairs(f1, start1, end1, f2, start2, end2, length, score); 
 	}
 	
-		
+	
 		
 	
 	@ResourceDescription("Return a gene's transcripts")
@@ -277,36 +279,6 @@ public class FeaturesController extends BaseQueryController {
 		//return featuresMapper.pubs(features);
 	}
 	
-	@ResourceDescription("Return a gene's transcripts")
-	@RequestMapping(method=RequestMethod.GET, value="/getInfo")
-	public LocatedFeature getInfo(
-	        @RequestParam(value="feature") String feature, 
-	        @RequestParam(value="organism",required=false) String organism, 
-	        @RequestParam(value="name",required=false) String name, 
-	        @RequestParam(value="type",required=false) String type) {
-		
-		
-		Integer organism_id =  null;
-		if (organism != null) {
-		    Organism o = this.getOrganism(organismsMapper, organism);
-		    if (o != null) 
-		        organism_id = o.ID;
-		}
-		
-		LocatedFeature resultFeature = featureMapper.getOfType(feature, organism_id, name, type);
-		resultFeature.coordinates = featureMapper.coordinates(resultFeature);
-		
-		if (resultFeature.coordinates != null && resultFeature.coordinates.size() > 0) {
-		    Coordinates c = resultFeature.coordinates.get(0);
-		    resultFeature.fmin = c.fmin;
-		    resultFeature.fmax = c.fmax;
-		    resultFeature.region = c.region;
-		    resultFeature.phase = c.phase;
-		    resultFeature.strand = c.strand;
-		}
-		
-		return resultFeature;
-		
-		//return featuresMapper.pubs(features);
-	}
+	
+    
 }

@@ -54,6 +54,10 @@ public class Feature implements Serializable {
 	@XmlElementWrapper(name="dbxrefs")
 	public List<Dbxref> dbxrefs;
 	
+	@XmlElement(name="domain", required=false)
+    @XmlElementWrapper(name="domains")
+    public List<LocatedFeature> domains;
+	
 	@XmlElement(name="change", required=false)
 	@XmlElementWrapper(name="changes")
 	public List<Change> changes;
@@ -114,6 +118,15 @@ public class Feature implements Serializable {
 	@XmlElement(name="relationship", required=false)
 	@XmlElementWrapper(name="relationships")
 	public List<FeatureRelationship> relationships;
+	
+	@XmlElement(name="parents")
+	public List<Feature> parents;
+	
+	@XmlElement(name="children")
+	public List<Feature> children;
+	
+	@XmlElement
+	public Cvterm relationshipType;
 	
 	@XmlElement(required=false)
 	public Organism organism;

@@ -19,10 +19,7 @@
 	   (select feature_id from feature where uniqueName = #{region} )  )
 	JOIN cvterm t ON f.type_id = t.cvterm_id
 	
-	WHERE t.name in 
-	    <foreach item="item" index="index" collection="types" open="(" separator="," close=")"> 
-            #{item} 
-        </foreach> 
+	
 	
 	<![CDATA[
 		AND (
@@ -44,32 +41,37 @@
       WHERE <include refid="org.genedb.crawl.mappers.FeatureMapper.featureSelector"/>  
   </select>
   
+  <sql id="select_locations">
+      
+      SELECT
+      f.uniqueName as uniqueName,
+      f.organism_id, 
+      type.name as type,
+      #{region} as region, 
+      fl.fmin, 
+      fl.fmax,
+      fl.strand,
+      fl.phase,
+      f.is_obsolete,
+      f2.uniquename as parent,
+      frt.name as parent_relationship_type,
+      fl.is_fmin_partial,
+      fl.is_fmax_partial,
+
+      'colour' as propname,
+      fp.value as value
+
+          FROM feature f
+
+      JOIN cvterm type ON f.type_id = type.cvterm_id 
+      JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = 
+          (select feature_id from feature where uniqueName = #{region} ) )
+      
+  </sql>
   
   <select id="locations" resultMap="locations" >
     
-    SELECT
-    f.uniqueName as uniqueName,
-    f.organism_id, 
-    type.name as type,
-    #{region} as region, 
-    fl.fmin, 
-    fl.fmax,
-    fl.strand,
-    fl.phase,
-    f.is_obsolete,
-    f2.uniquename as parent,
-    frt.name as parent_relationship_type,
-    fl.is_fmin_partial,
-    fl.is_fmax_partial,
-    
-    'colour' as propname,
-    fp.value as value
-    
-        FROM feature f
-    
-    JOIN cvterm type ON f.type_id = type.cvterm_id 
-    JOIN featureloc fl ON (f.feature_id = fl.feature_id AND fl.srcfeature_id = 
-        (select feature_id from feature where uniqueName = #{region} ) )
+    <include refid="select_locations"/>
     
     LEFT OUTER JOIN feature_relationship fr ON f.feature_id = fr.subject_id
     LEFT JOIN feature f2 ON fr.object_id = f2.feature_id 
