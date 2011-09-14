@@ -58,7 +58,6 @@ public class Alignment extends BioDataFile {
 
         reader.close();
         reader = null;
-        file = null;
         
         
         logger.info("got the sequences, and closed the file");        
