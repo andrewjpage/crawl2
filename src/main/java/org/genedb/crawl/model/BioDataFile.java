@@ -1,10 +1,11 @@
 package org.genedb.crawl.model;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class BioDataFile {
+public abstract class BioDataFile {
 
 	@XmlAttribute(required = true)
 	public Integer fileID;
@@ -23,8 +24,8 @@ public class BioDataFile {
 		return (String.format("%d : %s : %s", fileID, file, meta));
 	}
 	
-	public void init() throws IOException {
-		// do nothing
-	}
+	abstract public void init() throws IOException;
+	
+	abstract public List<MappedSAMSequence> getSequences() throws IOException;
 	
 }

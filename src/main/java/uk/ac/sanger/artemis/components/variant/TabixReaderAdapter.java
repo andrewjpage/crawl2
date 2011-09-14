@@ -27,6 +27,12 @@ public class TabixReaderAdapter extends VariantReaderAdapter{
 	        }
 	    }
 	}
+
+	// TODO - tabix readers do not have a close method...
+    @Override
+    public void close() throws IOException {
+        reader = null;
+    }
 	
 	
 }

@@ -47,7 +47,7 @@ public class BioDataFileStore <T extends BioDataFile> {
 		
 		generateMetaFields();
 		assignFileIDs();
-		//getReaders();
+		initialiseReaders();
 	}
 	
 	
@@ -114,11 +114,9 @@ public class BioDataFileStore <T extends BioDataFile> {
 		}
 	}
 	
-//	void getReaders() throws IOException {
-//		for (BioDataFile file : files) {
-//			file.init();
-//		}
-//	}
+	private void initialiseReaders() throws IOException {
+		for (BioDataFile file : files) file.init();
+	}
 	
 	public T getFile(int fileID) {
 		if (fileID < files.size()) {
@@ -187,37 +185,10 @@ public class BioDataFileStore <T extends BioDataFile> {
 	
 	
 	public List<MappedSAMSequence> getSequences(int fileID) throws IOException {
-		BioDataFile file = getFile(fileID);
-		
-		List<MappedSAMSequence> sequences = new ArrayList<MappedSAMSequence>();
-		
-		if (file instanceof Alignment) {
-			
-			Alignment alignment = (Alignment) file;
-			for (SAMSequenceRecord ssr : alignment.getReader().getFileHeader().getSequenceDictionary().getSequences()) {
-				MappedSAMSequence mss = new MappedSAMSequence();
-				mss.length = ssr.getSequenceLength();
-				mss.name = ssr.getSequenceName();
-				mss.index = ssr.getSequenceIndex();
-				
-				sequences.add(mss);
-			}
-			
-		} else if (file instanceof Variant) {
-			Variant variant = (Variant) file;
-			
-			for (String seqname : variant.getReader().getSeqNames()) {
-				MappedSAMSequence mss = new MappedSAMSequence();
-				mss.name = seqname;
-				sequences.add(mss);
-			}
-		}
-		
-		return sequences;
+		return getFile(fileID).getSequences();
 	}
 	
 	public List<T> listforsequence(String sequence) throws Exception {
-		
 		
 		Map<Integer, T> map = new HashMap<Integer, T>();
 		
@@ -236,7 +207,7 @@ public class BioDataFileStore <T extends BioDataFile> {
 			
 			for (MappedSAMSequence fileSequence : getSequences(fileID)) {
 				
-				if (actualSequenceName.equals(fileSequence.name)) {
+				if (sequence.equals(fileSequence.name)) {
 					map.put(fileID, file);
 				}
 				
