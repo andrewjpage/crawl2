@@ -43,7 +43,7 @@ public class TermsController extends BaseQueryController {
             @RequestParam("organism") String organism, 
             @RequestParam(value="term") String term,
             @RequestParam(value="cv") String cv) {
-        Organism o = this.getOrganism(organismsMapper, organism);
+        Organism o = util.getOrganism(organism);
         int i = featureCvTermsMapper.countInOrganism(o, cv, term);
         Statistic statistic = new Statistic();
         statistic.name = "count";

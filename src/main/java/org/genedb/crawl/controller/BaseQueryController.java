@@ -24,7 +24,9 @@ import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Resource;
 import org.genedb.crawl.model.Service;
+import org.genedb.crawl.modelling.FeatureMapperUtil;
 import org.genedb.crawl.annotations.ResourceDescription;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -37,6 +39,9 @@ import org.springframework.web.bind.annotation.ValueConstants;
 public abstract class BaseQueryController {
 	
 	private Logger logger = Logger.getLogger(BaseQueryController.class);
+	
+	@Autowired
+    public FeatureMapperUtil util;
 	
 	class ListSplittingPropertyEditor extends PropertyEditorSupport {
 		
@@ -252,35 +257,35 @@ public abstract class BaseQueryController {
 		return arguments.get(index);
 	}
 	
-	protected Organism getOrganism(OrganismsMapper organisms, String organism) {
-		Organism mappedOrganism = null;
-		
-		if (organism.contains(":")) {
-			String[] split = organism.split(":");
-			
-			if (split.length == 2) {
-					
-				String prefix = split[0];
-				String orgDescriptor = split[1];
-				
-				if (prefix.equals("com")) {
-					mappedOrganism = organisms.getByCommonName(orgDescriptor);
-				} else if (prefix.equals("tax")) {
-					mappedOrganism = organisms.getByTaxonID(orgDescriptor);
-				} else if (prefix.equals("org")) {
-					mappedOrganism = organisms.getByID(Integer.parseInt(orgDescriptor));
-				}
-				
-			}
-			
-		} else {
-			
-			mappedOrganism = organisms.getByCommonName(organism);
-			
-		}
-		
-		return mappedOrganism;
-	}
+//	protected Organism getOrganism(OrganismsMapper organisms, String organism) {
+//		Organism mappedOrganism = null;
+//		
+//		if (organism.contains(":")) {
+//			String[] split = organism.split(":");
+//			
+//			if (split.length == 2) {
+//					
+//				String prefix = split[0];
+//				String orgDescriptor = split[1];
+//				
+//				if (prefix.equals("com")) {
+//					mappedOrganism = organisms.getByCommonName(orgDescriptor);
+//				} else if (prefix.equals("tax")) {
+//					mappedOrganism = organisms.getByTaxonID(orgDescriptor);
+//				} else if (prefix.equals("org")) {
+//					mappedOrganism = organisms.getByID(Integer.parseInt(orgDescriptor));
+//				}
+//				
+//			}
+//			
+//		} else {
+//			
+//			mappedOrganism = organisms.getByCommonName(organism);
+//			
+//		}
+//		
+//		return mappedOrganism;
+//	}
 	
 	
 }

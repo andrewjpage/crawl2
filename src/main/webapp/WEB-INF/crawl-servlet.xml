@@ -51,7 +51,9 @@
 			<value>${alignments}</value>
 		</property>
 	</bean>
-
+	
+	<bean id="FeatureMapperUtil" class="org.genedb.crawl.modelling.FeatureMapperUtil"  />
+	
 	<bean class="org.genedb.crawl.view.CrawlViewResolver">
 		<property name="order" value="1" />
 

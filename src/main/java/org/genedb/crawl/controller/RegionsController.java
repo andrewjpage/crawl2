@@ -316,7 +316,7 @@ public class RegionsController extends BaseQueryController {
 		
 		Integer organism_id = null;
 		if (organism != null) {
-		    Organism o = getOrganism(organismsMapper, organism);
+		    Organism o = util.getOrganism(organism);
 		    if (o != null)
 		        organism_id = o.ID;
 		}
@@ -333,7 +333,7 @@ public class RegionsController extends BaseQueryController {
 			@RequestParam(value="offset", required=false) Integer offset,
 			@RequestParam(value="type", required=false) String type) throws CrawlException {
 		
-		Organism o = getOrganism(organismsMapper, organism);
+		Organism o = util.getOrganism(organism);
 		
 		List<Feature> r = null;
 		if (organismRegionMap.containsKey(o.ID)) {
@@ -355,7 +355,7 @@ public class RegionsController extends BaseQueryController {
 			@RequestParam("organism") String organism
 			) throws CrawlException {
 		
-		Organism o = getOrganism(organismsMapper, organism);
+		Organism o = util.getOrganism(organism);
 		
 		List<Cvterm> regionTypes = regionsMapper.typesInOrganism( o.ID );
 		List<Feature> regions = new ArrayList<Feature>();

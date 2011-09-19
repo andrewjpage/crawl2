@@ -78,7 +78,7 @@ public class VariantController extends BaseQueryController {
 	public List<Variant> listfororganism( 
 			@RequestParam("organism") String organism) throws IOException {
 		
-		Organism mappedOrganism = getOrganism(organismsMapper, organism);
+		Organism mappedOrganism = util.getOrganism(organism);
 		return variantStore.listfororganism(mappedOrganism.common_name);
 	}
 	

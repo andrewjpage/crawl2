@@ -76,21 +76,21 @@ public class OrganismsController extends BaseQueryController {
 	@RequestMapping(method=RequestMethod.GET, value="/get")
 	public List<Organism> getByString(@RequestParam("organism") String organism) throws CrawlException {
 	    ArrayList<Organism> list = new ArrayList<Organism>();
-		list.add(getOrganism(organismsMapper, organism));
+		list.add(util.getOrganism(organism));
 		return addProps(list);
 	}
 	
 	@ResourceDescription(value="Get an organism property", type="Organism")
     @RequestMapping(method=RequestMethod.GET, value="/property")
 	public Property property(@RequestParam("organism") String organism, @RequestParam("term") String term, @RequestParam(value="cv", required=false) String cv) {
-	    Organism o = this.getOrganism(organismsMapper, organism);
+	    Organism o = util.getOrganism(organism);
 	    return organismsMapper.getOrganismProp(o, cv, term);
 	}
 	
 	@ResourceDescription(value="Get an organism property", type="Organism")
     @RequestMapping(method=RequestMethod.GET, value="/properties")
     public List<Property> properties(@RequestParam("organism") String organism, @RequestParam(value="cv", required=false) String cv) {
-        Organism o = this.getOrganism(organismsMapper, organism);
+        Organism o = util.getOrganism(organism);
         return organismsMapper.getOrganismProps(o, cv);
     }
 	
