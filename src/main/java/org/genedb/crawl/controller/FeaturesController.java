@@ -218,7 +218,7 @@ public class FeaturesController extends BaseQueryController {
 			@RequestParam(value="date") Date date, 
 			@RequestParam("organism") String organism, 
 			@RequestParam(value="region", required = false) String region) throws CrawlException {
-		Organism o = getOrganism(organismsMapper, organism);
+		Organism o = util.getOrganism(organism);
 		return featuresMapper.annotationModified(date, o.ID, region);
 	}
 	
@@ -228,7 +228,7 @@ public class FeaturesController extends BaseQueryController {
 			@RequestParam(value="date") Date date, 
 			@RequestParam("organism") String organism, 
 			@RequestParam(value="region", required = false) String region) throws CrawlException {
-		Organism o = getOrganism(organismsMapper, organism);
+		Organism o = util.getOrganism(organism);
 		return featuresMapper.annotationModifiedStatistics(date, o.ID, region);
 	}
 	

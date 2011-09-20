@@ -6,19 +6,24 @@ import java.util.List;
 
 import javax.jws.WebService;
 
+import org.biojava.bio.BioException;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.mappers.FeatureMapper;
 import org.genedb.crawl.mappers.FeaturesMapper;
 import org.genedb.crawl.mappers.OrganismsMapper;
+import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Dbxref;
 import org.genedb.crawl.model.Feature;
+import org.genedb.crawl.model.Property;
 
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
+import org.genedb.crawl.modelling.FeatureMapperUtil;
+import org.genedb.util.TranslationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -44,6 +49,9 @@ public class FeatureController extends BaseQueryController{
     @Autowired
     public OrganismsMapper organismsMapper;
     
+    @Autowired
+    public RegionsMapper regionsMapper;
+    
     private String[] defaultRelationshipTypes = new String[] {"part_of", "derives_from"};
 
     @ResourceDescription("Return a gene's transcripts")
@@ -57,7 +65,7 @@ public class FeatureController extends BaseQueryController{
         
         Integer organism_id =  null;
         if (organism != null) {
-            Organism o = this.getOrganism(organismsMapper, organism);
+            Organism o = util.getOrganism(organism);
             if (o != null) 
                 organism_id = o.ID;
         }
@@ -78,7 +86,7 @@ public class FeatureController extends BaseQueryController{
             @RequestParam(value="organism",required=false) String organism, 
             @RequestParam(value="name",required=false) String name) {
         
-        Feature feature = getFeature(featureUniqueName, name, organism);
+        Feature feature = util.getFeature(featureUniqueName, name, organism);
         return featureMapper.dbxrefs(feature);
     }
     
@@ -110,19 +118,6 @@ public class FeatureController extends BaseQueryController{
         
     }
     
-    private Feature getFeature(String uniqueName, String name, String organism) {
-        Integer organism_id =  null;
-        
-        if (organism != null) {
-            Organism o = this.getOrganism(organismsMapper, organism);
-            if (o != null) 
-                organism_id = o.ID;
-        }
-        
-        Feature resultFeature = featureMapper.get(uniqueName, name, organism_id);
-        
-        return resultFeature;
-    }
     
     
     @RequestMapping(method=RequestMethod.GET, value="/parents")
@@ -136,7 +131,7 @@ public class FeatureController extends BaseQueryController{
             relationships = defaultRelationshipTypes;
         
         List<Cvterm> relationshipTerms = getRelationshipTypes(Arrays.asList(relationships), terms);
-        Feature feature = getFeature(featureUniqueName, name, organism);
+        Feature feature = util.getFeature(featureUniqueName, name, organism);
         return featureMapper.parents(feature, relationshipTerms);
     }
     
@@ -151,7 +146,7 @@ public class FeatureController extends BaseQueryController{
             relationships = defaultRelationshipTypes;
         
         List<Cvterm> relationshipTerms = getRelationshipTypes(Arrays.asList(relationships), terms);
-        Feature feature = getFeature(featureUniqueName, name, organism);
+        Feature feature = util.getFeature(featureUniqueName, name, organism);
         return featureMapper.children(feature, relationshipTerms);
     }
     
@@ -176,77 +171,21 @@ public class FeatureController extends BaseQueryController{
         
         List<Cvterm> ofType = getRelationshipTypes(Arrays.asList(relationships), terms);
         
-        Feature feature = getFeature(uniqueName, name, organism);
+        Feature feature = util.getFeature(uniqueName, name, organism);
         
         
-        Feature hierarchyRoot = getAncestorGene(feature, ofType);
+        Feature hierarchyRoot = util.getAncestorGene(feature, ofType);
         hierarchyRoot.organism = this.organismsMapper.getByID(hierarchyRoot.organism_id);
         
         if (hierarchyRoot == null)
             hierarchyRoot = feature;
         
-        getDescendants(hierarchyRoot, ofType, includeSummaries);
+        util.getDescendants(hierarchyRoot, ofType, includeSummaries);
         
         return hierarchyRoot;
         
     }
     
-//    public Feature geneSummary(@RequestParam("feature") String featureUniqueName, 
-//            @RequestParam(value="organism",required=false) String organism, 
-//            @RequestParam(value="name",required=false) String name) {
-//        
-//        List<Cvterm> ofType = getRelationshipTypes(Arrays.asList(defaultRelationshipTypes), terms);
-//        
-//        Feature feature = getFeature(featureUniqueName, name, organism);
-//        
-//        Feature hierarchyRoot = getAncestorGene(feature, ofType);
-//        
-//        if (hierarchyRoot == null)
-//            hierarchyRoot = feature;
-//        
-//        getDescendants(hierarchyRoot, ofType, false);
-//        
-//        return hierarchyRoot;
-//        
-//        
-//        
-//    }
-    
-    private Feature getAncestorGene(Feature currentFeature, List<Cvterm> ofType) {
-        
-        if (currentFeature.type.name.equals("gene") || currentFeature.type.name.equals("pseudogene"))
-            return currentFeature;
-        
-        List<Feature> parents = featureMapper.parents(currentFeature, ofType);
-        
-        for (Feature parent : parents) {
-            // parents are objects
-            Feature root = getAncestorGene(parent, ofType);
-            
-            if (root != null) {
-                return root;
-            }
-            
-        }
-        
-        return null;
-    }
-    
-    private void getDescendants(Feature feature, List<Cvterm> ofType, boolean includeSummaries) {
-        
-        feature.children = featureMapper.children(feature, ofType);
-        if (includeSummaries)
-            summarise(feature);
-        
-        if (feature.children == null)
-            return;
-        
-        for (Feature child : feature.children) {
-            // children are subjects
-            getDescendants(child, ofType, includeSummaries);
-        }
-        
-    }
     
 
     @ResourceDescription("Return features located on features")
@@ -262,8 +201,30 @@ public class FeatureController extends BaseQueryController{
             @RequestParam(value="name",required=false) String name) {
         List<LocatedFeature> domains = new ArrayList<LocatedFeature>();
         
-        Feature feature = getFeature(featureUniqueName, name, organism);
+        Feature feature = util.getFeature(featureUniqueName, name, organism);
         return featureMapper.domains(feature);
         
     }
+    
+    
+    @ResourceDescription("Return feature dbxrefs")
+    @RequestMapping(method = RequestMethod.GET, value = "/polypeptide_properties")
+    public List<Property> getPolypeptideProperties(
+            @RequestParam(value = "feature") String featureUniqueName, 
+            @RequestParam(value = "organism", required = false) String organism, 
+            @RequestParam(value = "name", required = false) String name) throws BioException, TranslationException {
+    
+        Feature feature = util.getFeature(featureUniqueName, name, organism);
+        
+        // assemble a hierarchy for this feature
+        List<Cvterm> ofType = getRelationshipTypes(Arrays.asList(defaultRelationshipTypes), terms);
+        Feature geneFeature = util.getAncestorGene(feature, ofType);
+        util.getDescendants(geneFeature, ofType, false);
+        
+        return util.getPolypeptideProperties(feature, geneFeature);
+        
+        
+    }
+    
+    
 }

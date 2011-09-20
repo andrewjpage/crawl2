@@ -144,7 +144,7 @@
 
   <select id="sequenceTrimmed" resultType="org.genedb.crawl.model.Sequence">
         SELECT 
-            substring (residues from ${start} for (${end} - ${start})) as dna, 
+            substring (residues from (${start} +1) for (${end} - ${start})) as dna, 
             seqlen as length, 
             organism_id,
             '${start}' as start,

@@ -101,7 +101,7 @@ public class SamController extends BaseQueryController {
 			@RequestParam("organism") String organism) throws CrawlException {
 
 		List<Alignment> matchedAlignments = new ArrayList<Alignment>();
-		Organism mappedOrganism = getOrganism(organismsMapper, organism);
+		Organism mappedOrganism = util.getOrganism(organism);
 		if (mappedOrganism != null) {
 			matchedAlignments = sam.listfororganism(mappedOrganism.common_name);
 		}
