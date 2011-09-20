@@ -142,6 +142,7 @@
             fl.fmax as fmax, 
             fl.phase as phase, 
             fl.strand as strand,
+            c.name as regionType,
             
             exists(
                 select type_id from featureprop sfp 
@@ -158,26 +159,7 @@
     
     <select id="coordinates" resultMap="coordinates" >
         <include refid="coordinateSelector" /> WHERE <include refid="featureSelector"/>  
-        
-       <!--  SELECT 
-            sf.uniquename AS region, 
-            f.uniquename AS uniqueName, 
-            f.name as name, 
-            sfp.value as toplevel, 
-            fl.fmin as fmin, 
-            fl.fmax as fmax, 
-            fl.phase as phase, 
-            fl.strand as strand
-          FROM feature f
-          JOIN featureloc fl ON f.feature_id = fl.feature_id 
-          JOIN feature sf ON fl.srcfeature_id = sf.feature_id
-          LEFT OUTER JOIN featureprop sfp on sf.feature_id = sfp.feature_id and sfp.type_id = 
-              (select cvterm_id from cvterm join cv using (cv_id) where cv.name = 'genedb_misc' and cvterm.name = 'top_level_seq')
-          
-        WHERE <include refid="featureSelector"/> 
-        -->
-  
-  </select>
+    </select>
   
     <resultMap id="coordinates" type="org.genedb.crawl.model.Coordinates">
        <result property="region" column="region"/> 
@@ -185,6 +167,9 @@
        <result property="fmax" column="fmax"/> 
        <result property="strand" column="strand"/>
        <result property="toplevel" column="toplevel"/>  
+       <association property="regionType" javaType="org.genedb.crawl.model.Cvterm">
+			<result column="regionType" property="name" />
+		</association>
     </resultMap>
     
     <select id="synonyms" resultType="org.genedb.crawl.model.Synonym" >
