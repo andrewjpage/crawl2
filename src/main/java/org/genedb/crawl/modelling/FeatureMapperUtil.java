@@ -201,8 +201,10 @@ public class FeatureMapperUtil {
             Coordinates coordinates = exon.coordinates.get(0);
             String dnaString = regionsMapper.sequenceTrimmed(coordinates.region, coordinates.fmin, coordinates.fmax).dna;
             
-            if (coordinates.strand < 0)
-                dnaString = Bases.reverseComplement(dnaString);
+            // if (coordinates.strand < 0)
+            //                 dnaString = Bases.reverseComplement(dnaString);
+            
+            logger.info(String.format(">%s (%s) %d-%d \n%s", exon.uniqueName, coordinates.region, coordinates.fmin, coordinates.fmax, dnaString));
             
             sequence.append(dnaString);
         }
@@ -215,14 +217,27 @@ public class FeatureMapperUtil {
             throw new RuntimeException("Could not find transcript");
 
         List<Feature> exons = getExons(transcript);
+        
+        Feature firstExon = exons.get(0);
+        if (firstExon == null)
+            throw new RuntimeException("Could not find exon");
+        
         String exonSequence = getExonSequence(exons);
-
-        String phase = exons.get(0).coordinates.get(0).phase;
+        logger.info(String.format("transcript : %s, exonSequence : %s", transcript.uniqueName, exonSequence));
+        
+        Coordinates firstExonCoordinate = firstExon.coordinates.get(0);
+        
+        boolean isFwd = (firstExonCoordinate.strand > 0) ? true : false;
+        if (! isFwd) {
+            logger.info("reversing");
+            exonSequence = Bases.reverseComplement(exonSequence);
+            logger.info(String.format("reversed transcript : %s, exonSequence : %s", transcript.uniqueName, exonSequence));
+        }
+            
+        String phase = firstExonCoordinate.phase;
         if (phase == null)
             phase = "0";
-
-        logger.info(String.format("transcript : %s, exonSequence : %s", transcript.uniqueName, exonSequence));
-
+        
         Organism o = organismsMapper.getByID(feature.organism_id);
 
         Property translationTableProp = organismsMapper.getOrganismProp(o, "genedb_misc", "translationTable");
@@ -243,10 +258,14 @@ public class FeatureMapperUtil {
         // coordinates.fmin, coordinates.fmax).dna;
 
         String residuesString = translate(translationTable, dnaString, phase, false);
+        
+        logger.info(residuesString);
 
         SymbolTokenization proteinTokenization = ProteinTools.getTAlphabet().getTokenization("token");
         SymbolList residuesSymbolList = null;
         residuesSymbolList = new SimpleSymbolList(proteinTokenization, residuesString);
+        
+        logger.info(residuesSymbolList);
 
         if (residuesSymbolList.length() == 0) {
             throw new RuntimeException(String.format("Polypeptide feature has zero-length residues"));
