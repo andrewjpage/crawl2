@@ -1,6 +1,8 @@
 package org.genedb.crawl.modelling;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -210,13 +212,34 @@ public class FeatureMapperUtil {
         }
         return sequence.toString();
     }
+    
+    class ExonSorter implements Comparator<Feature> {
 
+        @Override
+        public int compare(Feature feature1, Feature feature2) {
+            Coordinates coordinates1 = feature1.coordinates.get(0);
+            assert(coordinates1 != null);
+            Coordinates coordinates2 = feature2.coordinates.get(0);
+            assert(coordinates2 != null);
+            
+            if (coordinates1.fmin > coordinates2.fmin)
+                return 1;
+            if (coordinates1.fmin > coordinates2.fmin)
+                return -1;
+            return 0;
+            
+        }
+        
+    }
+    
     public List<Property> getPolypeptideProperties(Feature feature, Feature hierarchyFeature) throws NumberFormatException, BioException, TranslationException {
         Feature transcript = getTranscript(feature, hierarchyFeature);
         if (transcript == null)
             throw new RuntimeException("Could not find transcript");
 
         List<Feature> exons = getExons(transcript);
+        
+        Collections.sort(exons, new ExonSorter());
         
         Feature firstExon = exons.get(0);
         if (firstExon == null)
