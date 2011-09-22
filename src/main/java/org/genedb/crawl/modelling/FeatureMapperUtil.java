@@ -119,7 +119,9 @@ public class FeatureMapperUtil {
         feature.orthologues = featureMapper.orthologues(feature);
 
     }
-
+    
+    
+    
     public Feature getAncestorGene(Feature currentFeature, List<Cvterm> ofType) {
 
         if (currentFeature.type.name.equals("gene") || currentFeature.type.name.equals("pseudogene"))
@@ -213,21 +215,22 @@ public class FeatureMapperUtil {
         return sequence.toString();
     }
     
-    class ExonSorter implements Comparator<Feature> {
+    class FeatureLocationSorter implements Comparator<Feature> {
 
         @Override
         public int compare(Feature feature1, Feature feature2) {
+            
             Coordinates coordinates1 = feature1.coordinates.get(0);
             assert(coordinates1 != null);
+            
             Coordinates coordinates2 = feature2.coordinates.get(0);
             assert(coordinates2 != null);
             
             if (coordinates1.fmin > coordinates2.fmin)
                 return 1;
-            if (coordinates1.fmin > coordinates2.fmin)
+            if (coordinates1.fmin < coordinates2.fmin)
                 return -1;
             return 0;
-            
         }
         
     }
@@ -236,10 +239,13 @@ public class FeatureMapperUtil {
         Feature transcript = getTranscript(feature, hierarchyFeature);
         if (transcript == null)
             throw new RuntimeException("Could not find transcript");
-
+        
+        //featureMapper.properties(transcript);
+        
+        
         List<Feature> exons = getExons(transcript);
         
-        Collections.sort(exons, new ExonSorter());
+        Collections.sort(exons, new FeatureLocationSorter());
         
         Feature firstExon = exons.get(0);
         if (firstExon == null)

@@ -214,6 +214,7 @@
     <select id="parents" resultMap="relationships" >
     SELECT 
             object.uniquename,
+            object.name,
             object.feature_id,
             object.organism_id,
             object_type.name as type,
@@ -225,6 +226,7 @@
     <select id="children" resultMap="relationships" >
     SELECT 
             subject.uniquename,
+            subject.name,
             subject.feature_id,
             subject.organism_id,
             subject_type.name as type,
