@@ -264,14 +264,18 @@ public class FeatureMapperUtil {
         }
             
         String phase = firstExonCoordinate.phase;
-        if (phase == null)
+        if (phase == null) 
             phase = "0";
         
         Organism o = organismsMapper.getByID(feature.organism_id);
 
         Property translationTableProp = organismsMapper.getOrganismProp(o, "genedb_misc", "translationTable");
-        int translationTable = Integer.parseInt(translationTableProp.value);
-
+        
+        int translationTable = 1;
+        if (translationTableProp != null && translationTableProp.value != null) {
+            translationTable = Integer.parseInt(translationTableProp.value);
+        }
+        
         return getPolypeptideProperties(exonSequence, Integer.parseInt(phase), translationTable);
     }
 
