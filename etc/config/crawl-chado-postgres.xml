@@ -16,6 +16,10 @@
     
     <context:property-placeholder location="classpath:project.properties" />
     
+    <context:component-scan base-package="org.genedb.crawl.dao.backend" />
+    
+    <bean id="FeatureMapperUtil" class="org.genedb.crawl.modelling.FeatureMapperUtil"  />
+    
     <!-- <context:component-scan base-package="org.genedb.crawl.business.postgres" />  -->
     
     <!-- DataSource Property -->

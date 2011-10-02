@@ -1,11 +1,8 @@
 package org.genedb.crawl.controller;
 
-import java.beans.PropertyEditorSupport;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -16,18 +13,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.genedb.crawl.mappers.OrganismsMapper;
-import org.genedb.crawl.mappers.TermsMapper;
 import org.genedb.crawl.model.Argument;
-import org.genedb.crawl.model.Cv;
-import org.genedb.crawl.model.Cvterm;
-import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Resource;
 import org.genedb.crawl.model.Service;
-import org.genedb.crawl.modelling.FeatureMapperUtil;
 import org.genedb.crawl.annotations.ResourceDescription;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
+import org.genedb.crawl.controller.editor.DatePropertyEditor;
+import org.genedb.crawl.controller.editor.ListSplittingPropertyEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,94 +27,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ValueConstants;
 
 
-public abstract class BaseQueryController {
+public abstract class BaseController {
 	
-	private Logger logger = Logger.getLogger(BaseQueryController.class);
+	private Logger logger = Logger.getLogger(BaseController.class);
 	
-	@Autowired
-    public FeatureMapperUtil util;
-	
-	class ListSplittingPropertyEditor extends PropertyEditorSupport {
-		
-		@Override
-		public void setAsText(String text) {
-//			logger.info("setAsText");
-//			logger.info(text);
-			
-			List<String> list = Arrays.asList(text.split(","));
-			
-			this.setValue(list);
-			
-//			logger.info("value??");
-//			logger.info(this.getValue());
-		}
-		
-		
-		@Override
-		public String getAsText() {
-			
-			@SuppressWarnings("unchecked")
-			List<String> list = (List<String>) this.getValue();
-			String str = StringUtils.arrayToCommaDelimitedString(list.toArray());
-			// logger.info(str);
-			return str;
-		}
-	}
-	
-	class DatePropertyEditor extends PropertyEditorSupport {
-		
-		
-		final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		
-		@Override
-		public void setAsText(String text) {
-			
-			try {
-				Date date = df.parse(text);
-				this.setValue(date);
-			} catch (ParseException e) {
-				throw new RuntimeException(e);
-			}
-			
-		}
-		
-		@Override
-		public String getAsText() {
-			Date date = (Date) this.getValue();
-			return df.format(date);
-		}
-	}
 	
 	@InitBinder
     public void initBinder(WebDataBinder binder) {
 		// we might be able to use this to split lists...
 		binder.registerCustomEditor(List.class, new ListSplittingPropertyEditor());
 		binder.registerCustomEditor(Date.class, new DatePropertyEditor());
-	}
-	
-	private Map<String, String> relationshipTypes;
-	
-	@javax.annotation.Resource() 
-	public void setRelationshipTypes(Map<String, String> relationshipTypes) {
-		this.relationshipTypes = relationshipTypes;
-	}
-	
-	protected List<Cvterm> getRelationshipTypes(List<String> types, TermsMapper termsMapper) {
-		List<Cvterm> terms = new ArrayList<Cvterm>();
-		for (String type : types) {
-			if (relationshipTypes.containsKey(type)) {
-				
-				Cvterm cvterm = new Cvterm();
-				cvterm.name = type;
-				cvterm.cv = new Cv();
-				cvterm.cv.name = relationshipTypes.get(type);
-				
-				cvterm.cvterm_id = termsMapper.getCvtermID(cvterm.cv.name, cvterm.name);
-				
-				terms.add(cvterm);
-			}
-		}
-		return terms;
 	}
 	
 	
@@ -135,7 +48,7 @@ public abstract class BaseQueryController {
 		
 		Service service = new Service();
 		
-		Class<? extends BaseQueryController> cls = getClass();
+		Class<? extends BaseController> cls = getClass();
 		
 		
 		RequestMapping requestMapping = cls.getAnnotation(RequestMapping.class);
@@ -240,15 +153,15 @@ public abstract class BaseQueryController {
 		return service;
 	}
 	
-	protected String[] mergeArrays(String[][] tomerge) {
-		Set<String> merged = new HashSet<String>();
-		for (String[] array : tomerge) {
-			if (array != null) {
-				merged.addAll(Arrays.asList(array));
-			}
-		}
-		return merged.toArray(new String[]{});
-	}
+//	private String[] mergeArrays(String[][] tomerge) {
+//		Set<String> merged = new HashSet<String>();
+//		for (String[] array : tomerge) {
+//			if (array != null) {
+//				merged.addAll(Arrays.asList(array));
+//			}
+//		}
+//		return merged.toArray(new String[]{});
+//	}
 	
 	private Argument getOrCreateArgument(Map<Integer, Argument> arguments, int index) {
 		if (! arguments.containsKey(index)) {
@@ -257,35 +170,6 @@ public abstract class BaseQueryController {
 		return arguments.get(index);
 	}
 	
-//	protected Organism getOrganism(OrganismsMapper organisms, String organism) {
-//		Organism mappedOrganism = null;
-//		
-//		if (organism.contains(":")) {
-//			String[] split = organism.split(":");
-//			
-//			if (split.length == 2) {
-//					
-//				String prefix = split[0];
-//				String orgDescriptor = split[1];
-//				
-//				if (prefix.equals("com")) {
-//					mappedOrganism = organisms.getByCommonName(orgDescriptor);
-//				} else if (prefix.equals("tax")) {
-//					mappedOrganism = organisms.getByTaxonID(orgDescriptor);
-//				} else if (prefix.equals("org")) {
-//					mappedOrganism = organisms.getByID(Integer.parseInt(orgDescriptor));
-//				}
-//				
-//			}
-//			
-//		} else {
-//			
-//			mappedOrganism = organisms.getByCommonName(organism);
-//			
-//		}
-//		
-//		return mappedOrganism;
-//	}
 	
 	
 }

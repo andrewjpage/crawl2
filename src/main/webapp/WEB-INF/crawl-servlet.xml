@@ -25,8 +25,8 @@
 	<context:property-placeholder location="classpath:project.properties" />
 
 	<import resource="crawl-repository.xml" />
-
 	<context:component-scan base-package="org.genedb.crawl.controller" />
+	<!-- <import resource="crawl-controller.xml" /> -->
 
 	<bean class="org.genedb.crawl.view.CrawlMappingExceptionResolver">
 		<property name="defaultErrorView" value="suffix" />
@@ -52,7 +52,7 @@
 		</property>
 	</bean>
 	
-	<bean id="FeatureMapperUtil" class="org.genedb.crawl.modelling.FeatureMapperUtil"  />
+	
 	
 	<bean class="org.genedb.crawl.view.CrawlViewResolver">
 		<property name="order" value="1" />
@@ -76,21 +76,22 @@
     <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
     
-    <jaxws:endpoint 
+     <!-- <jaxws:endpoint 
       id="organismsControllerBean" 
       implementor="#organismsController" 
-      address="/organisms" />
+      address="/organisms" /> -->
     
-    <jaxws:endpoint 
+     <jaxws:endpoint 
       id="featuresControllerBean" 
       implementor="#featuresController" 
-      address="/features" />
+      address="/features" /> 
       
       <jaxws:endpoint 
       id="featureControllerBean" 
       implementor="#featureController" 
       address="/feature" />
-    
+      
+    <!-- 
     <jaxws:endpoint 
       id="regionsControllerBean" 
       implementor="#regionsController" 
@@ -105,7 +106,7 @@
       id="samsControllerBean" 
       implementor="#samController" 
       address="/sams" />
-
+ -->
 
     
     

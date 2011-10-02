@@ -8,6 +8,7 @@ import java.io.Writer;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -69,6 +70,13 @@ public class JsonIzer {
 		}
 		
 		return object;
+	}
+	
+	public JsonParser getParser(String json) throws JsonParseException, IOException {
+	    
+	    //JsonFactory jFact = mapper.getJsonFactory();
+	    JsonFactory jFact = new JsonFactory();
+	    return jFact.createJsonParser(json);
 	}
 	
 	public Object fromJson(String string, @SuppressWarnings("rawtypes") Class cls) throws JsonParseException, JsonMappingException, IOException {

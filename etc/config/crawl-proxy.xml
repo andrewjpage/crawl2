@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:security="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd"
+
+    default-init-method="postConstruction">
+    
+    <bean id="proxies" class="org.genedb.crawl.dao.proxy.Proxies" >
+        <property name="resources" value="${resource.resources}" />
+    </bean>
+    
+    <bean id="daoInvocationHandler" class="org.genedb.crawl.dao.proxy.DAOInvocationHandler" />
+    
+    <bean id="daoFactory" class="org.genedb.crawl.dao.proxy.DAOFactory">
+        <property name="invocationHandler" ref="daoInvocationHandler" />
+    </bean>
+    
+    <!-- The DAOs below are constructed by the factory above -->
+    
+    <bean id="featureDAO" factory-bean="daoFactory" factory-method="getProxy">
+        <constructor-arg type="java.lang.Class" value="org.genedb.crawl.dao.FeatureDAO" />
+    </bean>
+    
+    <bean id="featuresDAO" factory-bean="daoFactory" factory-method="getProxy">
+        <constructor-arg type="java.lang.Class" value="org.genedb.crawl.dao.FeaturesDAO" />
+    </bean>
+    
+    <bean id="organismsDAO" factory-bean="daoFactory" factory-method="getProxy">
+        <constructor-arg type="java.lang.Class" value="org.genedb.crawl.dao.OrganismsDAO" />
+    </bean>
+    
+    <bean id="regionsDAO" factory-bean="daoFactory" factory-method="getProxy">
+        <constructor-arg type="java.lang.Class" value="org.genedb.crawl.dao.RegionsDAO" />
+    </bean>
+    
+    <bean id="samDAO" factory-bean="daoFactory" factory-method="getProxy">
+        <constructor-arg type="java.lang.Class" value="org.genedb.crawl.dao.SamDAO" />
+    </bean>
+    
+    <bean id="termsDAO" factory-bean="daoFactory" factory-method="getProxy">
+        <constructor-arg type="java.lang.Class" value="org.genedb.crawl.dao.TermsDAO" />
+    </bean>
+    
+    <bean id="variantDAO" factory-bean="daoFactory" factory-method="getProxy">
+        <constructor-arg type="java.lang.Class" value="org.genedb.crawl.dao.VariantDAO" />
+    </bean>
+    
+    <!-- <context:component-scan base-package="org.genedb.crawl.dao.proxy" /> -->
+    
+</beans>

@@ -31,7 +31,7 @@ public class ClientTest extends TestCase {
 		
 		try {
 			
-			List<Organism> organisms = client.request(Organism.class, "organisms", "list");
+			List<Organism> organisms = client.request(List.class, "organisms", "list", null);
 			
 			for (Organism o : organisms) {
 				logger.info(o.common_name);
@@ -54,7 +54,7 @@ public class ClientTest extends TestCase {
 			parameters.put("start", new String[] {"100"});
 			parameters.put("end", new String[] {"10000"});
 			
-			List<LocatedFeature> features = client.request(LocatedFeature.class, "regions", "locations", parameters);
+			List<LocatedFeature> features = client.request(List.class, "regions", "locations", parameters);
 			
 			for (LocatedFeature o : features) {
 				logger.info(o.uniqueName);
