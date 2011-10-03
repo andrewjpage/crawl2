@@ -14,6 +14,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
+import org.codehaus.jackson.type.JavaType;
 import org.codehaus.jackson.type.TypeReference;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 
@@ -95,6 +96,11 @@ public class JsonIzer {
 		Object obj = mapper.readValue(string, type);
 		return obj;
 	}
+	
+	public Object fromJson(String string, JavaType type) throws JsonParseException, JsonMappingException, IOException {
+        Object obj = mapper.readValue(string, type);
+        return obj;
+    }
 	
 	/*
 	 * This method can be used to load up files that are plain lists. It has been used like this :

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.type.JavaType;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.client.CrawlClient;
 import org.springframework.util.Assert;
@@ -29,7 +30,7 @@ public class Proxies {
         Proxies.resources = resources;
     }
     
-    public static <T extends Object> T proxyRequest(Class<T> cls) throws CrawlException {
+    public static <T extends Object> T proxyRequest(JavaType type) throws CrawlException {
         
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
         Assert.isInstanceOf(ServletRequestAttributes.class, attrs);
@@ -59,9 +60,9 @@ public class Proxies {
             
             try {
                 
-                T result = client.request(cls, resource, method, parameters);
+                T result = client.request(type, resource, method, parameters);
                 if (result != null) {
-                    logger.info(cls + " -- " + result.getClass());
+                    logger.info(type + " -- " + result.getClass());
                     logger.info("found result, returning");
                     return result;
                 }

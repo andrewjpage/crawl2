@@ -22,6 +22,8 @@ import org.genedb.crawl.model.*;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.type.TypeFactory;
+import org.codehaus.jackson.type.JavaType;
+import org.codehaus.jackson.type.TypeReference;
 import org.genedb.crawl.json.JsonIzer;
 
 @SuppressWarnings("unused")
@@ -47,12 +49,27 @@ public class CrawlClient {
             Map<String, String[]> parameters) throws IOException, CrawlException {
 	    
 	    String result = this.result(resource, method, parameters);
-	    logger.info(result);
+	    //logger.info(result);
 	    T object = (T) jsonIzer.fromJson(result, cls);
 	    
 	    return object;
 	    
 	}
+	
+	
+	public <T extends Object> T request(
+            JavaType type,
+            String resource, 
+            String method,
+            Map<String, String[]> parameters) throws IOException, CrawlException {
+        
+        String result = this.result(resource, method, parameters);
+        //logger.info(result);
+        T object = (T) jsonIzer.fromJson(result, type);
+        
+        return object;
+        
+    }
 	
 //	public <T extends Object> List<T> request(
 //			Class<T> cls,

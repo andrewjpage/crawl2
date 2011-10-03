@@ -5,6 +5,7 @@ import java.util.List;
 import javax.jws.WebService;
 
 import org.genedb.crawl.CrawlException;
+import org.genedb.crawl.annotations.ListType;
 import org.genedb.crawl.annotations.ResourceDescription;
 import org.genedb.crawl.dao.OrganismsDAO;
 
