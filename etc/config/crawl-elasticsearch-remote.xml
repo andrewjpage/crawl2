@@ -16,8 +16,10 @@
     
     
     <context:property-placeholder location="classpath:project.properties" />
+    <context:component-scan base-package="org.genedb.crawl.dao.backend" />
+    <context:component-scan base-package="org.genedb.crawl.elasticsearch.mappers" />
     
-    <context:component-scan base-package="org.genedb.crawl.elasticsearch.mappers" />    
+    <bean id="FeatureMapperUtil" class="org.genedb.crawl.modelling.FeatureMapperUtil"  />    
     
     <bean id="connection" class="org.genedb.crawl.elasticsearch.TransportConnection">
         <property name="host" value="${resource.elasticsearch.address.host}" />
