@@ -121,8 +121,8 @@ public class RegionsDAO extends BaseDAO implements org.genedb.crawl.dao.RegionsD
         int actualEnd = end;
         
         LocationBoundaries expandedBoundaries = regionsMapper.locationsMinAndMaxBoundaries(region, start, end, exclude, new ArrayList<String>(boundaryTypes));
-        logger.debug(expandedBoundaries.start);
-        logger.debug(expandedBoundaries.end);
+        // logger.debug(expandedBoundaries.start);
+        // logger.debug(expandedBoundaries.end);
         if (expandedBoundaries != null) {
             if (expandedBoundaries.start != null && expandedBoundaries.start < start) {
                 actualStart = expandedBoundaries.start;
