@@ -38,7 +38,7 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 	private Logger logger = Logger.getLogger(ElasticSearchFeatureMapper.class);
 	
 	@Override
-	public Feature get(String uniqueName, String name, Integer organism_id) {
+	public Feature get(String uniqueName, String name, Integer organism_id, String type) {
 		
 	    BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
 	    
@@ -50,6 +50,10 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 	    
 	    if (name != null) {
             booleanQuery.must(QueryBuilders.fieldQuery("name",escape( name)));
+        }
+	    
+	    if (type != null) {
+            booleanQuery.must(QueryBuilders.fieldQuery("type.name", escape(type)));
         }
 	    
 	    List<LocatedFeature> features = (List<LocatedFeature>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, LocatedFeature.class);
@@ -291,46 +295,46 @@ public class ElasticSearchFeatureMapper extends ElasticSearchBaseMapper implemen
 	}
 	
 
-	@Override
-	public LocatedFeature getOfType(String uniqueName, Integer organism_id,
-			String name, String type) {
-		
-	    BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
-        
-        booleanQuery.must(QueryBuilders.fieldQuery("uniqueName", escape(uniqueName)));
-        
-        if (type != null) {
-            booleanQuery.must(QueryBuilders.fieldQuery("type.name", escape(type)));
-        }
-	    
-	    if (organism_id != null) {
-            booleanQuery.must(QueryBuilders.fieldQuery("organism_id", organism_id));
-        }
-        
-        if (name != null) {
-            booleanQuery.must(QueryBuilders.fieldQuery("name", escape(name)));
-        }
-        
-        List features = null; 
-        
-        if (type != null) {
-            if (type.equals("gene")) {
-                features = (List<Gene>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, Gene.class);
-            } else if (type.equals("mRNA")) {
-                features = (List<Transcript>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, Transcript.class);
-            } else if (type.equals("exon")) {
-                features = (List<Exon>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, Exon.class);
-            } else {
-                features = (List<LocatedFeature>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, LocatedFeature.class);
-            }
-        } else {
-            features = (List<LocatedFeature>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, LocatedFeature.class);
-        }
-        
-        
-        
-        return (LocatedFeature) features.get(0);
-	}
+//	@Override
+//	public LocatedFeature getOfType(String uniqueName, Integer organism_id,
+//			String name, String type) {
+//		
+//	    BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
+//        
+//        booleanQuery.must(QueryBuilders.fieldQuery("uniqueName", escape(uniqueName)));
+//        
+//        if (type != null) {
+//            booleanQuery.must(QueryBuilders.fieldQuery("type.name", escape(type)));
+//        }
+//	    
+//	    if (organism_id != null) {
+//            booleanQuery.must(QueryBuilders.fieldQuery("organism_id", organism_id));
+//        }
+//        
+//        if (name != null) {
+//            booleanQuery.must(QueryBuilders.fieldQuery("name", escape(name)));
+//        }
+//        
+//        List features = null; 
+//        
+//        if (type != null) {
+//            if (type.equals("gene")) {
+//                features = (List<Gene>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, Gene.class);
+//            } else if (type.equals("mRNA")) {
+//                features = (List<Transcript>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, Transcript.class);
+//            } else if (type.equals("exon")) {
+//                features = (List<Exon>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, Exon.class);
+//            } else {
+//                features = (List<LocatedFeature>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, LocatedFeature.class);
+//            }
+//        } else {
+//            features = (List<LocatedFeature>) getAllMatches(connection.getIndex(), connection.getFeatureType(), booleanQuery, LocatedFeature.class);
+//        }
+//        
+//        
+//        
+//        return (LocatedFeature) features.get(0);
+//	}
 
     @Override
     public List<Synonym> synonyms(Feature feature) {

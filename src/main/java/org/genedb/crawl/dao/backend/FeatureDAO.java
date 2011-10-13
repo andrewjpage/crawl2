@@ -3,6 +3,7 @@ package org.genedb.crawl.dao.backend;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.biojava.bio.BioException;
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.mappers.FeatureMapper;
@@ -10,19 +11,21 @@ import org.genedb.crawl.mappers.FeaturesMapper;
 import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.mappers.TermsMapper;
-import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
 import org.genedb.crawl.model.Dbxref;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.model.Property;
+import org.genedb.crawl.model.Synonym;
 import org.genedb.util.TranslationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureDAO {
+    
+    private static Logger logger = Logger.getLogger(FeatureDAO.class);
     
     @Autowired
     public FeaturesMapper  featuresMapper;
@@ -45,7 +48,7 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
      * @see org.genedb.crawl.controller.FeatureControllerInterface#getInfo(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public LocatedFeature getInfo(
+    public Feature get(
             String uniqueName, 
             String organism, 
             String name,
@@ -59,7 +62,7 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
                 organism_id = o.ID;
         }
         
-        LocatedFeature resultFeature = featureMapper.getOfType(uniqueName, organism_id, name, type);
+        Feature resultFeature = featureMapper.get(uniqueName, name, organism_id, type);
         
         summarise(resultFeature);
         
@@ -86,18 +89,20 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
         feature.coordinates = featureMapper.coordinates(feature);
         
         // TODO - this might need to be fixed to work with non-LocatedFeature instances
-        if (feature instanceof LocatedFeature 
-                && feature.coordinates != null 
-                && feature.coordinates.size() > 0) {
-            LocatedFeature locatedFeature = (LocatedFeature) feature;
-            Coordinates c = locatedFeature.coordinates.get(0);
-            locatedFeature.fmin = c.fmin;
-            locatedFeature.fmax = c.fmax;
-            locatedFeature.region = c.region;
-            locatedFeature.phase = c.phase;
-            locatedFeature.strand = c.strand;
-            
-        }
+//        if (feature instanceof LocatedFeature 
+//                && feature.coordinates != null 
+//                && feature.coordinates.size() > 0) {
+//            LocatedFeature locatedFeature = (LocatedFeature) feature;
+//            Coordinates c = locatedFeature.coordinates.get(0);
+//            locatedFeature.fmin = c.fmin;
+//            locatedFeature.fmax = c.fmax;
+//            locatedFeature.region = c.region;
+//            locatedFeature.phase = c.phase;
+//            locatedFeature.strand = c.strand;
+//            
+//            feature = LocatedFeatureUtil.fromFeature(feature);
+//            
+//        }
         
         feature.properties = featureMapper.properties(feature);
         feature.terms = featureMapper.terms(feature);
@@ -107,6 +112,7 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
         feature.domains = featureMapper.domains(feature);
         feature.orthologues = featureMapper.orthologues(feature);
         
+        logger.info(String.format("summarising feature %s, last modified %s, last accessioned %s", feature.uniqueName , feature.timeaccessioned, feature.timelastmodified));
     }
     
     
@@ -231,6 +237,19 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
         return util.getPolypeptideProperties(feature, geneFeature);
         
         
+    }
+
+    @Override
+    public List<Synonym> synonyms(String featureUniqueName, String organism, String name) {
+        Feature feature = util.getFeature(featureUniqueName, name, organism);
+        return featureMapper.synonyms(feature);
+    }
+
+    @Override
+    public Feature getIsoform(String featureUniqueName, String organism, String name) {
+        Feature feature = util.getFeature(featureUniqueName, name, organism);
+        List<Cvterm> ofType = getRelationshipTypes(Arrays.asList(defaultRelationshipTypes), terms);
+        return util.getIsoform(feature, ofType);
     }
     
 }

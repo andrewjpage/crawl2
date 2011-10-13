@@ -12,35 +12,38 @@
             organism_id, 
             uniqueName,
             f.name,
-            type.name as type 
+            type.name as type,
+            f.timelastmodified,
+            f.timeaccessioned
         FROM feature f
-        JOIN cvterm type ON type.cvterm_id = f.type_id 
+        JOIN cvterm type ON type.cvterm_id = f.type_id <if test="type != null"> and type.name = #{type} </if> 
         WHERE <include refid="featureSelector"/>
     </select>
     
-    <!-- 
     
-     -->
-    <select id="getOfType" resultMap="typedFeatureResult" >
+   <!--  <select id="getOfType" resultMap="typedFeatureResult" >
         SELECT 
             feature_id, 
             organism_id, 
             uniqueName,
             f.name,
-            type.name as type 
+            type.name as type,
+            f.timelastmodified,
+            f.timeaccessioned
         FROM feature f
         JOIN cvterm type ON type.cvterm_id = f.type_id <if test="type != null"> and type.name = #{type} </if> 
         WHERE <include refid="featureSelector"/> 
     </select>
     
-    <resultMap type="org.genedb.crawl.model.LocatedFeature"
-    	id="typedFeatureResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult">
+    <resultMap type="org.genedb.crawl.model.Feature"
+    	id="typedFeatureResult" 
+    	extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult">
     	
-    	<!-- if none of the types are found by this discriminator, the resultmap 
+    	if none of the types are found by this discriminator, the resultmap 
     	defined outside of the discriminator block will be returned instead 
     	as this resultMap inherits from basicFeatureResult, 
     	this will be whatever is contained in basicFeatureResult
-    	-->
+    	
     	<discriminator column="type" javaType="String" >
     	   <case value="gene" resultMap="geneResult" />
     	   <case value="exon" resultMap="exonResult" />
@@ -51,7 +54,7 @@
 
     <resultMap type="org.genedb.crawl.model.Gene" id="geneResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap>
     <resultMap type="org.genedb.crawl.model.Transcript" id="transcriptResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap>
-    <resultMap type="org.genedb.crawl.model.Exon" id="exonResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap> 
+    <resultMap type="org.genedb.crawl.model.Exon" id="exonResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap>  -->
     
     
     <select id="properties"  resultMap="properties" parameterType="org.genedb.crawl.model.Feature" >
@@ -218,6 +221,8 @@
             object.feature_id,
             object.organism_id,
             object_type.name as type,
+            object.timelastmodified,
+            object.timeaccessioned,
             <include refid="relationships"/>
             
         WHERE subject.uniquename = #{feature.uniqueName}  
@@ -230,6 +235,8 @@
             subject.feature_id,
             subject.organism_id,
             subject_type.name as type,
+            object.timelastmodified,
+            object.timeaccessioned,
             <include refid="relationships"/>
             
         WHERE object.uniquename = #{feature.uniqueName}  

@@ -15,6 +15,7 @@ import org.elasticsearch.client.Client;
 import org.genedb.crawl.bam.BioDataFileStore;
 import org.genedb.crawl.bam.BioDataFileStoreInitializer;
 import org.genedb.crawl.controller.VariantController;
+import org.genedb.crawl.dao.backend.VariantDAO;
 import org.genedb.crawl.elasticsearch.Connection;
 import org.genedb.crawl.elasticsearch.index.gff.GFFIndexBuilder;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
@@ -259,7 +260,7 @@ public class VariantTest extends TestCase {
 		//String sequence = region;
 		
 //		Sequence regionSequence = regionsMapper.sequence(sequence);
-		List<LocatedFeature> features = VariantController.getExons(region, start, end, regionsMapper, featureMapper);
+		List<LocatedFeature> features = VariantDAO.getExons(region, start, end, regionsMapper, featureMapper);
 		
 //		
 		for (LocatedFeature f : features) {

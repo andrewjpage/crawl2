@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.genedb.crawl.elasticsearch.index.NonDatabaseDataSourceIndexBuilder;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
+import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
 import org.kohsuke.args4j.Option;
@@ -19,7 +20,6 @@ import uk.ac.ebi.das.jdas.adapters.features.FeatureAdapter;
 import uk.ac.ebi.das.jdas.exceptions.ValidationException;
 import uk.ac.ebi.das.jdas.schema.entryPoints.SEGMENT;
 
-import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.Property;
 import org.genedb.crawl.modelling.RegionFeatureBuilder;
 

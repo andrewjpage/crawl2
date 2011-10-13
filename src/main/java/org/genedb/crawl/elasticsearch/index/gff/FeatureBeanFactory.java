@@ -260,8 +260,7 @@ public class FeatureBeanFactory {
 					
 					try {
 						SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss z");
-						Date date;
-						date = df.parse(stringValue);
+						Date date = df.parse(stringValue);
 						feature.timelastmodified = date;
 					} catch (ParseException e) {
 						logger.error("Could not parse date : " + stringValue);

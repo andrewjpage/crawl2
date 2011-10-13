@@ -203,7 +203,7 @@ public class SQLIndexer {
 		
 		regions.add(region);
 		
-		Feature f = featureMapper.get(region, null, null);
+		Feature f = featureMapper.get(region, null, null, null);
 		
 		if (f != null) {
 			

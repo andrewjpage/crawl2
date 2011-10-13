@@ -12,6 +12,7 @@ import org.genedb.crawl.dao.FeatureDAO;
 import org.genedb.crawl.model.Dbxref;
 import org.genedb.crawl.model.Feature;
 import org.genedb.crawl.model.Property;
+import org.genedb.crawl.model.Synonym;
 
 import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.util.TranslationException;
@@ -34,19 +35,19 @@ public class FeatureController extends BaseController implements FeatureDAO {
     @Override
     @ResourceDescription("Return a gene's information")
     @RequestMapping(method=RequestMethod.GET, value="/info") 
-    public LocatedFeature getInfo(
+    public Feature get(
             @RequestParam("uniqueName") String uniqueName, 
             @RequestParam(value="organism",required=false) String organism, 
             @RequestParam(value="name",required=false) String name,
             @RequestParam(value="type",required=false) String type) {
-        return dao.getInfo(uniqueName, organism, name, type);
+        return dao.get(uniqueName, organism, name, type);
     }
     
     @Override
     @ResourceDescription("Return feature dbxrefs")
     @RequestMapping(method=RequestMethod.GET, value="/dbxrefs")
     public List<Dbxref> dbxrefs(
-            @RequestParam(value="feature") String featureUniqueName, 
+            @RequestParam(value="uniqueName") String featureUniqueName, 
             @RequestParam(value="organism",required=false) String organism, 
             @RequestParam(value="name",required=false) String name) {
         return dao.dbxrefs(featureUniqueName, organism, name);
@@ -56,7 +57,7 @@ public class FeatureController extends BaseController implements FeatureDAO {
     @Override
     @RequestMapping(method=RequestMethod.GET, value="/parents")
     public List<Feature> parents( 
-            @RequestParam("feature") String featureUniqueName, 
+            @RequestParam("uniqueName") String featureUniqueName, 
             @RequestParam(value="organism",required=false) String organism, 
             @RequestParam(value="name",required=false) String name,
             @RequestParam(value="relationships", required=false) String[] relationships) throws CrawlException {
@@ -66,7 +67,7 @@ public class FeatureController extends BaseController implements FeatureDAO {
     @Override
     @RequestMapping(method=RequestMethod.GET, value="/children")
     public List<Feature> children( 
-            @RequestParam("feature") String featureUniqueName, 
+            @RequestParam("uniqueName") String featureUniqueName, 
             @RequestParam(value="organism",required=false) String organism, 
             @RequestParam(value="name",required=false) String name,
             @RequestParam(value="relationships", required=false) String[] relationships) throws CrawlException {
@@ -90,14 +91,14 @@ public class FeatureController extends BaseController implements FeatureDAO {
     @Override
     @ResourceDescription("Return features located on features")
     @RequestMapping(method=RequestMethod.GET, value="/locations")
-    public List<LocatedFeature> locations(@RequestParam("feature") String  feature ) {
+    public List<LocatedFeature> locations(@RequestParam("uniqueName") String  feature ) {
         return dao.locations(feature);
     }
     
     @Override
     @RequestMapping(method=RequestMethod.GET, value="/domains")
     public List<LocatedFeature> domains(
-            @RequestParam("feature") String featureUniqueName, 
+            @RequestParam("uniqueName") String featureUniqueName, 
             @RequestParam(value="organism",required=false) String organism, 
             @RequestParam(value="name",required=false) String name) {
         return dao.domains(featureUniqueName, organism, name);
@@ -108,10 +109,30 @@ public class FeatureController extends BaseController implements FeatureDAO {
     @ResourceDescription("Return feature dbxrefs")
     @RequestMapping(method = RequestMethod.GET, value = "/polypeptide_properties")
     public List<Property> getPolypeptideProperties(
-            @RequestParam(value = "feature") String featureUniqueName, 
+            @RequestParam(value = "uniqueName") String featureUniqueName, 
             @RequestParam(value = "organism", required = false) String organism, 
             @RequestParam(value = "name", required = false) String name) throws BioException, TranslationException {
         return dao.getPolypeptideProperties(featureUniqueName, organism, name);
+    }
+
+    @Override
+    @ResourceDescription("Return feature synonyms")
+    @RequestMapping(method = RequestMethod.GET, value = "/synonyms")
+    public List<Synonym> synonyms(
+            @RequestParam("uniqueName") String uniqueName, 
+            @RequestParam(value="organism",required=false) String organism, 
+            @RequestParam(value="name",required=false) String name) {
+        return dao.synonyms(uniqueName, organism, name);
+    }
+
+    @Override
+    @ResourceDescription("Returns the isoform unique name")
+    @RequestMapping(method = RequestMethod.GET, value = "/isoform")
+    public Feature getIsoform(
+            @RequestParam("uniqueName") String uniqueName, 
+            @RequestParam(value="organism",required=false) String organism, 
+            @RequestParam(value="name",required=false) String name) {
+        return dao.getIsoform(uniqueName, organism, name);
     }
     
     

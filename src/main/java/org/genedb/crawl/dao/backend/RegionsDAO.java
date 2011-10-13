@@ -1,6 +1,7 @@
 package org.genedb.crawl.dao.backend;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -97,21 +98,22 @@ public class RegionsDAO extends BaseDAO implements org.genedb.crawl.dao.RegionsD
         
         if (types != null) {
             geneTypes.addAll(types);
+        } else {
+            geneTypes.addAll(Arrays.asList(new String[]{"gene", "pseudogene"}));
         }
         
         // boundary calculations must include genes or pseudogenes, so we clone the set
         Set<String> boundaryTypes = new HashSet<String>(geneTypes);
         
-        // let's never exclude gene or pseudogenes from boundary calculations, and always include them 
         if (exclude) {
+         // if exluding types, make sure that genes and pseudogenes are not on that list for boundary calculations
             boundaryTypes.remove("gene");
             boundaryTypes.remove("pseudogene");
         } else {
+            // conversely, if including types, then boundary calculations need genes and pseudogenes, whether or not these have been specified by the requester
             boundaryTypes.add("gene");
             boundaryTypes.add("pseudogene");
         }
-        
-        
         
         
         logger.info(String.format("%s %d-%d %s", region, start,end,exclude));

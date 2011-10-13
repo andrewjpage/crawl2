@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
+
 public class HierarchicalFeature extends Feature {
 	
 	@XmlElement(name="child")

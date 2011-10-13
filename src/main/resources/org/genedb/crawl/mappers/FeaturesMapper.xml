@@ -712,6 +712,10 @@
         <result property="feature_id" column="feature_id" />
         <result property="uniqueName" column="uniqueName" />
         <result property="name" column="name" />
+        <result property="timeaccessioned" column="timeaccessioned"
+        	javaType="java.util.Date" jdbcType="DATE" />
+        <result property="timelastmodified" column="timelastmodified" 
+            javaType="java.util.Date" jdbcType="DATE" />
         <result property="organism_id" column="organism_id" />
         <association property="type" javaType="org.genedb.crawl.model.Cvterm">
             <result property="name" column="type" />

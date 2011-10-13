@@ -91,7 +91,7 @@ public class FeaturesDAO extends BaseDAO implements org.genedb.crawl.dao.Feature
             HierarchicalFeature hf = new HierarchicalFeature();
             hf.uniqueName = feature;
             
-            Feature f = featureMapper.getOfType(feature, null, null, null);
+            Feature f = featureMapper.get(feature, null, null, null);
             hf.type = f.type.name;
             
             MapperUtil.searchForRelations(featuresMapper, hf, relationshipTypes, HierarchicalSearchType.CHILDREN);
@@ -277,7 +277,7 @@ public class FeaturesDAO extends BaseDAO implements org.genedb.crawl.dao.Feature
     @Override
     public List<Gene> transcripts(String gene, boolean exons) {
         List<Gene> l = new ArrayList<Gene>(); 
-        Gene geneFeature = (Gene) featureMapper.getOfType(gene, null, null, "gene");
+        Gene geneFeature = (Gene) featureMapper.get(gene, null, null, "gene");
         if (geneFeature != null) {
             logger.info(geneFeature.getClass());
             logger.info(geneFeature.uniqueName);

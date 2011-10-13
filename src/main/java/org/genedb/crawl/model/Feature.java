@@ -1,6 +1,5 @@
 package org.genedb.crawl.model;
 
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,10 +9,14 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.genedb.crawl.json.JsonDateSerializer;
 
 public class Feature implements Serializable {
 	
-	@XmlAttribute
+    private static final long serialVersionUID = 5345245255772822999L;
+
+    @XmlAttribute
 	public String uniqueName;
 	
 	@XmlAttribute(required=false)
@@ -21,9 +24,6 @@ public class Feature implements Serializable {
 	
 	@XmlAttribute(required=false)
 	public String residues;
-	
-//	@XmlAttribute(required=false)
-//	public Boolean topLevel;
 	
 	@XmlElement(required=false)
 	public List<String> genes;
@@ -63,23 +63,15 @@ public class Feature implements Serializable {
 	public List<Change> changes;
 	
 	@XmlElement(required=false)
+	@JsonSerialize(using=JsonDateSerializer.class)
 	public Date timelastmodified;
 	
-	public Date timelastaccessioned;
-	
 	@XmlElement(required=false)
+	@JsonSerialize(using=JsonDateSerializer.class)
+	public Date timeaccessioned;
+
+    @XmlElement(required=false)
 	public boolean isObsolete;
-	
-//	@XmlElement(required=false)
-//	public String getTimelastodified() {
-//		
-//		if (timelastmodified != null) {
-//			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-//			return df.format(timelastmodified);
-//		}
-//		
-//		return null;
-//	}
 	
 	public void addDbxref(Dbxref dbxref) {
 		if (dbxrefs == null) {
@@ -101,19 +93,6 @@ public class Feature implements Serializable {
 	
 	@XmlElement(required=false)
 	public Cvterm type;
-	
-//	@XmlElement(name="type", required=false)
-//	public String getTypeName() {
-//		if (type != null) {
-//			return type.name;
-//		}
-//		return null;
-//	}
-//	
-//	public void setTypeName(String typeName) {
-//		type = new Cvterm();
-//		type.name = typeName;
-//	}
 	
 	@XmlElement(name="relationship", required=false)
 	@XmlElementWrapper(name="relationships")

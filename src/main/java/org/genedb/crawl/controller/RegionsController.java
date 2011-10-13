@@ -60,7 +60,7 @@ public class RegionsController extends BaseController implements RegionsDAO {
 			@RequestParam("region") String region, 
 			@RequestParam(value="start",required=false) Integer start, 
 			@RequestParam(value="end", required=false) Integer end, 
-			@RequestParam(value="exclude") Boolean exclude,
+			@RequestParam(value="exclude", required=false) Boolean exclude,
 			@RequestParam(value="types", required=false) @ResourceDescription("A list of features types to exclude or include.") List<String> types
 			) throws CrawlException {
 		return dao.locations(region, start, end, exclude, types);
