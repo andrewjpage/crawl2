@@ -17,7 +17,9 @@ public abstract class Connection {
 	private static Logger logger = Logger.getLogger(Connection.class);
 
 	String index;
-	String featureType;
+	String ontologyIndex;
+
+    String featureType;
 	String regionType;
 	String organismType;
 
@@ -27,6 +29,13 @@ public abstract class Connection {
 
 	public void setIndex(String index) {
 		this.index = index;
+	}
+	
+	public String getOntologyIndex() {
+	    return ontologyIndex;
+	}
+	public void setOntologyIndex(String ontologyIndex) {
+	    this.ontologyIndex = ontologyIndex;
 	}
 
 	public String getFeatureType() {

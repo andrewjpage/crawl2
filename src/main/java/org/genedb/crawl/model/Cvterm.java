@@ -59,6 +59,17 @@ public class Cvterm implements Serializable {
 		pubs.add(pub);
 	}
 	
+	@XmlAttribute(required=false)
+	public String definition;
+	
+	@XmlElement(name="parent")
+	@XmlElementWrapper(name="parents", required=false)
+	public List<CvtermRelationship> parents;
+	
+	@XmlElement(name="child")
+	@XmlElementWrapper(name="chilren", required=false)
+	public List<CvtermRelationship> children;
+	
 	
 	
 }

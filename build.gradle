@@ -36,7 +36,7 @@ repositories {
 	
 	
 	// a local repository for jars that are not available from online ones
-	flatDir name: 'localRepository', dirs: 'lib/local'
+	flatDir name: 'localRepository', dirs: ['lib/local', 'lib/local/obo']
 	
     mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/jboss/"] 
     mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"]
@@ -123,6 +123,12 @@ dependencies {
 	compile group: 'net.sf', name: 'sam', version: '1.45', ext: 'jar'
 	compile group: 'org.sanger', name: 'artemis', version: 'v13.2.1', ext:'jar'
     compile group: 'org.biojava', name: 'biojava', version: '1.6', ext:'jar'
+    compile group: 'org.obo', name: 'obo', version: '1.0', ext:'jar'
+    compile group: 'org.obo', name: 'bbop', version: '1.0', ext:'jar'
+    
+    compile group:'jgrapht', name:'jgrapht', version: '0.7.3'
+    
+    
     
 //    compile group: 'com.hp.hpl.jena', name: 'jena', version: '2.6.4'
 //    compile group: 'edu.stanford.smi.protege', name: 'protege', version: '3.4.7'

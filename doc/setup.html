@@ -381,6 +381,16 @@ a "references" block in there. If OTOH you do supply a -r parameter, that can ei
 contain an "references" block as well. 
 </P>
 
+<h3 id="ontologies">Ontologies and controlled vocabularies</h3>
+
+<P>
+Crawl can query controlled vocabularies and ontology files in 
+OBO format. To index the gene ontology, you can do : 
+</P>
+
+<pre><code>
+    ./crawl cv2es -cv src/test/resources/cv/gene_ontology_ext.obo -pe resource-elasticsearch-local.properties -vn go -ns biological_process -ns molecular_function -ns cellular_component
+</code></pre>
 
 <h3 id="das">Indexing DAS sources</h3>
 

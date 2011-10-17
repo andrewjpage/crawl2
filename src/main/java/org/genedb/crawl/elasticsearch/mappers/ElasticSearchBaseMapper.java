@@ -308,7 +308,7 @@ public abstract class ElasticSearchBaseMapper {
 			logger.debug("Source:");
 			logger.debug(json);
 			
-			logger.info(String.format("Storing %s in index %s and type %s", key, index, type));
+			logger.info(String.format("Storing %s/%s/%s", index, type, key));
 			
 			connection
 				.getClient()
