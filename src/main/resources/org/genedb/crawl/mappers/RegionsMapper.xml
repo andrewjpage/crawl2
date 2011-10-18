@@ -4,7 +4,7 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="org.genedb.crawl.mappers.RegionsMapper">  
 
-  <!-- <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/> -->
+  <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/>
     
   
   <select id="locationsMinAndMaxBoundaries" resultType="org.genedb.crawl.model.LocationBoundaries">
