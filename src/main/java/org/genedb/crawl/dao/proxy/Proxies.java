@@ -60,7 +60,7 @@ public class Proxies {
             
             try {
                 
-                T result = client.request(type, resource, method, parameters);
+                T result = (T) client.request(type, resource, method, parameters);
                 if (result != null) {
                     logger.info(type + " -- " + result.getClass());
                     logger.info("found result, returning");
