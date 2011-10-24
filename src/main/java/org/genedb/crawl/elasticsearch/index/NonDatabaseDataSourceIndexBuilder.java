@@ -16,6 +16,7 @@ import org.genedb.crawl.elasticsearch.index.gff.GFFFileFilter;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchOrganismsMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchRegionsMapper;
+import org.genedb.crawl.elasticsearch.mappers.ElasticSearchTermsMapper;
 import org.genedb.crawl.model.Organism;
 
 public abstract class NonDatabaseDataSourceIndexBuilder extends IndexBuilder {
@@ -25,6 +26,7 @@ public abstract class NonDatabaseDataSourceIndexBuilder extends IndexBuilder {
 	protected ElasticSearchFeatureMapper featureMapper;
 	protected ElasticSearchOrganismsMapper organismsMapper;
 	protected ElasticSearchRegionsMapper regionsMapper;
+	protected ElasticSearchTermsMapper termsMapper;
 
 	public NonDatabaseDataSourceIndexBuilder() {
 		super();
@@ -41,6 +43,10 @@ public abstract class NonDatabaseDataSourceIndexBuilder extends IndexBuilder {
 		
 		regionsMapper = new ElasticSearchRegionsMapper();
 		regionsMapper.setConnection(connection);
+		
+		termsMapper = new ElasticSearchTermsMapper();
+		termsMapper.setConnection(connection);
+		
 	}
 	
 	protected void convertPath(String path, Organism organism) throws ParseException, IOException {

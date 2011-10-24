@@ -9,13 +9,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.sf.samtools.SAMSequenceRecord;
-
 import org.apache.log4j.Logger;
-import org.genedb.crawl.model.Alignment;
 import org.genedb.crawl.model.BioDataFile;
 import org.genedb.crawl.model.MappedSAMSequence;
-import org.genedb.crawl.model.Variant;
 import org.springframework.util.StringUtils;
 
 /**
@@ -137,7 +133,6 @@ public class BioDataFileStore <T extends BioDataFile> {
 			
 			if (file.organism.equals(organism)) {
 				list.add(file);
-				logger.info("added!");
 			}
 		}
 		
@@ -204,10 +199,9 @@ public class BioDataFileStore <T extends BioDataFile> {
 				continue;
 			}
 			
-			
 			for (MappedSAMSequence fileSequence : getSequences(fileID)) {
 				
-				if (sequence.equals(fileSequence.name)) {
+				if (sequence.equals(fileSequence.name) || actualSequenceName.equals(fileSequence.name)) {
 					map.put(fileID, file);
 				}
 				

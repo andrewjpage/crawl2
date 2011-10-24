@@ -13,5 +13,5 @@ public class Synonym implements Serializable {
 	public String synonymtype;
 	
 	@XmlAttribute
-	public boolean is_current;
+	public Boolean is_current;
 }

@@ -3,6 +3,7 @@ package org.genedb.crawl.model;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
+
 public class FeatureRelationship {
 	
 	@XmlAttribute

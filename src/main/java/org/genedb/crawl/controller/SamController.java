@@ -1,23 +1,18 @@
 package org.genedb.crawl.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import org.genedb.crawl.CrawlException;
 import org.genedb.crawl.annotations.ResourceDescription;
-import org.genedb.crawl.bam.BioDataFileStoreInitializer;
-import org.genedb.crawl.bam.Sam;
+import org.genedb.crawl.dao.SamDAO;
 
-import org.genedb.crawl.mappers.OrganismsMapper;
 import org.genedb.crawl.model.Alignment;
 import org.genedb.crawl.model.MappedCoverage;
 import org.genedb.crawl.model.MappedQuery;
 import org.genedb.crawl.model.MappedSAMHeader;
 import org.genedb.crawl.model.MappedSAMSequence;
-import org.genedb.crawl.model.Organism;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,34 +24,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 @ResourceDescription("Provides methods for SAM/BAM alignment querying.")
 @RequestMapping("/sams")
 @WebService(serviceName="sams")
-public class SamController extends BaseQueryController {
+public class SamController extends BaseController implements org.genedb.crawl.dao.SamDAO {
 
-	private Sam sam = new Sam();
-
-	@Autowired
-	private OrganismsMapper organismsMapper;
-
-	@Autowired
-	@WebMethod(exclude=true)
-	public void setBioDataFileStoreInitializer(
-			BioDataFileStoreInitializer initializer) {
-		sam.setAlignmentStore(initializer.getAlignments());
-	}
-
-	@RequestMapping(method = RequestMethod.GET, value = { "/header",
-			"/header.*" })
+    @Autowired
+    SamDAO dao;
+    
+    @RequestMapping(method = RequestMethod.GET, value = { "/header","/header.*" })
 	@ResourceDescription("Returns the header attributes for a SAM or BAM in the repository.")
 	public MappedSAMHeader header(@RequestParam("fileID") int fileID)
 			throws Exception {
-		return sam.header(fileID);
+        return dao.header(fileID);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = { "/sequences",
-			"/sequences.*" })
+	@RequestMapping(method = RequestMethod.GET, value = { "/sequences","/sequences.*" })
 	@ResourceDescription("Returns the sequences for a SAM or BAM in the repository.")
 	public List<MappedSAMSequence> sequences(@RequestParam("fileID") int fileID)
 			throws Exception {
-		return sam.sequence(fileID);
+		return dao.sequences(fileID);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = { "/query", "/query.*" })
@@ -70,12 +54,10 @@ public class SamController extends BaseQueryController {
 			@RequestParam(value = "filter", defaultValue = "0") int filter,
 			@RequestParam(value = "properties", required = false) String[] properties)
 			throws Exception {
-		return sam.query(fileID, sequence, start, end, contained, properties,
-				filter);
+	    return dao.query(fileID, sequence, start, end, contained, filter, properties);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = { "/coverage",
-			"/coverage.*" })
+	@RequestMapping(method = RequestMethod.GET, value = { "/coverage","/coverage.*" })
 	@ResourceDescription("Computes the coverage count for a range, windowed in steps for a SAM or BAM in the repository.")
 	public synchronized MappedCoverage coverage(
 			@RequestParam("fileID") int fileID,
@@ -85,36 +67,27 @@ public class SamController extends BaseQueryController {
 			@RequestParam("window") int window,
 			@RequestParam(value = "filter", defaultValue = "0", required = false) Integer filter)
 			throws Exception {
-		return sam.coverage(fileID, sequence, start, end, window, filter);
+	    return dao.coverage(fileID, sequence, start, end, window, filter);
 	}
 
 	@ResourceDescription("Returns a list of SAM / BAM files in the repository.")
 	@RequestMapping(method = RequestMethod.GET, value = { "/list", "/list.*" })
 	public List<Alignment> list() {
-		return sam.list();
+		return dao.list();
 	}
 
 	@ResourceDescription("Returns a list of SAM / BAM files for a particular organism.")
-	@RequestMapping(method = RequestMethod.GET, value = { "/listfororganism",
-			"/listfororganism.*" })
+	@RequestMapping(method = RequestMethod.GET, value = { "/listfororganism","/listfororganism.*" })
 	public List<Alignment> listfororganism(
 			@RequestParam("organism") String organism) throws CrawlException {
-
-		List<Alignment> matchedAlignments = new ArrayList<Alignment>();
-		Organism mappedOrganism = util.getOrganism(organism);
-		if (mappedOrganism != null) {
-			matchedAlignments = sam.listfororganism(mappedOrganism.common_name);
-		}
-		return matchedAlignments;
+	    return dao.listfororganism(organism);
 	}
 
 	@ResourceDescription("Returns a list of SAM / BAM files for a particular sequence.")
-	@RequestMapping(method = RequestMethod.GET, value = { "/listforsequence",
-			"/listforsequence.*" })
+	@RequestMapping(method = RequestMethod.GET, value = { "/listforsequence","/listforsequence.*" })
 	public List<Alignment> listforsequence(
 			@RequestParam("sequence") String sequence) throws Exception {
-		List<Alignment> matchedAlignments = sam.listforsequence(sequence);
-		return matchedAlignments;
+	    return dao.listforsequence(sequence);
 	}
 
 }

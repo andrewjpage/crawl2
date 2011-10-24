@@ -74,8 +74,8 @@
     <include refid="select_locations"/>
     
     LEFT OUTER JOIN feature_relationship fr ON f.feature_id = fr.subject_id
-    LEFT JOIN feature f2 ON fr.object_id = f2.feature_id 
-    JOIN cvterm frt ON fr.type_id = frt.cvterm_id AND frt.cvterm_id in 
+    LEFT OUTER JOIN feature f2 ON fr.object_id = f2.feature_id 
+    LEFT OUTER JOIN cvterm frt ON fr.type_id = frt.cvterm_id AND frt.cvterm_id in 
                                (select cvterm_id from cvterm where name in ('part_of', 'derives_from'))  
 	
 	LEFT OUTER JOIN featureprop fp ON fp.feature_id = f.feature_id AND fp.type_id = (SELECT cvterm_id FROM cvterm WHERE name = 'colour') 
@@ -99,11 +99,14 @@
   </select>
   
   <sql id="types_exclude_filter">
-    <if test="types != null"> AND type.name <if test="exclude == true"> NOT </if> IN 
-        <foreach item="item" index="index" collection="types" open="(" separator="," close=")"> 
-            #{item} 
-        </foreach> 
-    </if>
+    <if test="types != null">
+        <if test="types.size() > 0"> 
+            AND type.name <if test="exclude == true"> NOT </if> IN 
+	        <foreach item="item" index="index" collection="types" open="(" separator="," close=")"> 
+	            #{item} 
+	        </foreach> 
+	    </if>
+	</if>
   </sql>
   
   <resultMap type="org.genedb.crawl.model.LocatedFeature" id="locations">

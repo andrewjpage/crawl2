@@ -17,6 +17,7 @@ hput COMMANDS das2es org.genedb.crawl.elasticsearch.index.das.DASIndexBuilder
 hput COMMANDS gff2es org.genedb.crawl.elasticsearch.index.gff.GFFIndexBuilder
 hput COMMANDS org2es org.genedb.crawl.elasticsearch.index.json.OrganismIndexBuilder
 hput COMMANDS ref2es org.genedb.crawl.elasticsearch.index.json.ReferenceIndexBuilder
+hput COMMANDS cv2es org.genedb.crawl.elasticsearch.index.cv.CvIndexBuilder
 
 usage() {
 	usage_string="crawl ["

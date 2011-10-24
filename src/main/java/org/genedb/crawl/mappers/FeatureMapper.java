@@ -21,7 +21,8 @@ public interface FeatureMapper {
 	Feature get(
 		@Param("uniqueName") String uniqueName,
 		@Param("name") String name,
-		@Param("organism_id") Integer organism_id);
+		@Param("organism_id") Integer organism_id,
+		@Param("type") String type);
 	
 	List<Property> properties(Feature feature);
 	
@@ -38,11 +39,11 @@ public interface FeatureMapper {
 	
 	void delete(Feature feature);
 	
-	LocatedFeature getOfType(
-			@Param("uniqueName") String uniqueName,
-			@Param("organism_id") Integer organism_id,
-			@Param("name") String name,
-			@Param("type") String type);
+//	LocatedFeature getOfType(
+//			@Param("uniqueName") String uniqueName,
+//			@Param("organism_id") Integer organism_id,
+//			@Param("name") String name,
+//			@Param("type") String type);
 	
 	List<Transcript> transcripts(@Param("gene") Gene gene, @Param("exons") boolean exons);
 	

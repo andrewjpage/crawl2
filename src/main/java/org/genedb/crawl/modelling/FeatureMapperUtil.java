@@ -58,7 +58,7 @@ public class FeatureMapperUtil {
                 organism_id = o.ID;
         }
 
-        Feature resultFeature = featureMapper.get(uniqueName, name, organism_id);
+        Feature resultFeature = featureMapper.get(uniqueName, name, organism_id, null);
 
         return resultFeature;
     }
@@ -120,7 +120,35 @@ public class FeatureMapperUtil {
 
     }
     
-    
+    /**
+     * 
+     * An isoform is defined (in order of searching) : 
+     *   - as the parent transcript (for a multi-isoform gene), or  
+     *   - the first transcript if the requested feature is not a descendant of transcript, or  
+     *   - the gene if part of a gene model.
+     *   
+     * If nothing is found, then assume it is not part of a gene model, in which case just 
+     * return the requested feature. 
+     * 
+     * @param feature
+     * @param ofType
+     * @return
+     */
+    public Feature getIsoform(Feature feature, List<Cvterm> ofType) {
+        
+        Feature gene = this.getAncestorGene(feature, ofType);
+        
+        if (gene == null)
+            return feature;
+        
+        getDescendants(gene, ofType, false);
+        Feature transcript = getTranscript(feature, gene);
+        
+        if (transcript == null)
+            return gene;
+        
+        return transcript;
+    }
     
     public Feature getAncestorGene(Feature currentFeature, List<Cvterm> ofType) {
 
@@ -158,13 +186,21 @@ public class FeatureMapperUtil {
 
     }
 
-    public static Feature getTranscript(Feature requested, Feature hierarchyFeature) {
+    public Feature getTranscript(Feature requested, Feature hierarchyFeature) {
 
         Feature firstTranscript = null;
-
+        
+        logger.info(String.format(" -> %s (%s) ", hierarchyFeature.uniqueName, hierarchyFeature.type.name));
+        
+        Collections.sort(hierarchyFeature.children, new FeatureUniqueNameSorter());
+        
         for (Feature child : hierarchyFeature.children) {
             if (child.type.name.equals("mRNA")) {
+                
+                logger.info(String.format(" --> %s (%s) ", child.uniqueName, child.type.name));
+                
                 if (requested.uniqueName.equals(hierarchyFeature.uniqueName) || requested.uniqueName.equals(child.uniqueName)) {
+                    logger.info("1");
                     return child;
                 }
 
@@ -172,17 +208,22 @@ public class FeatureMapperUtil {
                     firstTranscript = child;
 
                 for (Feature grandChild : child.children) {
+                    logger.info(String.format(" ---> %s (%s) ", grandChild.uniqueName, grandChild.type.name));
                     String grandChildType = grandChild.type.name;
-                    if (requested.type.name.equals(grandChildType)) {
+                    if (requested.type.name.equals(grandChildType) && requested.uniqueName.equals(grandChild.uniqueName)) {
                         if (grandChildType.equals("polypeptide")) {
+                            logger.info("2");
                             return child;
                         } else if (grandChildType.equals("exon")) {
+                            logger.info("3");
                             return child;
                         }
                     }
                 }
             }
         }
+        
+        logger.info(" --->! ");
 
         return firstTranscript;
     }
@@ -233,6 +274,13 @@ public class FeatureMapperUtil {
             return 0;
         }
         
+    }
+    
+    class FeatureUniqueNameSorter implements Comparator<Feature> {
+        @Override
+        public int compare(Feature feature1, Feature feature2) {
+            return feature1.uniqueName.compareTo(feature2.uniqueName);
+        }
     }
     
     public List<Property> getPolypeptideProperties(Feature feature, Feature hierarchyFeature) throws NumberFormatException, BioException, TranslationException {
