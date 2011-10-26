@@ -1,9 +1,12 @@
 package org.genedb.crawl.modelling;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.biojava.bio.BioException;
@@ -48,6 +51,8 @@ public class FeatureMapperUtil {
 
     @Autowired
     public FeatureMapper    featureMapper;
+    
+    public static final Set<String> transcriptTypes = new HashSet<String>(Arrays.asList(new String[] {"mRNA", "ncRNA", "snoRNA", "snRNA", "tRNA", "miscRNA", "rRNA"}));
     
     public Feature getFeature(String uniqueName, String name, String organism) {
         Integer organism_id = null;
@@ -144,7 +149,13 @@ public class FeatureMapperUtil {
         getDescendants(gene, ofType, false);
         Feature transcript = getTranscript(feature, gene);
         
+        // if there are no transcripts, must use the gene
         if (transcript == null)
+            return gene;
+        
+        // if the transcript is alone, use the gene
+        List<Feature> transcripts = getTranscripts(gene);
+        if (transcripts.size() == 1) 
             return gene;
         
         return transcript;
@@ -185,7 +196,17 @@ public class FeatureMapperUtil {
         }
 
     }
-
+    
+    public List<Feature> getTranscripts(Feature gene) {
+        List<Feature> transcripts = new ArrayList<Feature>();
+        for (Feature child : gene.children) {
+            if ( transcriptTypes.contains(child.type.name)) {
+                transcripts.add(child);
+            }
+        }
+        return transcripts;
+    }
+    
     public Feature getTranscript(Feature requested, Feature hierarchyFeature) {
 
         Feature firstTranscript = null;

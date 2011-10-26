@@ -178,7 +178,6 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
         
         Feature feature = util.getFeature(uniqueName, name, organism);
         
-        
         Feature hierarchyRoot = util.getAncestorGene(feature, ofType);
         
         if (hierarchyRoot == null)
@@ -188,6 +187,11 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
         
         
         util.getDescendants(hierarchyRoot, ofType, includeSummaries);
+        
+        // mybatis returns 'null' strings here
+        if (hierarchyRoot.name != null && hierarchyRoot.name.equals("null")) {
+            hierarchyRoot.name = null;
+        }
         
         return hierarchyRoot;
         
