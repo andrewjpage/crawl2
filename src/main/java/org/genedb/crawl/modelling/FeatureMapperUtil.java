@@ -121,6 +121,11 @@ public class FeatureMapperUtil {
         feature.pubs = featureMapper.pubs(feature);
         feature.dbxrefs = featureMapper.dbxrefs(feature);
         feature.domains = featureMapper.domains(feature);
+        
+        for (Feature domain : feature.domains) {
+            summarise(domain);
+        }
+        
         feature.orthologues = featureMapper.orthologues(feature);
 
     }
