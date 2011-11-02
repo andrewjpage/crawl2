@@ -762,7 +762,7 @@
         SELECT
             
              distinct fctype.name as name , 
-             count (fcp_date.feature_cvtermprop_id) as value
+             count (distinct f.uniqueName) as value
             
             <include refid="annotationModifiedSnippet"/>
         
