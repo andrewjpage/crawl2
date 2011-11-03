@@ -16,10 +16,10 @@ public class Coordinates implements Serializable {
 	public Cvterm regionType;
 	
 	@XmlAttribute(required=true)
-	public int fmin;
+	public Integer fmin;
 	
 	@XmlAttribute(required=true)
-	public int fmax;
+	public Integer fmax;
 	
 	@XmlAttribute(required=true)
 	public String phase;
