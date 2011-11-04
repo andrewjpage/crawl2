@@ -45,6 +45,8 @@ public class XMLView extends BaseView implements View{
 		
 		response.setContentType(contentType);
 		
+		logger.info(String.format("rendering %s", contentType));
+		
 		XMLResponseWrapper wrapper = new XMLResponseWrapper();
 		
 		if (showParameters) {
@@ -70,6 +72,8 @@ public class XMLView extends BaseView implements View{
 			}
 			
 		}
+		
+		logger.info(String.format("Martialling with %s, marshaller %s", jc, m));
 		
 		m.marshal(wrapper, response.getWriter());
 			
