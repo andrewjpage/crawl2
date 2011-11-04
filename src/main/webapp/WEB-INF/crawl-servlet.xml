@@ -76,10 +76,10 @@
     <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
     
-     <!-- <jaxws:endpoint 
+     <jaxws:endpoint 
       id="organismsControllerBean" 
       implementor="#organismsController" 
-      address="/organisms" /> -->
+      address="/organisms" /> 
     
      <jaxws:endpoint 
       id="featuresControllerBean" 
@@ -91,7 +91,7 @@
       implementor="#featureController" 
       address="/feature" />
       
-    <!-- 
+    
     <jaxws:endpoint 
       id="regionsControllerBean" 
       implementor="#regionsController" 
@@ -106,7 +106,7 @@
       id="samsControllerBean" 
       implementor="#samController" 
       address="/sams" />
- -->
+ 
 
     
     
