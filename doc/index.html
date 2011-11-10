@@ -7,6 +7,24 @@
 <script type="text/javascript" src="http://www.genedb.org/includes/scripts/jquery/jquery-genePage-combined-new.js"></script>
 <script src="http://samaxesjs.googlecode.com/files/jquery.toc-1.1.1.js"></script>
 
+<script>
+
+$(function() {
+   
+    $.ajax({
+        url : "./Web-Artemis/index.html",
+        success : function(data) {
+            $("#web-artemis-link").attr("href", "./Web-Artemis/index.html");
+        },
+        error : function (jqXHR, textStatus, errorThrown) {
+            $("#web-artemis-link").attr("href", "http://www.genedb.org/web-artemis/");
+        }
+    });
+    
+});
+
+</script>
+
 <style>
 
 body {
@@ -116,7 +134,7 @@ li {
 
 <h2 id="web-artemis">Visually explore the data</h2>
 
-<P><a href="./Web-Artemis/index.html">Web Artemis</a> is a <em>very cool</em> genome browser. It talks to Crawl services, so can be used to explore the data they hold. 
+<P><a id="web-artemis-link" href="./Web-Artemis/index.html">Web Artemis</a> is a <em>very cool</em> genome browser. It talks to Crawl services, so can be used to explore the data they hold. 
 
 <h2 id="services">REST Services</h2>
 
