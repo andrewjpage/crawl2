@@ -81,7 +81,8 @@ dependencies {
     
     compile group: 'org.postgresql', name: 'com.springsource.org.postgresql.jdbc4', version:'8.3.604'
     
-	compile group: 'com.hazelcast', name:'hazelcast', version:'1.9.4'
+	compile group: 'com.hazelcast', name:'hazelcast', version:'1.9.4.3'
+    compile group: 'com.hazelcast', name:'hazelcast-spring', version:'1.9.4.3'
 	
     compile group: 'org.mybatis', name: 'mybatis', version:'3.0.5'
     compile group: 'org.mybatis', name: 'mybatis-hazelcast', version:'1.0.0'
@@ -310,13 +311,13 @@ war.doFirst{
 	
 	new File("tmp/WEB-INF/classes/").mkdirs()
 	
-    if (props["hazelcast"] != null)
-        hazelcast = props["hazelcast"]
-    
-	ant.copy (
-		file: hazelcast,
-		toFile:'tmp/WEB-INF/classes/hazelcast.xml',
-		overwrite:'true' )
+//    if (props["hazelcast"] != null)
+//        hazelcast = props["hazelcast"]
+//    
+//	ant.copy (
+//		file: hazelcast,
+//		toFile:'tmp/WEB-INF/classes/hazelcast.xml',
+//		overwrite:'true' )
 	
 	
 	/*
@@ -417,13 +418,16 @@ task copyLibs << {
 /*
  * A custom task for wiping local ElasticSearch data
  */
-task cleanes << {
-    println "Deleting " + props["resource.elasticsearch.local.pathdata"]
-    ant.delete(dir:props["resource.elasticsearch.local.pathdata"])
-    println "Deleting " + props["resource.elasticsearch.local.pathlogs"]
-    ant.delete(dir:props["resource.elasticsearch.local.pathlogs"])
-}
+//task cleanes << {
+//    println "Deleting " + props["resource.elasticsearch.local.pathdata"]
+//    ant.delete(dir:props["resource.elasticsearch.local.pathdata"])
+//    println "Deleting " + props["resource.elasticsearch.local.pathlogs"]
+//    ant.delete(dir:props["resource.elasticsearch.local.pathlogs"])
+//}
 
+clean {
+    ant.delete(dir:"tmp")
+}
 
 /*
  * currently required for the eclipse plugin because currently eclipse classpath does 
