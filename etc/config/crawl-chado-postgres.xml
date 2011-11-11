@@ -23,57 +23,19 @@
     
     <context:property-placeholder location="classpath:project.properties" />
     
-    <context:component-scan base-package="org.genedb.crawl.dao.backend" />
+    <!-- 
+        The following hazelcast-spring approach doesn't work with mybatis-hazelcast because this calls Hazelcast.get...() methods,
+        which currently cause a "default" instance to be instantiated, bypassing all spring configuration. Two
+        instances are then created, and mybatis will always use the non-spring managed one. 
+        
+        This could possibly be fixed by hazelcast, making Hazelcast.get...() methods check to see if a spring managed
+        instance is available, or it could be fixed by mybatis-hazelcast, doing a similar check.  
+        
+        Until this is fixed, it is not possible to configure hazelcast with spring for use by mybatis.  
     
-    <bean id="FeatureMapperUtil" class="org.genedb.crawl.modelling.FeatureMapperUtil"  />
-    
-    <!-- <context:component-scan base-package="org.genedb.crawl.business.postgres" />  -->
-    
-    <!-- DataSource Property -->
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
-        <property name="driverClassName" value="org.postgresql.Driver" />
-        <property name="url"><value>jdbc:postgresql://${dbhost}:${dbport}/${dbname}</value></property>
-        <property name="username"><value>${dbuser}</value></property>
-        <property name="password"><value>${dbpassword}</value></property>
-    </bean>
-    
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"> 
-        <property name="dataSource" ref="dataSource" /> 
-        <property name="configLocation" value="classpath:ibatis.xml"/>
-    </bean> 
-    
-    <bean id="organismsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.genedb.crawl.mappers.OrganismsMapper" /> 
-        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
-    </bean> 
-    
-    <bean id="regionsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.genedb.crawl.mappers.RegionsMapper" /> 
-        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
-    </bean>
-    
-    <bean id="termsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.genedb.crawl.mappers.TermsMapper" /> 
-        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
-    </bean> 
-    
-    <bean id="featuresMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.genedb.crawl.mappers.FeaturesMapper" /> 
-        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
-    </bean>
-    
-    <bean id="featureCvtermMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.genedb.crawl.mappers.FeatureCvtermMapper" /> 
-        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
-    </bean>
-    
-    <bean id="featureMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
-        <property name="mapperInterface" value="org.genedb.crawl.mappers.FeatureMapper" /> 
-        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
-    </bean>
-    
-    
-    <hz:hazelcast id="instance">
+     -->
+    <!-- 
+    <hz:hazelcast id="hazelcast">
         <hz:config>
             <hz:group name="crawl-${dbhost}-${dbport}-${dbname}" password="crawl-${dbhost}-${dbport}-${dbname}"/>
             <hz:properties>
@@ -128,7 +90,84 @@
             
 
         </hz:config>
-    </hz:hazelcast>
+    </hz:hazelcast>  -->
+        
+    <context:component-scan base-package="org.genedb.crawl.dao.backend" />
+    
+    <bean id="FeatureMapperUtil" class="org.genedb.crawl.modelling.FeatureMapperUtil"  />
+    
+    <!-- <context:component-scan base-package="org.genedb.crawl.business.postgres" />  -->
+    
+    <!-- DataSource Property -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" >
+        <property name="driverClassName" value="org.postgresql.Driver" />
+        <property name="url"><value>jdbc:postgresql://${dbhost}:${dbport}/${dbname}</value></property>
+        <property name="username"><value>${dbuser}</value></property>
+        <property name="password"><value>${dbpassword}</value></property>
+    </bean>
+    
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"> 
+        <property name="dataSource" ref="dataSource" /> 
+        <property name="configLocation" value="classpath:ibatis.xml"/>
+    </bean> 
+    
+    <bean id="organismsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.genedb.crawl.mappers.OrganismsMapper" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean> 
+    
+    <bean id="regionsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.genedb.crawl.mappers.RegionsMapper" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean>
+    
+    <bean id="termsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.genedb.crawl.mappers.TermsMapper" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean> 
+    
+    <bean id="featuresMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.genedb.crawl.mappers.FeaturesMapper" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean>
+    
+    <bean id="featureCvtermMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.genedb.crawl.mappers.FeatureCvtermMapper" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean>
+    
+    <bean id="featureMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"> 
+        <property name="mapperInterface" value="org.genedb.crawl.mappers.FeatureMapper" /> 
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" /> 
+    </bean>
+    
+    <!-- <bean id="_hzInstance_1_dev" class="com.hazelcast.core.Hazelcast" factory-method="newHazelcastInstance">
+	    <constructor-arg>
+	        <bean class="com.hazelcast.config.Config">
+	            <property name="groupConfig">
+	                <bean class="com.hazelcast.config.GroupConfig">
+	                    <property name="name" value="crawl-${dbhost}-${dbport}-${dbname}"/>
+	                    <property name="password" value="crawl-${dbhost}-${dbport}-${dbname}"/>
+	                </bean>
+	            </property>
+	            <property name="mapConfigs">
+	               <map>
+	                   <entry key="org.genedb.crawl.mappers.RegionsMapper">
+	                       <bean class="com.hazelcast.config.MapConfig">
+	                           <property name="evictionPercentage" value="75"></property>
+	                       </bean>
+	                   </entry>
+	               </map>
+	            </property>
+	        </bean>
+	    </constructor-arg>
+	</bean>
+	
+	<bean id="org.genedb.crawl.mappers.RegionsMapper" factory-bean="_hzInstance_1_dev" factory-method="getMap">
+	       <constructor-arg value="org.genedb.crawl.mappers.RegionsMapper"/>
+    </bean> -->
+	
+    
     
     
     
