@@ -1,5 +1,6 @@
 package org.genedb.crawl.modelling;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -388,34 +389,37 @@ public class FeatureMapperUtil {
             }
             residuesSymbolList = residuesSymbolList.subList(1, residuesSymbolList.length() - 1);
         }
-
+        
+        
         Property aminoProp = new Property();
         aminoProp.name = "Amino Acids";
         aminoProp.value = String.valueOf(residuesSymbolList.length());
         properties.add(aminoProp);
-
+        
+        DecimalFormat df = new DecimalFormat("#.0");
         double isoElectricPoint = new IsoelectricPointCalc().getPI(residuesSymbolList, false, false);
 
         Property isoProp = new Property();
         isoProp.name = "Isoelectric Point";
-        isoProp.value = "pH " + String.valueOf(isoElectricPoint);
+        isoProp.value = "pH " + df.format(isoElectricPoint);
         properties.add(isoProp);
 
         double mass2 = calculateMass(residuesSymbolList);
 
         Property massProp = new Property();
         massProp.name = "Mass";
-        massProp.value = String.valueOf(mass2 / 1000) + " kDa";
+        massProp.value = df.format(mass2 / 1000) + " kDa";
         properties.add(massProp);
 
         double charge = calculateCharge(residuesString);
 
         Property chargeProp = new Property();
         chargeProp.name = "Charge";
-        chargeProp.value = String.valueOf(charge);
+        chargeProp.value = df.format(charge);
         properties.add(chargeProp);
 
         return properties;
+        
     }
 
     public static String translate(int translationTableId, String dnaSequence, int phase, boolean stopCodonTranslatedAsSelenocysteine) throws TranslationException {
