@@ -172,7 +172,7 @@ public class CrawlClient {
 
         URL url = new URL(urlString);
 
-        logger.info(url);
+        logger.debug(url);
 
         try {
             
