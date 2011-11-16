@@ -238,6 +238,18 @@ you can enable download from this site by adding the genedb developer https cert
 
 <P>which will configure eclipse to be aware of crawl's dependencies.</P>
 
+<h4 id="unittesting">Unit testing</h4>
+
+<P>
+    crawl is unit tested everytime it's built. However, sometimes you want to only test a singe case :
+</P>
+
+<pre><code>./gradlew -Dtest.single=ClientTest clean test</code></pre>
+
+<P>and sometimes you don't want to test at all</P>
+
+<pre><code>./gradlew build -x test</code></pre>
+
 <h4 id="installation">Installation</h4>
 
 <P>If you need to be able to run (or, more likely, have your users run) the crawl.jar somewhere outside 
@@ -407,7 +419,7 @@ OBO format. To index the gene ontology, you can do :
 
 ./crawl das2es -pe resource-elasticsearch-local.properties \
     -u http://das.sanger.ac.uk/das \
-    -s pjazz_berghei \
+    -s pbg \
     -r berg01 \
     -o '{"common_name":"Pberghei"}' </code></pre>
 
