@@ -9,7 +9,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.genedb.crawl.json.JsonDateDeserializer;
 import org.genedb.crawl.json.JsonDateSerializer;
 
 public class Feature implements Serializable {
@@ -64,10 +66,12 @@ public class Feature implements Serializable {
 	
 	@XmlElement(required=false)
 	@JsonSerialize(using=JsonDateSerializer.class)
+	@JsonDeserialize(using=JsonDateDeserializer.class)
 	public Date timelastmodified;
 	
 	@XmlElement(required=false)
 	@JsonSerialize(using=JsonDateSerializer.class)
+	@JsonDeserialize(using=JsonDateDeserializer.class)
 	public Date timeaccessioned;
 
     @XmlElement(required=false)

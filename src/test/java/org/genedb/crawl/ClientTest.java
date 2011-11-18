@@ -29,10 +29,10 @@ public class ClientTest extends TestCase {
         CrawlClient client = new CrawlClient(baseURL);
 
         List<Organism> organisms = client.request(List.class, Organism.class, "organisms", "list", null);
-
-        for (Organism o : organisms) {
-            logger.info(o.common_name);
-        }
+        
+        assertTrue(organisms.size() > 0);
+        
+        
 
     }
 
@@ -50,40 +50,45 @@ public class ClientTest extends TestCase {
 
             List<Feature> regions = client.request(List.class, Feature.class, "regions", "inorganism", inOrganismParameters);
             
-            boolean found = false;
-            
+            int n = 0;
             for (Feature region : regions) {
 
-                logger.info("  -" + region.uniqueName);
-
-                Map<String, String[]> locationsParameters = new HashMap<String, String[]>();
-                locationsParameters.put("region", new String[] { region.uniqueName });
-
-                locationsParameters.put("start", new String[] { "1" });
-                locationsParameters.put("end", new String[] { "1000000" });
-                locationsParameters.put("exclude", new String[] { "false" });
-                locationsParameters.put("types", new String[] { "gene" });
-                
-                List<LocatedFeature> features = client.<List>request(List.class, LocatedFeature.class, "regions", "locations", locationsParameters);
-
-                for (LocatedFeature feature : features) {
-                    logger.info("   -" + feature.uniqueName);
-
-                    Map<String, String[]> infoParameters = new HashMap<String, String[]>();
-                    locationsParameters.put("types", new String[] { feature.uniqueName });
-
-                    Feature gene = (Feature) client.<Feature>request(Feature.class, "feature", "info", infoParameters);
-
-                    for (Feature child : gene.children) {
-                        logger.info("    -" + child.uniqueName);
-                    }
+                if (n == 0) {
                     
-                    found = true;
+                    assertTrue(region.uniqueName != null);
+                    
+                    logger.info("  -" + region.uniqueName);
+
+                    Map<String, String[]> locationsParameters = new HashMap<String, String[]>();
+                    locationsParameters.put("region", new String[] { region.uniqueName });
+
+                    locationsParameters.put("start", new String[] { "1" });
+                    locationsParameters.put("end", new String[] { "1000000" });
+                    locationsParameters.put("exclude", new String[] { "false" });
+                    locationsParameters.put("types", new String[] { "gene" });
+                    
+                    List<LocatedFeature> features = client.<List> request(List.class, LocatedFeature.class, "regions", "locations", locationsParameters);
+
+                    if (features.size() > 0) {
+                        LocatedFeature feature = features.get(0);
+                        
+                        assertTrue(feature.uniqueName != null);
+                        
+                        Map<String, String[]> infoParameters = new HashMap<String, String[]>();
+                        infoParameters.put("uniqueName", new String[] { feature.uniqueName });
+
+                        Feature gene = (Feature) client.<Feature> request(Feature.class, "feature", "hierarchy", infoParameters);
+
+                        logger.info("   -" + feature.uniqueName);
+
+                        for (Feature child : gene.children) {
+                            logger.info("    -" + child.uniqueName);
+                        }
+                    }
+
                 }
 
-                // only do this once per organism....
-                if (found)
-                    break;
+                n++;
 
             }
 

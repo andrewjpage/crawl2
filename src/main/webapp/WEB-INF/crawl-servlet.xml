@@ -38,12 +38,19 @@
 		</property>
 	</bean>
 
+	<bean id="jaxbContext" class="javax.xml.bind.JAXBContext" factory-method="newInstance">
+		<constructor-arg>
+			<value>org.genedb.crawl.model</value>
+		</constructor-arg>
+	</bean>
+
 	<!--<bean id="gsonView" class="org.genedb.crawl.view.GsonView"> <property 
 		name="showParameters"><value>${showParameters}</value></property> </bean> -->
-	<bean id="xView" class="org.genedb.crawl.view.XMLView">
+	<bean id="xView" class="org.genedb.crawl.view.XMLView" >
 		<property name="showParameters">
 			<value>${showParameters}</value>
 		</property>
+		<property name="jaxbContext" ref="jaxbContext" />
 	</bean>
 
 	<bean id="bioDataFileStoreInitializer" class="org.genedb.crawl.bam.BioDataFileStoreInitializer">

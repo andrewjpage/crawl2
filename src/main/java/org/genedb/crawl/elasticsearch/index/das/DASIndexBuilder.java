@@ -34,7 +34,7 @@ public class DASIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 	@Option(name = "-s", aliases = {"--source"}, usage = "The name of the DAS source.", required = true)
 	public String source;
 	
-	@Option(name = "-r", aliases = {"--region"}, usage = "The name of the DAS source.", required = false)
+	@Option(name = "-r", aliases = {"--region"}, usage = "If you only want to index one region, specify its id here.", required = false)
 	public String region;
 	
 	@Option(name = "-c", aliases = {"--create_regions"}, usage = "If true, an attempt will be made to create/update regions from the DAS source.", required = false)
@@ -78,53 +78,55 @@ public class DASIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 			
 			List<FeatureAdapter> features = fetcher.getFeatures(segment, segment.getStart(), segment.getStop());
 			
-			for (FeatureAdapter featureAdapter : features) { 
-				
-				LocatedFeature feature = new LocatedFeature();
-				
-				int fmin = interbase ? featureAdapter.getStart() : featureAdapter.getStart() -1;
-				int fmax = featureAdapter.getEnd();
-				
-				feature.uniqueName = featureAdapter.getId();
-				feature.fmin = fmin;
-				feature.fmax = fmax;
-				feature.organism_id = o.ID;
-				
-				feature.region = segment.getId();
-				feature.type = new Cvterm();
-				feature.type.name = featureAdapter.getType().getId();
-				
-				Coordinates coordinates = new Coordinates();
-				feature.coordinates = new ArrayList<Coordinates>();
-				feature.coordinates.add(coordinates);
-				coordinates.region =feature.region;
-				coordinates.fmin = fmin;
-				coordinates.fmax = fmax;
-				
-				
-				
-				feature.properties =new ArrayList<Property>();
-				
-				Property prop = new Property();
-				prop.name = "comment";
-				prop.value = String.format("Pulled in from %s/%s/%s", url, source, segment.getId());
-				
-//				prop.type = new Cvterm();
-//				prop.type.name = "comment";
-//				prop.type.cv = new Cv();
-//				prop.type.cv.name = "cvterm_property_type";
-				
-				feature.properties.add(prop);
-				
-				featureMapper.createOrUpdate(feature);
-				
-				logger.debug(String.format("Indexing feature: %s %s %s %s", featureAdapter.getId(), featureAdapter.getType().getId(), featureAdapter.getStart(), featureAdapter.getEnd()));
-			}
+			this.indexFeatures(o, segment, features);
 		}
 		
 	}
 	
-	
+	protected void indexFeatures(Organism o, SEGMENT segment, List<FeatureAdapter> features) throws ValidationException {
+	    for (FeatureAdapter featureAdapter : features) { 
+            
+            LocatedFeature feature = new LocatedFeature();
+            
+            int fmin = interbase ? featureAdapter.getStart() : featureAdapter.getStart() -1;
+            int fmax = featureAdapter.getEnd();
+            
+            feature.uniqueName = featureAdapter.getId();
+            feature.fmin = fmin;
+            feature.fmax = fmax;
+            feature.organism_id = o.ID;
+            
+            feature.region = segment.getId();
+            feature.type = new Cvterm();
+            feature.type.name = featureAdapter.getType().getId();
+            
+            Coordinates coordinates = new Coordinates();
+            feature.coordinates = new ArrayList<Coordinates>();
+            feature.coordinates.add(coordinates);
+            coordinates.region =feature.region;
+            coordinates.fmin = fmin;
+            coordinates.fmax = fmax;
+            
+            
+            
+            feature.properties =new ArrayList<Property>();
+            
+            Property prop = new Property();
+            prop.name = "comment";
+            prop.value = String.format("Pulled in from %s/%s/%s", url, source, segment.getId());
+            
+//          prop.type = new Cvterm();
+//          prop.type.name = "comment";
+//          prop.type.cv = new Cv();
+//          prop.type.cv.name = "cvterm_property_type";
+            
+            feature.properties.add(prop);
+            
+            featureMapper.createOrUpdate(feature);
+            
+            logger.debug(String.format("Indexing feature: %s %s %s %s", featureAdapter.getId(), featureAdapter.getType().getId(), featureAdapter.getStart(), featureAdapter.getEnd()));
+        }
+	}
 	
 	public static void main(String[] args) throws Exception {
 		new DASIndexBuilder().prerun(args).closeIndex();
