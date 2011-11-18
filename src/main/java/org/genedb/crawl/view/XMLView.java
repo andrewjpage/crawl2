@@ -23,19 +23,17 @@ public class XMLView extends BaseView implements View{
 	private static final Logger logger = Logger.getLogger(XMLView.class);
 
 	private String contentType = "application/xml";
-	private JAXBContext jc;
-	private Marshaller m;
+	private JAXBContext jaxbContext;
 	
-	public XMLView() throws JAXBException {
-		super();
-		
-		jc = JAXBContext.newInstance("org.genedb.crawl.model");
-		m = jc.createMarshaller();
-	}
 	
 	@Override
 	public String getContentType() {
 		return contentType;
+	}
+	
+	public void setJaxbContext(JAXBContext jaxbContext) throws JAXBException {
+	    this.jaxbContext = jaxbContext;
+	    
 	}
 	
 	
@@ -45,7 +43,7 @@ public class XMLView extends BaseView implements View{
 		
 		response.setContentType(contentType);
 		
-		logger.info(String.format("rendering %s", contentType));
+		logger.debug(String.format("rendering %s", contentType));
 		
 		XMLResponseWrapper wrapper = new XMLResponseWrapper();
 		
@@ -73,9 +71,8 @@ public class XMLView extends BaseView implements View{
 			
 		}
 		
-		logger.info(String.format("Martialling with %s, marshaller %s", jc, m));
-		
-		m.marshal(wrapper, response.getWriter());
+		Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.marshal(wrapper, response.getWriter());
 			
 	}
 	

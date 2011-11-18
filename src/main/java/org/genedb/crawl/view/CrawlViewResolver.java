@@ -80,7 +80,7 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
     		sep = ", ";
     	}
     	
-    	logger.debug(sb.toString());
+    	logger.info(sb.toString());
 		
 		return extension;
 	}
