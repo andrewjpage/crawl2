@@ -64,7 +64,7 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
         
         Feature resultFeature = featureMapper.get(uniqueName, name, organism_id, type);
         
-        summarise(resultFeature);
+        util.summarise(resultFeature);
         
         return resultFeature;
         
@@ -84,36 +84,36 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
         return featureMapper.dbxrefs(feature);
     }
     
-    private void summarise (Feature feature) {
-        
-        feature.coordinates = featureMapper.coordinates(feature);
-        
-        // TODO - this might need to be fixed to work with non-LocatedFeature instances
-//        if (feature instanceof LocatedFeature 
-//                && feature.coordinates != null 
-//                && feature.coordinates.size() > 0) {
-//            LocatedFeature locatedFeature = (LocatedFeature) feature;
-//            Coordinates c = locatedFeature.coordinates.get(0);
-//            locatedFeature.fmin = c.fmin;
-//            locatedFeature.fmax = c.fmax;
-//            locatedFeature.region = c.region;
-//            locatedFeature.phase = c.phase;
-//            locatedFeature.strand = c.strand;
-//            
-//            feature = LocatedFeatureUtil.fromFeature(feature);
-//            
-//        }
-        
-        feature.properties = featureMapper.properties(feature);
-        feature.terms = featureMapper.terms(feature);
-        feature.synonyms = featureMapper.synonyms(feature);
-        feature.pubs = featureMapper.pubs(feature);
-        feature.dbxrefs = featureMapper.dbxrefs(feature);
-        feature.domains = featureMapper.domains(feature);
-        feature.orthologues = featureMapper.orthologues(feature);
-        
-        logger.info(String.format("summarising feature %s, last modified %s, last accessioned %s", feature.uniqueName , feature.timeaccessioned, feature.timelastmodified));
-    }
+//    private void summarise (Feature feature) {
+//        
+//        feature.coordinates = featureMapper.coordinates(feature);
+//        
+//        // TODO - this might need to be fixed to work with non-LocatedFeature instances
+////        if (feature instanceof LocatedFeature 
+////                && feature.coordinates != null 
+////                && feature.coordinates.size() > 0) {
+////            LocatedFeature locatedFeature = (LocatedFeature) feature;
+////            Coordinates c = locatedFeature.coordinates.get(0);
+////            locatedFeature.fmin = c.fmin;
+////            locatedFeature.fmax = c.fmax;
+////            locatedFeature.region = c.region;
+////            locatedFeature.phase = c.phase;
+////            locatedFeature.strand = c.strand;
+////            
+////            feature = LocatedFeatureUtil.fromFeature(feature);
+////            
+////        }
+//        
+//        feature.properties = featureMapper.properties(feature);
+//        feature.terms = featureMapper.terms(feature);
+//        feature.synonyms = featureMapper.synonyms(feature);
+//        feature.pubs = featureMapper.pubs(feature);
+//        feature.dbxrefs = featureMapper.dbxrefs(feature);
+//        feature.domains = featureMapper.domains(feature);
+//        feature.orthologues = featureMapper.orthologues(feature);
+//        
+//        logger.info(String.format("summarising feature %s, last modified %s, last accessioned %s", feature.uniqueName , feature.timeaccessioned, feature.timelastmodified));
+//    }
     
     
     
