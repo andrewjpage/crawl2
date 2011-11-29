@@ -99,7 +99,7 @@ public class FeatureMapperUtil {
         return mappedOrganism;
     }
 
-    private void summarise(Feature feature) {
+    public void summarise(Feature feature) {
 
         feature.coordinates = featureMapper.coordinates(feature);
 

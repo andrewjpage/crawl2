@@ -6,7 +6,7 @@
     
     <sql id="select_organism">
         select 
-	       o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
+	       o.genus || ' ' || o.species as name, o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
 	    from 
 	       organism o
 	     left outer join organismprop op on op.organism_id = o.organism_id and op.type_id = 
