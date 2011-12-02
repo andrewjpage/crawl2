@@ -57,31 +57,50 @@
         <max-pool-size>64</max-pool-size>
         <keep-alive-seconds>60</keep-alive-seconds>
     </executor-service>
+    <!-- 
+        this is currently on the hazelcast wiki (http://code.google.com/p/hazelcast/wiki/MapEviction), but there is a
+         note saying this might go away, so for posterity :
+        
+	        cluster_wide_map_size: Cluster-wide total max map size (default policy)
+			map_size_per_jvm: Max map size per JVM
+			partitions_wide_map_size: Partitions (default 271) wide max map size
+			used_heap_size: Max used heap size in MB (mega-bytes) per JVM
+			used_heap_percentage: Max used heap size percentage per JVM
+			
+		examples :
+		
+			<max-size policy="cluster_wide_map_size">50000</max-size>
+			<max-size policy="map_size_per_jvm">5000</max-size>
+			<max-size policy="partitions_wide_map_size">27100</max-size>
+			<max-size policy="used_heap_size">4096</max-size>
+			<max-size policy="used_heap_percentage">75</max-size>
+			
+     -->
     <map name="regions">
         <backup-count>0</backup-count>
         <eviction-policy>LFU</eviction-policy>
-        <max-size policy="cluster_wide_map_size">10</max-size>
+        <max-size policy="map_size_per_jvm">10</max-size>
         <eviction-percentage>25</eviction-percentage>
         <merge-policy>hz.ADD_NEW_ENTRY</merge-policy>
     </map>
     <map name="org.genedb.crawl.mappers.RegionsMapper">
         <backup-count>0</backup-count>
         <eviction-policy>LFU</eviction-policy>
-        <max-size policy="cluster_wide_map_size">500</max-size>
+        <max-size policy="map_size_per_jvm">500</max-size>
         <eviction-percentage>25</eviction-percentage>
         <merge-policy>hz.ADD_NEW_ENTRY</merge-policy>
     </map>
     <map name="org.genedb.crawl.mappers.FeatureCvtermMapper">
         <backup-count>0</backup-count>
         <eviction-policy>LFU</eviction-policy>
-        <max-size policy="cluster_wide_map_size">100</max-size>
+        <max-size policy="map_size_per_jvm">100</max-size>
         <eviction-percentage>25</eviction-percentage>
         <merge-policy>hz.ADD_NEW_ENTRY</merge-policy>
     </map>
     <map name="org.genedb.crawl.mappers.FeatureMapper">
         <backup-count>0</backup-count>
         <eviction-policy>LFU</eviction-policy>
-        <max-size policy="cluster_wide_map_size">1000</max-size>
+        <max-size policy="map_size_per_jvm">1000</max-size>
         <eviction-percentage>25</eviction-percentage>
         <merge-policy>hz.ADD_NEW_ENTRY</merge-policy>
     </map>
