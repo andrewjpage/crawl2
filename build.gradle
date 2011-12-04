@@ -224,6 +224,8 @@ test {
 */
 task install(dependsOn: 'jar') << {
    
+   ant.delete(dir:dir)
+    
    copy {
 	   from tree = fileTree(project.buildDir.getPath() + "/libs").include('**/*.jar')
 	   into dir + "/lib"
@@ -232,6 +234,14 @@ task install(dependsOn: 'jar') << {
    copy {
 	   from "./crawl"
 	   into dir + "/bin"
+   }
+   
+   copy {
+       from('.') {
+           include 'resource*.properties'
+           include '*.xml'
+       }
+       into dir + "/etc/"
    }
    
    ant.chmod(perm: "+x", dir: new File(dir + "/bin"), includes: '*')

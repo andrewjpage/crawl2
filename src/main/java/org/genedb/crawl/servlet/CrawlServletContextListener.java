@@ -7,6 +7,7 @@ import com.hazelcast.core.Hazelcast;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
+import org.genedb.crawl.hazelcast.HazelcastMonitor;
 
 public class CrawlServletContextListener implements ServletContextListener {
     

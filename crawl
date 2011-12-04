@@ -19,6 +19,7 @@ hput COMMANDS gff2es org.genedb.crawl.elasticsearch.index.gff.GFFIndexBuilder
 hput COMMANDS org2es org.genedb.crawl.elasticsearch.index.json.OrganismIndexBuilder
 hput COMMANDS ref2es org.genedb.crawl.elasticsearch.index.json.ReferenceIndexBuilder
 hput COMMANDS cv2es org.genedb.crawl.elasticsearch.index.cv.CvIndexBuilder
+hput COMMANDS hazelcast org.genedb.crawl.hazelcast.HazelcastService
 
 usage() {
 	usage_string="crawl ["
@@ -70,8 +71,10 @@ then
 	usage
 fi
 
-
-java $CRAWL_JAVA_SETTINGS -cp "$CRAWL_CLASSPATH" $JAVA_ENTRY_POINT "$@"
+# the java.net.preferIPv4Stack must be set to true, or else Hazelcast 
+# instances may not be able to see it (it is also set in the Hazelcast 
+# example wrapper scripts)
+java $CRAWL_JAVA_SETTINGS -Djava.net.preferIPv4Stack=true -cp "$CRAWL_CLASSPATH" $JAVA_ENTRY_POINT "$@"
 
 finish_time=$(date +%s)
 echo "Time duration: $((finish_time - start_time)) secs."  
