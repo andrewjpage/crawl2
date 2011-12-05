@@ -238,7 +238,8 @@ task install(dependsOn: 'jar') << {
    
    copy {
        from('.') {
-           include 'resource*.properties'
+           include '*.properties'
+           exclude 'gradle.properties'
            include '*.xml'
        }
        into dir + "/etc/"
