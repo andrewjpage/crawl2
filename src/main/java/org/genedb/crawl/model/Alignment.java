@@ -51,7 +51,7 @@ public class Alignment extends BioDataFile {
             mss.name = ssr.getSequenceName();
             mss.index = ssr.getSequenceIndex();
             
-            logger.info(String.format("%s %s %s", mss.name, mss.index, mss.length));
+            logger.debug(String.format("%s %s %s", mss.name, mss.index, mss.length));
             
             sequences.add(mss);
         }
@@ -60,13 +60,13 @@ public class Alignment extends BioDataFile {
         reader = null;
         
         
-        logger.info("got the sequences, and closed the file");        
+        //logger.info("got the sequences, and closed the file");        
     }
 
     @XmlTransient
     public SAMFileReader getReader() throws IOException {
 
-        logger.debug(this);
+        //logger.debug(this);
 
         if (reader == null) {
 
@@ -75,11 +75,11 @@ public class Alignment extends BioDataFile {
             }
 
             if (index != null) {
-                logger.info("getting index: " + index);
+                logger.debug("getting index: " + index);
                 indexFile = getFile(index);
             }
 
-            logger.info("getting bam: " + file);
+            logger.debug("getting bam: " + file);
 
             if (file.startsWith("http")) {
 

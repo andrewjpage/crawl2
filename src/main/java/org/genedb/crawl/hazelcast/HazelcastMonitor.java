@@ -1,4 +1,4 @@
-package org.genedb.crawl.servlet;
+package org.genedb.crawl.hazelcast;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,12 +11,17 @@ import org.apache.log4j.Logger;
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.EntryListener;
 import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.Instance;
 import com.hazelcast.core.InstanceEvent;
 import com.hazelcast.core.InstanceListener;
 
 public class HazelcastMonitor implements InstanceListener {
+    
+    public HazelcastMonitor() {
+        logger.info("Monitor activated");
+    }
 
-    private Logger logger = Logger.getLogger(HazelcastMonitor.class);
+    private static Logger logger = Logger.getLogger(HazelcastMonitor.class);
     private EntryMonitor<Object,Object> entryMonitor = new EntryMonitor<Object,Object>();
     private int time = 300000;
     private Map<String,Timer> timers = new HashMap<String,Timer>();
@@ -25,8 +30,12 @@ public class HazelcastMonitor implements InstanceListener {
         logger.info(String.format("%s %s %s", event.getEventType(), event.getInstanceType(), event.getInstance()));
     }
     
-    private String getId(InstanceEvent event) {
-        return event.getInstance().getId().toString().substring(2);
+    public static String getId(InstanceEvent event) {
+        return getId(event.getInstance());
+    }
+    
+    public static String getId(Instance instance) {
+        return instance.getId().toString().substring(2);
     }
     
     @Override
@@ -74,19 +83,21 @@ public class HazelcastMonitor implements InstanceListener {
         // logger.warn("listener removed");
     }
     
-    private void stats(String mapName) {
-        logger.info(String.format("%s (%s):\n%s\n%s\n%s",
+    public static String stats(String mapName) {
+        String stats = String.format("%s (%s):\n%s\n%s\n%s",
                 mapName,
                 Hazelcast.getMap(mapName).size(),
                 Hazelcast.getConfig().findMatchingMapConfig(mapName),
                 Hazelcast.getMap(mapName),
-                Hazelcast.getMap(mapName).getLocalMapStats()));
+                Hazelcast.getMap(mapName).getLocalMapStats());
+        logger.info(stats);
+        return stats;
     }
 
     class EntryMonitor<K, V> implements EntryListener<K, V> {
 
         private void entryEvent(EntryEvent<K, V> event) {
-            logger.info(String.format("%s %s", event.getEventType(), event.getName()));
+            logger.info(String.format("%s %s : %s", event.getEventType(), event.getKey(), event.getName()));
         }
 
         @Override
