@@ -67,4 +67,9 @@ public class LocalConnection extends Connection {
 		}
 		
 	}
+	
+	@Override
+    public String toString() {
+        return String.format("%s, Data: %s, Logs: %s", super.toString(), pathData, pathLogs);
+    }
 }

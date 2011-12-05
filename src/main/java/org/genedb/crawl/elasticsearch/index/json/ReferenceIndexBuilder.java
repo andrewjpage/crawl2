@@ -17,26 +17,21 @@ public class ReferenceIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 	
 	@Option(name = "-r", aliases = {"--refs"}, usage = "The path a JSON file containing reference sequences", required = false)
 	public String refs;
+	
+	private boolean converted = false;
 		
 	public void run() throws IOException, ParseException {
 		
 		init();
 		
-		
-		boolean converted = false;
-		
 		if (refs != null) {
-			convertJson(refs);
-			converted = true;
+		    splitAlignments(refs);
 		} else {
 			String alignments = elasticSearchProperties.getProperty("alignments");
 			if (alignments != null) {
-				convertJson(alignments);
-				converted = true;
+			    splitAlignments(alignments);
 			}
 		}
-		
-		
 		
 		if (! converted) {
 			logger.warn("Did not perform any conversions - please supply a reference JSON block " +
@@ -47,17 +42,25 @@ public class ReferenceIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 		
 	}
 	
-	private void convertJson(String json) throws JsonParseException, JsonMappingException, IOException, ParseException {
+	private void splitAlignments(String alignments) throws JsonParseException, JsonMappingException, IOException, ParseException {
+	    String[] split = alignments.split(",");
+        for (String alignment : split) { 
+            convertAlignments(alignment);
+        }
+	}
+	
+	private void convertAlignments(String alignmentsString) throws JsonParseException, JsonMappingException, IOException, ParseException {
 		
-		logger.info("Strying to read in " + json);
+		logger.info("Strying to read in " + alignmentsString);
 		
-		Alignments store = jsonIzer.fromStringOrFile(json, Alignments.class);
+		Alignments alignments = jsonIzer.fromStringOrFile(alignmentsString, Alignments.class);
 		
-		if (store.references != null) {
-			for(Reference ref : store.references) {
+		if (alignments.references != null) {
+			for(Reference ref : alignments.references) {
 				logger.info("Converting organism reference " + ref.file + " : " + ref.organism);
 				organismsMapper.createOrUpdate(ref.organism);
 				convertPath(ref.file,ref.organism);
+				converted = true;
 			}
 		}
 	}

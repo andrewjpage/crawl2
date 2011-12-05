@@ -56,4 +56,9 @@ public class TransportConnection extends Connection {
 		}
 	}
 	
+	@Override
+    public String toString() {
+        return String.format("%s, Host: %s, Port: %s, Cluster: %s", super.toString(), host, port, clusterName);
+    }
+	
 }

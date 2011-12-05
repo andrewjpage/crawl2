@@ -93,5 +93,10 @@ public abstract class Connection {
 		
 		logger.info("Status achieved: " + status + "!");
 	}
+	
+	@Override
+	public String toString() {
+	    return String.format("Connection: %s, Index: %s", this.getClass().getName(), index);
+	}
 
 }

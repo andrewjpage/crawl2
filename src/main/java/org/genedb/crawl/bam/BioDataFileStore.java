@@ -105,13 +105,14 @@ public class BioDataFileStore <T extends BioDataFile> {
 	void assignFileIDs() {
 		for (BioDataFile file : files) {
 			file.fileID = fileID++;
-			logger.info(String.format("Assigning file %d (%s) :: %s", 
-					file.fileID, file.getClass() , file.file));
 		}
 	}
 	
 	private void initialiseReaders() throws IOException {
-		for (BioDataFile file : files) file.init();
+		for (BioDataFile file : files) { 
+		    file.init();
+		    logger.info(String.format("%d (%s) %s", file.fileID, file.getClass().getName() , file.file));
+		}
 	}
 	
 	public T getFile(int fileID) {

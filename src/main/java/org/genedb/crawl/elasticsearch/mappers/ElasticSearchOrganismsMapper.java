@@ -36,6 +36,8 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 	
 	public List<Organism> list() {
 		
+	    logger.info("Fetching organisms from " + connection);
+	    
 		SearchResponse response = connection.getClient()
 			.prepareSearch(connection.getIndex())
 			.setTypes(connection.getOrganismType())
@@ -44,7 +46,7 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
 			.execute()
 			.actionGet();
 		
-		return this.getAllMatches(response, Organism.class);
+		return getAllMatches(response, Organism.class);
 		
 	}
 
