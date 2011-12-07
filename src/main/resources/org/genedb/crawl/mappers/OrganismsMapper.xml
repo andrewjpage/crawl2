@@ -6,11 +6,13 @@
     
     <sql id="select_organism">
         select 
-	       o.genus || ' ' || o.species as name, o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID 
+	       o.genus || ' ' || o.species as name, o.genus, o.species, o.common_name, o.organism_id as ID, op.value as taxonID, op_strain.value as strain
 	    from 
 	       organism o
 	     left outer join organismprop op on op.organism_id = o.organism_id and op.type_id = 
 	       (select cvterm.cvterm_id from cvterm where name = 'taxonId')
+	     left outer join organismprop op_strain on op_strain.organism_id = o.organism_id and op_strain.type_id = 
+           (select cvterm.cvterm_id from cvterm where name = 'strain_id')
     </sql>
     
   <select id="list" resultType="org.genedb.crawl.model.Organism" >
