@@ -15,6 +15,7 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.action.search.SearchRequestBuilder;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
 
@@ -299,27 +300,39 @@ public abstract class ElasticSearchBaseMapper {
 		return list;
 	}
 	
+	private int maxTries = 10;
+	private int sleepTime = 60000 ; // 1 minute
 	
 	public void createOrUpdate(String index, String type, String key, Object obj) {
-		
-		try {
-			
-			String json = jsonIzer.toJson(obj);
-			logger.debug("Source:");
-			logger.debug(json);
-			
-			logger.info(String.format("Storing %s/%s/%s", index, type, key));
-			
-			connection
-				.getClient()
-				.prepareIndex(index, type, key)
-				.setSource(json)
-				.execute()
-				.actionGet();
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	    
+        for (int t = 0; t< maxTries;t++) {
+	        try {
+	            cru(index, type, key, obj);
+	            return;
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            logger.error(e.getMessage());
+	            logger.error("Retrying");
+	        }
+	        try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+	        
+	    }
+	    
+	    throw new RuntimeException(String.format("Could not create or update in index %s, type %s, key %s, object %s.", index, type, key, obj));
+	}
+	
+	private synchronized void cru(String index, String type, String key, Object obj) throws IOException {
+	    String json = jsonIzer.toJson(obj);
+	    connection
+        .getClient()
+        .prepareIndex(index, type, key)
+        .setSource(json)
+        .execute()
+        .actionGet();
 	}
 	
 //	public void waitForYellowOrGreenStatus() {

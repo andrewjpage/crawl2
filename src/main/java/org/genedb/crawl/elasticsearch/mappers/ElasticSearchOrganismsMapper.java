@@ -96,39 +96,20 @@ public class ElasticSearchOrganismsMapper extends ElasticSearchBaseMapper implem
         return properties;
     }
 	
-	public void createOrUpdate(Organism organism) {
-		
-		try {
-			String source = jsonIzer.toJson(organism);
-			logger.info(source);
-			
-			logger.info(String.format("Storing organism as %s in index %s and type %s", connection.getIndex(), connection.getOrganismType(), organism.common_name));
-			
-			connection.getClient().prepareIndex(connection.getIndex(), connection.getOrganismType(), organism.common_name).setSource(source).execute().actionGet();
-			
-//			try {
-//				Thread.sleep(5000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			
-//			Organism retrievedOrganism = getByCommonName(organism.common_name);
-//			logger.info("fetch check response :");
-//			logger.info(jsonIzer.toJson(retrievedOrganism));
-//			
-			
-//			GetResponse r = connection.getClient().prepareGet(connection.getIndex(), connection.getOrganismType(), organism.common_name).execute().actionGet();
-//			logger.info("fetch check response :");
-//			logger.info(r.sourceAsString());
-			
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		
-		
-	}
+    public void createOrUpdate(Organism organism) {
 
+        //String source = jsonIzer.toJson(organism);
+        //logger.info(source);
+
+        logger.info(String.format("Storing organism as %s in index %s and type %s", connection.getIndex(), connection.getOrganismType(), organism.common_name));
+
+        // connection.getClient().prepareIndex(connection.getIndex(),
+        // connection.getOrganismType(),
+        // organism.common_name).setSource(source).execute().actionGet();
+
+        createOrUpdate(connection.getIndex(), connection.getOrganismType(), organism.common_name, organism);
+        
+    }
 
     
 
