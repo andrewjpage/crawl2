@@ -71,10 +71,19 @@ then
 	usage
 fi
 
+if [[ -z $JAVA_HOME ]]
+then
+    export JAVA='java'
+else
+    export JAVA="$JAVA_HOME/bin/java"
+fi
+
+echo $JAVA
+
 # the java.net.preferIPv4Stack must be set to true, or else Hazelcast 
 # instances may not be able to see it (it is also set in the Hazelcast 
 # example wrapper scripts)
-java $CRAWL_JAVA_SETTINGS -Djava.net.preferIPv4Stack=true -cp "$CRAWL_CLASSPATH" $JAVA_ENTRY_POINT "$@"
+$JAVA $CRAWL_JAVA_SETTINGS -Djava.net.preferIPv4Stack=true -cp "$CRAWL_CLASSPATH" $JAVA_ENTRY_POINT "$@"
 
 finish_time=$(date +%s)
 echo "Time duration: $((finish_time - start_time)) secs."  

@@ -24,6 +24,9 @@ public class Organism implements Serializable {
 	@XmlAttribute
 	public Integer ID;
 	
+	@XmlAttribute
+    public String strain;
+	
 	@XmlElement(name="property", required=false)
     @XmlElementWrapper(name="properties")
     public List<Property> properties;
