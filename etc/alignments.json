@@ -61,38 +61,38 @@
     ],
     "alignments" : [
         {
-            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_0h.bam",
-            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_0h.bam.bai",
+            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_0h.bam",
+            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_0h.bam.bai",
             "organism" : "Pfalciparum"
         },
         {
-            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_16h.bam",
-            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_16h.bam.bai",
+            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_16h.bam",
+            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_16h.bam.bai",
             "organism" : "Pfalciparum"
         },
         {
-            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_24h.bam",
-            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_24h.bam.bai",
+            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_24h.bam",
+            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_24h.bam.bai",
             "organism" : "Pfalciparum"
         },
         {
-            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_32h.bam",
-            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_32h.bam.bai",
+            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_32h.bam",
+            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_32h.bam.bai",
             "organism" : "Pfalciparum"
         },
         {
-            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_48h.bam",
-            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_48h.bam.bai",
+            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_48h.bam",
+            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_48h.bam.bai",
             "organism" : "Pfalciparum"
         },
         {
-            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_48hB.bam",
-            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_48hB.bam.bai",
+            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_48hB.bam",
+            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_48hB.bam.bai",
             "organism" : "Pfalciparum"
         },
         {
-            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_8h.bam",
-            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/MAL_8h.bam.bai",
+            "file" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_8h.bam",
+            "index" : "http://www.genedb.org/workshops/Lisbon2010/data/Malaria_RNASeq/version2.1.4/MAL_8h.bam.bai",
             "organism" : "Pfalciparum"
         }
     ]
