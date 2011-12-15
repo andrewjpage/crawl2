@@ -23,8 +23,6 @@ props.load(new FileInputStream(config))
 println "config ::"
 println config
 
-//compileJava.options.fork([memoryMaximumSize:"1024m"])
-
 def tmpResourcesPath = 'tmp/rootContent/resources/'
 def webArtemisClonePath = 'Web-Artemis'
 
@@ -34,41 +32,78 @@ configurations {
 
 repositories {
 	
+	maven {
+	    url "https://developer.genedb.org/nexus/content/repositories/jboss/"
+	}
+	maven {
+        url "https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"
+	}
+	maven {
+        url "https://developer.genedb.org/nexus/content/repositories/java.net-m2"
+	}
+	maven {
+        url "https://developer.genedb.org/nexus/content/repositories/central/"
+	}
+	maven {
+        url "https://developer.genedb.org/nexus/content/repositories/ApacheReleases/"
+	}
+	maven {
+        url "https://developer.genedb.org/nexus/content/repositories/ApachePublic/"
+	}
+	maven {
+        url "https://developer.genedb.org/nexus/content/repositories/apache-snapshots/"
+	}
+	maven {
+        url "https://developer.genedb.org/nexus/content/repositories/codehaus-snapshots/"
+	}
+	maven {
+        url "https://developer.genedb.org/nexus/content/repositories/spring-external/"
+	}
+	maven {
+        url "https://developer.genedb.org/nexus/content/repositories/spring-release/"
+	}
+	maven {
+        url "https://developer.genedb.org/nexus/content/repositories/Gradle/"
+	}
+	maven {
+        url "http://oss.sonatype.org/content/repositories/releases"
+	}
+	maven {
+        url "http://repo.gradle.org/gradle/repo"
+	}
+	maven {
+        url "http://download.java.net/maven/2"
+	}
+	maven {
+        url "http://repository.jboss.org/maven2"
+	}
+	maven {
+        url "http://www.ebi.ac.uk/~maven/m2repo"
+	}
+	maven {
+        url "http://repository.apache.org/content/groups/public/"
+	}
+	maven {
+        url "http://repository.springsource.com/maven/bundles/release"
+	}
+	maven {
+        url "http://repository.springsource.com/maven/bundles/external"
+	}
+	maven {
+        url "http://repository.springsource.com/maven/bundles/milestone"
+	}
+	
+	// bad to depend on maven central
+	// url "http://repository.sonatype.org/content/repositories/central"
+    // url "http://www.biojava.org/download/maven/"
+    // url "http://repository.springsource.com/maven/bundles/snapshot"
+	
 	
 	// a local repository for jars that are not available from online ones
 	flatDir name: 'localRepository', dirs: ['lib/local', 'lib/local/obo']
 	
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/jboss/"] 
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"]
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/java.net-m2"]
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/central/"]
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/ApacheReleases/"]
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/ApachePublic/"]
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/apache-snapshots/"]
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/codehaus-snapshots/"]
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/spring-external/"]
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/spring-release/"]
-    mavenRepo urls: ["https://developer.genedb.org/nexus/content/repositories/Gradle/"]
-    
-	// bad to depend on maven central
-	//    mavenRepo urls: ["http://repository.sonatype.org/content/repositories/central"]
-    mavenRepo urls: ["http://oss.sonatype.org/content/repositories/releases"]
-    mavenRepo urls: ["http://repo.gradle.org/gradle/repo"]
-    mavenRepo urls: ["http://download.java.net/maven/2"]
-    
-    mavenRepo urls: ["http://repository.jboss.org/maven2"]
-    
-    mavenRepo urls: ["http://www.ebi.ac.uk/~maven/m2repo"]
-    mavenRepo urls: ["http://repository.apache.org/content/groups/public/"]
-    //mavenRepo urls: ["http://www.biojava.org/download/maven/"]
-    
-    mavenRepo urls: ["http://repository.springsource.com/maven/bundles/release"]
-    mavenRepo urls: ["http://repository.springsource.com/maven/bundles/external"]
-    mavenRepo urls: ["http://repository.springsource.com/maven/bundles/milestone"]
-    //mavenRepo urls: ["http://repository.springsource.com/maven/bundles/snapshot"]
-    
 	// never use this!
-    mavenCentral()
+    // mavenCentral()
 }
 
 
@@ -138,7 +173,7 @@ dependencies {
     
 	
 	// does not currently work with eclipse target
-    // compile fileTree(dir: 'lib/local', includes: ['**.jar'])
+    compile fileTree(dir: 'lib/local', includes: ['**.jar'])
     
 }
 
@@ -147,7 +182,7 @@ jar {
 }
 
 task clientJar(type : Jar) {
-	from sourceSets.main.classes
+	from sourceSets.main.output
 	include 'org/genedb/crawl/client/**'
 	include 'org/genedb/crawl/model/**'
 	include 'org/genedb/crawl/json/**'
@@ -155,7 +190,7 @@ task clientJar(type : Jar) {
 }
 
 task elasticSearchRegexPlugin(type: Jar) {
-	from sourceSets.main.classes
+	from sourceSets.main.output
 	include 'org/genedb/crawl/elasticsearch/plugin/**'
 	include 'es-plugin.properties'
 	archiveName = "elasticsearch-regex-0.16.0.jar"
@@ -426,30 +461,10 @@ task copyLibs << {
 }
 
 
-/*
- * A custom task for wiping local ElasticSearch data
- */
-//task cleanes << {
-//    println "Deleting " + props["resource.elasticsearch.local.pathdata"]
-//    ant.delete(dir:props["resource.elasticsearch.local.pathdata"])
-//    println "Deleting " + props["resource.elasticsearch.local.pathlogs"]
-//    ant.delete(dir:props["resource.elasticsearch.local.pathlogs"])
-//}
-
 clean {
     ant.delete(dir:"tmp")
 }
 
-/*
- * currently required for the eclipse plugin because currently eclipse classpath does 
- * not fail gracefully if a sources jar is not available, which is the case for the 
- * local jars, see :
- * 		http://issues.gradle.org/browse/GRADLE-1157
- * should be able to remove this once it is fixed
- */
-eclipseClasspath {
-	downloadSources = false; // required for eclipseClasspath to work
-}
 
 
 
@@ -457,7 +472,7 @@ eclipseClasspath {
  * Generates the gradlew wrapper.
  */
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-2'
+    gradleVersion = '1.0-milestone-6'
 }
 
 /**
