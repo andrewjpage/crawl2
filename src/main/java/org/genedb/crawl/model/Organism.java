@@ -10,22 +10,28 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 public class Organism implements Serializable {
 	
 	@XmlAttribute
-	public String genus;
-	@XmlAttribute
-	public String species;
-	@XmlAttribute
-	public String common_name;
+	public Integer translation_table;
+	
 	@XmlAttribute
 	public Integer taxonID;
-	@XmlAttribute
-	public Integer translation_table;
+	
 	@XmlAttribute
 	public String name;
-	@XmlAttribute
-	public Integer ID;
 	
 	@XmlAttribute
     public String strain;
+	
+	@XmlAttribute
+	public String species;
+	
+	@XmlAttribute
+	public String genus;
+	
+	@XmlAttribute
+	public String common_name;
+	
+	@XmlAttribute
+	public Integer ID;
 	
 	@XmlElement(name="property", required=false)
     @XmlElementWrapper(name="properties")

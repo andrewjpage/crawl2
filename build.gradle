@@ -374,8 +374,8 @@ war.doFirst{
 		String indexFileName = tmpResourcesPath + "/" + webArtemisClonePath + "/index.html";
 		String html =   new File(indexFileName).getText();
 		
-		String toReplace = "{'directory':'.', 'source':'Pf3D7_01', 'start':'1', 'bases':'8000', 'showFeatureList':true, 'start': '1', 'zoomMaxRatio':'1.'});";
-		String with = "{webService:'${ws}', 'directory':'.', 'source':'${webArtemisInitialChromosome}', 'start':'1', 'bases':'8000', 'showFeatureList':true, 'start': '1', 'zoomMaxRatio':'1.'});";
+		String toReplace = "'directory':'.'";
+		String with = "webService:'${ws}', 'directory':'.'";
 		
 		println("Attempting to replace \n ${toReplace} \nwith \n ${with}");
 		String replaced = html.replace(toReplace, with); 
