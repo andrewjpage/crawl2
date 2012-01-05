@@ -10,15 +10,10 @@ public class ListSplittingPropertyEditor extends PropertyEditorSupport {
 		
 		@Override
 		public void setAsText(String text) {
-//			logger.info("setAsText");
-//			logger.info(text);
-			
+		    
 			List<String> list = Arrays.asList(text.split(","));
 			
 			this.setValue(list);
-			
-//			logger.info("value??");
-//			logger.info(this.getValue());
 		}
 		
 		
@@ -28,7 +23,6 @@ public class ListSplittingPropertyEditor extends PropertyEditorSupport {
 			@SuppressWarnings("unchecked")
 			List<String> list = (List<String>) this.getValue();
 			String str = StringUtils.arrayToCommaDelimitedString(list.toArray());
-			// logger.info(str);
 			return str;
 		}
 	}
