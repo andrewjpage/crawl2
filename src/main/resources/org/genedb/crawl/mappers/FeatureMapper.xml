@@ -223,6 +223,7 @@
             object_type.name as type,
             object.timelastmodified,
             object.timeaccessioned,
+            object.is_obsolete,
             <include refid="relationships"/>
             
         WHERE subject.uniquename = #{feature.uniqueName}  
@@ -237,6 +238,7 @@
             subject_type.name as type,
             subject.timelastmodified,
             subject.timeaccessioned,
+            subject.is_obsolete,
             <include refid="relationships"/>
             
         WHERE object.uniquename = #{feature.uniqueName}  
@@ -246,6 +248,7 @@
 		
 		<result column="uniqueName" property="uniqueName" />
 		<result column="name" property="name" />
+		<result property="isObsolete" column="is_obsolete"/>
 		<result property="timeaccessioned" column="timeaccessioned"
             javaType="java.util.Date" jdbcType="DATE" />
         <result property="timelastmodified" column="timelastmodified" 
