@@ -1,37 +1,81 @@
+/*********************************************************
+ *********************** Plugins *************************  
+ *********************************************************/
+
+ 
+
 apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'jetty'
 apply plugin: 'eclipse'
-apply plugin: 'idea'
 
-//configurations.compile.transitive = true
+
+
+
+/*********************************************************
+ ******************* Custom settings *********************
+ *********************************************************/
 
 /*
  * We need the crawl.jar for command line tasks.  
  */
 jar.enabled = true
 
+/*
+ * The version. Increment as appropriate.
+ */
 version = '0.1'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 logging.captureStandardOutput LogLevel.INFO
-
-// load properties from the specified config file
-Properties props = new Properties()
-props.load(new FileInputStream(config))
-println "config ::"
-println config
+//configurations.compile.transitive = true
 
 def tmpResourcesPath = 'tmp/rootContent/resources/'
 def webArtemisClonePath = 'Web-Artemis'
 
-configurations {
-    jaxws
-}
+// where jars go
+def lib_dir = "lib"
+
+// jars that we manually put in place
+def local_lib_dir = lib_dir + "/local"
+
+// like local_lib_dir, but libraries that are to be evaluated
+def local_experimental_dir = lib_dir + "/experimental"
+
+// jars copied here using the copyLibs task
+def local_cache_dir = lib_dir + "/cached"
+
+
+
+
+/*********************************************************
+ ****************** Config Properties ********************
+ *********************************************************/
+
+Properties props = new Properties()
+props.load(new FileInputStream(config))
+
+
+
+
+
+
+
+
+
+
+
+/*********************************************************
+ *************** Ivy/Maven dependencies ******************  
+ *********************************************************/
 
 repositories {
 	
+    // a local repository for jars that are not available from online ones
+    // at the top so it looks here first
+    flatDir name: 'localRepository', dirs: [local_lib_dir, local_cache_dir, local_experimental_dir]
+    
 	maven {
 	    url "https://developer.genedb.org/nexus/content/repositories/jboss/"
 	}
@@ -93,15 +137,6 @@ repositories {
         url "http://repository.springsource.com/maven/bundles/milestone"
 	}
 	
-	// bad to depend on maven central
-	// url "http://repository.sonatype.org/content/repositories/central"
-    // url "http://www.biojava.org/download/maven/"
-    // url "http://repository.springsource.com/maven/bundles/snapshot"
-	
-	
-	// a local repository for jars that are not available from online ones
-	flatDir name: 'localRepository', dirs: ['lib/local', 'lib/local/obo']
-	
 	// never use this!
     // mavenCentral()
 }
@@ -137,20 +172,9 @@ dependencies {
     
     compile group: 'org.mybatis', name: 'mybatis-spring', version:'1.0.0'
     
-    // used for runnin wsgen
-    //jaxws 'com.sun.xml.ws:jaxws-tools:2.1.4'
-    
     // used for soap services
     compile group: 'org.apache.cxf', name: 'cxf-rt-frontend-jaxws', version: '2.2.6'
     compile group: 'org.apache.cxf', name: 'cxf-rt-transports-http', version: '2.2.6'
-    
-    
-    
-    //compile group: 'org.neo4j', name: 'neo4j', version: '1.4.1'
-    //compile group: 'org.neo4j', name: 'neo4j-kernel', version: '1.4.1'
-    //compile group: 'org.neo4j', name: 'neo4j-meta-model', version: '0.9-SNAPSHOT'
-    
-    
     
     compile group: 'uk.ac.ebi.das', name:'jdas', version: '1.0.1'
 	
@@ -164,123 +188,122 @@ dependencies {
     
     compile group:'jgrapht', name:'jgrapht', version: '0.7.3'
     
-    
-    
-//    compile group: 'com.hp.hpl.jena', name: 'jena', version: '2.6.4'
-//    compile group: 'edu.stanford.smi.protege', name: 'protege', version: '3.4.7'
-//    compile group: 'edu.stanford.smi.protege', name: 'protege-owl', version: '3.4.7'
-//    compile group: 'edu.stanford.smi.protege', name: 'orphanNodesAlg'
-    
-	
-	// does not currently work with eclipse target
-    compile fileTree(dir: 'lib/local', includes: ['**.jar'])
+	// finally, any jars in lib/local
+    compile fileTree(dir: local_lib_dir, includes: ['**.jar'])
+    compile fileTree(dir: local_experimental_dir, includes: ['**.jar'])
+     
     
 }
 
-jar {
-	archiveName = "crawl.jar"
+
+
+
+
+/*********************************************************
+ ************** Customized standard tasks ****************
+ *********************************************************/
+
+
+clean {
+    ant.delete(dir:"tmp")
 }
 
-task clientJar(type : Jar) {
-	from sourceSets.main.output
-	include 'org/genedb/crawl/client/**'
-	include 'org/genedb/crawl/model/**'
-	include 'org/genedb/crawl/json/**'
-	baseName = "crawl-client"
-}
+/*
+* Testing.
+*/
 
-task elasticSearchRegexPlugin(type: Jar) {
-	from sourceSets.main.output
-	include 'org/genedb/crawl/elasticsearch/plugin/**'
-	include 'es-plugin.properties'
-	archiveName = "elasticsearch-regex-0.16.0.jar"
-}
-
-pluginDistDir = "tmp/plugin"
-
-task copyDist(dependsOn: [elasticSearchRegexPlugin], description: 'Builds the plugin zip file') << {
-	copy {
-		from project.buildDir.getPath() + "/libs/elasticsearch-regex-0.16.0.jar"
-		into pluginDistDir
-	}
-}
-
-task zipPlugin(type: Zip, dependsOn: ['copyDist']) {
-	from(pluginDistDir) {
-	}
-	archiveName = "elasticsearch-regex-0.16.0.zip"
-	ant.delete(dir: pluginDistDir)
-}
-
-task releasePlugin(dependsOn: [zipPlugin]) << {
-	copy {
-		from distsDir
-		into new File("/Library/WebServer/Documents/plugins/regex")
-	}
-}
-
-
-
-
-
-
-jar << {
-	
-    manifest {
-        attributes 'Implementation-Title': 'Crawl', 'Implementation-Version': '0.1'
-    }
-	
-	// the default set in the gradle.properties file is currently false as it should take less time
-	if (fat == "true") {
-	    from configurations.compile.collect {
-	        it.isDirectory() ? it : zipTree(it).matching{exclude{it.name == 'META-INF'}}
-	    }
-	} else {
-		copy {
-			from configurations.runtime
-			from configurations.runtime.allArtifacts*.file
-			into('build/libs')
-		}
-	}
-	
-	
+test {
+   maxHeapSize = '2048m'
 }
 
 test.doFirst {
-    systemProperties.putAll( props )
+   systemProperties.putAll( props )
 }
 
-test {
-	maxHeapSize = '2048m'
+
+/*
+ * There is an option to build a fat jar. It is slow. Off by default.
+ */
+jar {
+    
+    archiveName = "crawl.jar" // override to not include the version number in the archive name
+    
+    manifest {
+        attributes 'Implementation-Title': 'Crawl', 'Implementation-Version': '0.1'
+    }
+    
+    // must be executed during the jar task (as of gradle 1 milestone 7)
+    if (fat == "true") {
+        from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
 }
+
+// must be executed at the end of the jar task 
+jar << {
+    if (fat != "true") {
+        copy {
+            from configurations.runtime
+            into('build/libs')
+        }
+    }
+}
+
+
+
+
 
 /*
 * Currently using a custom install task because the gradle application plugin only supports one main class.
 */
-task install(dependsOn: 'jar') << {
-   
-   ant.delete(dir:dir)
+task install(dependsOn: ['jar']) << {
     
-   copy {
-	   from tree = fileTree(project.buildDir.getPath() + "/libs").include('**/*.jar')
-	   into dir + "/lib"
-   }
-   
-   copy {
-	   from "./crawl"
-	   into dir + "/bin"
-   }
-   
-   copy {
-       from('.') {
-           include '*.properties'
-           exclude 'gradle.properties'
-           include '*.xml'
-       }
-       into dir + "/etc/"
-   }
-   
-   ant.chmod(perm: "+x", dir: new File(dir + "/bin"), includes: '*')
+    description = "Installs the crawl and dependencies in a convenient location (by default in the user.home/bin folder"
+    
+    def the_dir = null;
+    
+    if (project.hasProperty("dir") && prompt_for_custom_installs) {
+        
+        if (new File(dir).isDirectory()) {
+            println "Using user supplied dir " + dir + ", which means wiping this folder."
+            def answer = yesno("Are you prepared to wipe this folder if it exists? (yes/no) \n")
+            if (answer == "no") {
+                println ("OK. Quitting installation.")
+                System.exit(1)
+            }
+        }
+        
+        the_dir = dir;
+        
+    } else {
+    
+        println "Using default dir " + System.properties["user.home"]
+        the_dir = System.properties["user.home"] + "/bin/crawl"
+        
+    }
+    
+    ant.delete(dir:the_dir)
+    
+    copy {
+        from tree = fileTree(project.buildDir.getPath() + "/libs").include('**/*.jar')
+        into the_dir + "/lib"
+    }
+
+    copy {
+        from "./crawl"
+        into the_dir + "/bin"
+    }
+
+    copy {
+        from('.') {
+            include '*.properties'
+            exclude 'gradle.properties'
+            include '*.xml'
+        }
+        into the_dir + "/etc/"
+    }
+
+    ant.chmod(perm: "+x", dir: new File(the_dir + "/bin"), includes: '*')
+
 }
 
 
@@ -291,68 +314,34 @@ task install(dependsOn: 'jar') << {
  * WAR building and deployment.
  */
 
+war {
+    
+    /* 
+     * We always want to force the war to be repackaged because the file copying 
+     * done during the war task (see war.doFirst) must be done even if the 
+     * classes aren't changed, because a different property file might be being 
+     * used.
+     * 
+     * Gradle has a convention whereby "cleanTask" forces that task to be 
+     * considered not up to date. Thus we use cleanWar to ensure that the war 
+     * used has the correct property and spring xml files put in.
+     */
+    dependsOn cleanWar
+    
+    webInf { from 'tmp/WEB-INF' }
+    baseName = props["deploy.name"]
+    archiveName = props["deploy.name"] + ".war"
+    from 'tmp/rootContent/'
+}
+
+
 war.doFirst{
-    
-    
-//    println configurations.compile
-//    
-//    println (configurations.compile).asPath
-//    println sourceSets.main.java.srcDirs
-//    println configurations.compile.asPath
-    
-    /*
-     * wsgen -verbose -d build/classes/main \
-     *  -cp build/classes/main:build/libs/org.springframework.web-3.0.5.RELEASE.jar:build/libs/org.springframework.beans-3.0.5.RELEASE.jar:build/libs/org.springframework.context-3.0.5.RELEASE.jar \
-     *  org.genedb.crawl.controller.FeaturesControlle
-     * */
-    
-//    ant {
-//     verbose=true
-//       taskdef(
-//         name:'wsgen',
-//         classname:'com.sun.tools.ws.ant.WsGen',
-//         classpath: (configurations.jaxws + configurations.compile ).asPath)
-//       wsgen(
-//         keep:true,
-//         destdir: 'build/classes/main',
-//         sei:'org.genedb.crawl.controller.FeaturesController',
-//         classpath: 'build/classes/main:' + configurations.compile.asPath)
-//       wsgen(
-//           keep:true,
-//           destdir: 'build/classes/main',
-//           sei:'org.genedb.crawl.controller.OrganismsController',
-//           classpath: 'build/classes/main:' + configurations.compile.asPath)
-//       wsgen(
-//           keep:true,
-//           destdir: 'build/classes/main',
-//           sei:'org.genedb.crawl.controller.RegionsController',
-//           classpath: 'build/classes/main:' + configurations.compile.asPath)
-////       wsgen(
-////           keep:true,
-////           destdir: 'build/classes/main',
-////           sei:'org.genedb.crawl.controller.SamController',
-////           classpath: 'build/classes/main:' + configurations.compile.asPath)
-////       wsgen(
-////           keep:true,
-////           destdir: 'build/classes/main',
-////           sei:'org.genedb.crawl.controller.VariantController',
-////           classpath: 'build/classes/main:' + configurations.compile.asPath)
-//    }
-    
-    
-    
     
     resourceType = props["resource.type"]
     ant.copy (
         file:'etc/config/crawl-' + resourceType + '.xml', 
         toFile:'tmp/WEB-INF/crawl-repository.xml',
         overwrite:'true' )
-    
-//    resourceController = props["resource.controller"]
-//    ant.copy (
-//        file:'etc/config/crawl-controller-' + resourceController + '.xml',
-//        toFile:'tmp/WEB-INF/crawl-controller.xml',
-//        overwrite:'true' )
     
 	
 	new File("tmp/WEB-INF/classes/").mkdirs()
@@ -412,7 +401,7 @@ war.doFirst{
 		String toReplace = "'directory':'.'";
 		String with = "webService:'${ws}', 'directory':'.'";
 		
-		println("Attempting to replace \n ${toReplace} \nwith \n ${with}");
+		// println("Attempting to replace \n ${toReplace} \nwith \n ${with}");
 		String replaced = html.replace(toReplace, with); 
 		
 		new File(indexFileName).setText(replaced);
@@ -427,16 +416,24 @@ war.doFirst{
 }
 
 
-
-war {
-    webInf { from 'tmp/WEB-INF' } 
-    baseName = props["deploy.name"]
-	archiveName = props["deploy.name"] + ".war"
-	from 'tmp/rootContent/'
+/*
+* Generates the gradlew wrapper.
+*/
+task wrapper(type: Wrapper) {
+   gradleVersion = '1.0-milestone-7'
 }
 
 
 
+
+
+/*********************************************************
+ ******************** Custom tasks ***********************  
+ *********************************************************/
+
+/*
+ * Copies the generated war a tomcat webapp folder.
+ */
 task deploy(dependsOn: 'war') << {
     copy {
         from war.archivePath
@@ -444,47 +441,133 @@ task deploy(dependsOn: 'war') << {
     }
 }
 
-// use this for generating a list of jars to add to the repo in lib/local ...
+
+/*
+ * Copies the dependencies (i.e., jars) into a local cached folder for inclusion into the git repository.
+ */
 task copyLibs << {
+    
+    new File(local_cache_dir).mkdirs()
+    
     def newFiles = []
     for(file in configurations.compile) {
         String fileName = file.getPath()
-        if (! fileName.contains("/lib/local/")) {
+        if (! fileName.contains(local_cache_dir)) {
             newFiles.add(fileName)
         }
     }
     
     copy {
         from files(newFiles)
-        into "lib/local"
+        into local_cache_dir
     }
 }
 
 
-clean {
-    ant.delete(dir:"tmp")
+/*
+ * Builds a 'lightweight' client jar. 
+ */
+task clientJar(type : Jar) {
+    from sourceSets.main.output
+    include 'org/genedb/crawl/client/**'
+    include 'org/genedb/crawl/model/**'
+    include 'org/genedb/crawl/json/**'
+    baseName = "crawl-client"
 }
 
+
+
+
+
+
+/**********************************************************
+ ************** Elasticsearch Plugin tasks* ***************
+ **********************************************************/
+
+/*
+ * To allow custom regex searches (e.g. of sequences), the following tasks 
+ * will generate a special elasticsearch plugin, which can be included in 
+ * an elasticsearch installation by means of a web server download. 
+ */
+
+pluginDistDir = "tmp/plugin"
+String arbitrary_elasticsearch_plugin_webserver_deployment_folder = "/Library/WebServer/Documents/plugins/regex"
+
+/*
+ * Generates the plugin jar
+ */
+task elasticSearchRegexPlugin(type: Jar) {
+    from sourceSets.main.output
+    include 'org/genedb/crawl/elasticsearch/plugin/**'
+    include 'es-plugin.properties'
+    archiveName = "elasticsearch-regex-0.16.0.jar"
+}
+
+/*
+ * Copies the jar into a folder for zipping.
+ */
+
+task copyDist(dependsOn: [elasticSearchRegexPlugin], description: 'Builds the plugin zip file') << {
+    copy {
+        from project.buildDir.getPath() + "/libs/elasticsearch-regex-0.16.0.jar"
+        into pluginDistDir
+    }
+}
+
+/*
+ * Zips a plugin jar folder for deployment.
+ */
+task zipPlugin(type: Zip, dependsOn: ['copyDist']) {
+    from(pluginDistDir) {
+    }
+    archiveName = "elasticsearch-regex-0.16.0.zip"
+    ant.delete(dir: pluginDistDir)
+}
+
+/*
+* Deploys the zipped jar to a web server.
+*/
+task releasePlugin(dependsOn: [zipPlugin]) << {
+    copy {
+        from distsDir
+        into new File(arbitrary_elasticsearch_plugin_webserver_deployment_folder)
+    }
+}
+
+
+
+/**********************************************************
+ ******************* Custom functions *********************
+ **********************************************************/
 
 
 
 /*
- * Generates the gradlew wrapper.
- */
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-6'
-}
-
-/**
  * Makes a git clone.
  */
 def gitClone(String url, String branch, File dir) {
 	dir.mkdirs()
     def exec = ['git','clone', url, '-b', branch]
-    println exec
+    //println exec
 	def proc = exec.execute(['GIT_SSL_NO_VERIFY=true'], dir)
 	proc.waitFor()
 	if (proc.exitValue() > 1) throw new Exception (proc.err.text)
+}
+
+
+/*
+ * Prompts the user for either a yes or a no.
+ */
+def yesno(message) {
+    def answer = null;
+    while (answer == null) {
+        println "Please enter yes or no : \n"
+        def user_answer = System.console().readLine()
+        if (user_answer == "yes" || user_answer == "no") {
+            answer = user_answer;
+        }
+    }
+    return answer;
 }
 
 
