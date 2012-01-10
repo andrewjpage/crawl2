@@ -2,8 +2,13 @@ package org.genedb.crawl.elasticsearch.index.gff;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.action.admin.indices.flush.FlushRequest;
+import org.elasticsearch.action.admin.indices.flush.FlushResponse;
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.genedb.crawl.elasticsearch.index.NonDatabaseDataSourceIndexBuilder;
 import org.genedb.crawl.model.Organism;
 import org.kohsuke.args4j.Option;
@@ -34,6 +39,9 @@ public class GFFIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
 		}
 		
 		logger.debug("Complete");
+		
+		FlushResponse fr = connection.getClient().admin().indices().flush(new FlushRequest(this.connection.getIndex())).actionGet();
+		logger.info(String.format("Flush! %s failed,  %s successful, %s total", fr.getFailedShards(), fr.getSuccessfulShards(), fr.getTotalShards()));
 		
 	}
 	
