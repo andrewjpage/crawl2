@@ -78,7 +78,7 @@ else
     export JAVA="$JAVA_HOME/bin/java"
 fi
 
-echo $JAVA
+# echo $JAVA
 
 # the java.net.preferIPv4Stack must be set to true, or else Hazelcast 
 # instances may not be able to see it (it is also set in the Hazelcast 

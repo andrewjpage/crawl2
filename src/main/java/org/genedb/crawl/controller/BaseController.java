@@ -4,13 +4,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.genedb.crawl.model.Argument;
@@ -34,7 +31,6 @@ public abstract class BaseController {
 	
 	@InitBinder
     public void initBinder(WebDataBinder binder) {
-		// we might be able to use this to split lists...
 		binder.registerCustomEditor(List.class, new ListSplittingPropertyEditor());
 		binder.registerCustomEditor(Date.class, new DatePropertyEditor());
 	}
@@ -153,15 +149,6 @@ public abstract class BaseController {
 		return service;
 	}
 	
-//	private String[] mergeArrays(String[][] tomerge) {
-//		Set<String> merged = new HashSet<String>();
-//		for (String[] array : tomerge) {
-//			if (array != null) {
-//				merged.addAll(Arrays.asList(array));
-//			}
-//		}
-//		return merged.toArray(new String[]{});
-//	}
 	
 	private Argument getOrCreateArgument(Map<Integer, Argument> arguments, int index) {
 		if (! arguments.containsKey(index)) {

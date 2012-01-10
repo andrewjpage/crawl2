@@ -153,7 +153,7 @@ public class FeatureMapperUtil {
             return feature;
         
         getDescendants(gene, ofType, false);
-        Feature transcript = getTranscript(feature, gene);
+        Feature transcript = getTranscript(feature, gene, true);
         
         // if there are no transcripts, must use the gene
         if (transcript == null)
@@ -213,7 +213,7 @@ public class FeatureMapperUtil {
         return transcripts;
     }
     
-    public Feature getTranscript(Feature requested, Feature hierarchyFeature) {
+    public Feature getTranscript(final Feature requested, final Feature hierarchyFeature, final boolean ignoreObsoletes) {
 
         Feature firstTranscript = null;
         
@@ -223,6 +223,9 @@ public class FeatureMapperUtil {
         
         for (Feature child : hierarchyFeature.children) {
             if (child.type.name.equals("mRNA")) {
+                
+                if (ignoreObsoletes && child.isObsolete)
+                    continue;
                 
                 logger.info(String.format(" --> %s (%s) ", child.uniqueName, child.type.name));
                 
@@ -235,6 +238,10 @@ public class FeatureMapperUtil {
                     firstTranscript = child;
 
                 for (Feature grandChild : child.children) {
+                    
+                    if (ignoreObsoletes && grandChild.isObsolete)
+                        continue;
+                    
                     logger.info(String.format(" ---> %s (%s) ", grandChild.uniqueName, grandChild.type.name));
                     String grandChildType = grandChild.type.name;
                     if (requested.type.name.equals(grandChildType) && requested.uniqueName.equals(grandChild.uniqueName)) {
@@ -311,7 +318,7 @@ public class FeatureMapperUtil {
     }
     
     public List<Property> getPolypeptideProperties(Feature feature, Feature hierarchyFeature) throws NumberFormatException, BioException, TranslationException {
-        Feature transcript = getTranscript(feature, hierarchyFeature);
+        Feature transcript = getTranscript(feature, hierarchyFeature, false);
         if (transcript == null)
             throw new RuntimeException("Could not find transcript");
         
