@@ -1,6 +1,7 @@
 package org.genedb.crawl.elasticsearch.mappers;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,8 +14,6 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.action.search.SearchRequestBuilder;
-import org.elasticsearch.common.xcontent.ToXContent;
-import org.elasticsearch.common.xcontent.json.JsonXContent;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FieldQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -22,6 +21,7 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortBuilders;
+import org.genedb.crawl.elasticsearch.index.gff.GFFSequenceExtractor;
 import org.genedb.crawl.mappers.RegionsMapper;
 import org.genedb.crawl.model.Coordinates;
 import org.genedb.crawl.model.Cvterm;
@@ -38,6 +38,7 @@ import com.hazelcast.core.Hazelcast;
 public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implements RegionsMapper {
 
 	private Logger logger = Logger.getLogger(ElasticSearchRegionsMapper.class);
+	private GFFSequenceExtractor extractor = new GFFSequenceExtractor();
 	
 	private int getTotalInRegion(String region) {
 		FieldQueryBuilder regionQuery = QueryBuilders.fieldQuery("region", region);
@@ -382,31 +383,51 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		sequence.length = 0;
 		sequence.organism_id = -1;
 		
-		try {
-			
-			logger.info(String.format("%s %s %s %s %s",connection.getIndex(), connection.getRegionType(), region, connection, connection.getClient()));
-			String json = connection
-							.getClient()
-							.prepareGet()
-							.setIndex(connection.getIndex())
-							.setType(connection.getRegionType())
-							.setId(region)
-							.execute()
-							.actionGet()
-							.sourceAsString();
-			
-			
-			
-			Feature regionFeature = (Feature) jsonIzer.fromJson(json, Feature.class);
-			
-			sequence.dna = regionFeature.residues;
-			sequence.length = regionFeature.residues.length();
-			sequence.organism_id = regionFeature.organism_id;
-			
-			
-		} catch (Exception e) {
-			logger.error(e);
-		} 
+	
+		
+	    Feature regionFeature = this.getInfo(region, null, null);
+	    String regionFilePath = null;
+	    
+	    for (Property prop : regionFeature.properties){
+	        if (prop.name.equals("file")) {
+	            regionFilePath = prop.value;
+	        }
+	    }
+	    
+	    if (regionFilePath != null) {
+            try {
+                sequence.dna = extractor.read(regionFilePath, region);;
+            } catch (IOException e) {
+                throw new RuntimeException("Could not read sequence file for " + region);
+            }
+	    }
+	    
+	    sequence.length = sequence.dna.length();
+        sequence.organism_id = regionFeature.organism_id;
+	    
+	    
+//		    
+//			logger.info(String.format("%s %s %s %s %s",connection.getIndex(), connection.getRegionType(), region, connection, connection.getClient()));
+//			String json = connection
+//							.getClient()
+//							.prepareGet()
+//							.setIndex(connection.getIndex())
+//							.setType(connection.getRegionType())
+//							.setId(region)
+//							.execute()
+//							.actionGet()
+//							.sourceAsString();
+//			
+//			
+//			
+//			Feature regionFeature = (Feature) jsonIzer.fromJson(json, Feature.class);
+//			
+//			sequence.dna = regionFeature.residues;
+//			sequence.length = regionFeature.residues.length();
+//			sequence.organism_id = regionFeature.organism_id;
+		
+		
+		
 		
 		Hazelcast.getMap("regions").put(region, sequence);
 		

@@ -11,7 +11,7 @@ import java.util.zip.GZIPInputStream;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.genedb.crawl.elasticsearch.index.gff.GFFAnnotatationAndFastaExtractor;
+import org.genedb.crawl.elasticsearch.index.gff.GFFAnnotatationExtractor;
 import org.genedb.crawl.elasticsearch.index.gff.GFFFileFilter;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchFeatureMapper;
 import org.genedb.crawl.elasticsearch.mappers.ElasticSearchOrganismsMapper;
@@ -73,11 +73,18 @@ public abstract class NonDatabaseDataSourceIndexBuilder extends IndexBuilder {
 	
 	protected void convertFile(File gffFile, Organism organism) throws ParseException, IOException {
 		BufferedReader reader = getReader(gffFile);
-		new GFFAnnotatationAndFastaExtractor(reader, organism, featureMapper, regionsMapper);
+		new GFFAnnotatationExtractor(reader, gffFile.getAbsolutePath(), organism, featureMapper, regionsMapper);
 	}
 	
-
-	public BufferedReader getReader(File file) throws IOException {
+	
+	/**
+	 * Returns the correct reader for gzipped or non-gzipped files.
+	 * 
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public static BufferedReader getReader(File file) throws IOException {
 		
 		BufferedReader reader = null;
 		

@@ -416,12 +416,6 @@ war.doFirst{
 }
 
 
-/*
-* Generates the gradlew wrapper.
-*/
-task wrapper(type: Wrapper) {
-   gradleVersion = '1.0-milestone-7'
-}
 
 
 
@@ -430,6 +424,14 @@ task wrapper(type: Wrapper) {
 /*********************************************************
  ******************** Custom tasks ***********************  
  *********************************************************/
+
+/*
+* Generates the gradlew wrapper. Run this task when you upgrade gradle.
+*/
+task createWrapper(type: Wrapper) {
+   gradleVersion = '1.0-milestone-7'
+}
+
 
 /*
  * Copies the generated war a tomcat webapp folder.
