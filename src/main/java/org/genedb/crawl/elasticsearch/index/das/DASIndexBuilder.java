@@ -67,7 +67,11 @@ public class DASIndexBuilder extends NonDatabaseDataSourceIndexBuilder {
                 logger.debug(sequence);
 
                 RegionFeatureBuilder rfb = new RegionFeatureBuilder(segment.getId(), o.ID);
-                rfb.addSequence(sequence);
+                
+                // @FIXME some other way will need to be made for fetching DAS sequences as we are 
+                // not storing them in the ES any more...
+                // rfb.addSequence(sequence);
+                
                 Feature region = rfb.getRegion();
                 regionsMapper.createOrUpdate(region);
 

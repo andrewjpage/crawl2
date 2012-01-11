@@ -189,7 +189,7 @@ public abstract class ElasticSearchBaseMapper {
 	
 	protected <T extends Object> T getFirstMatch(String indexName, String typeName, Map<String, String> fieldNamesAndValues, Class<T> cls) {
 	    
-		logger.info(String.format("Fetching index %s, type %s, field %s, value %s, casting to %s.", indexName, typeName, fieldNamesAndValues, cls.getName()));
+		logger.info(String.format("Fetching index %s, type %s, field %s, casting to %s.", indexName, typeName, fieldNamesAndValues, cls.getName()));
 		
 		BoolQueryBuilder booleanQuery = QueryBuilders.boolQuery();
 		for (String key : fieldNamesAndValues.keySet())  {

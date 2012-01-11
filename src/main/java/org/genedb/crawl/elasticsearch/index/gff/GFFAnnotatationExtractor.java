@@ -13,25 +13,20 @@ import org.genedb.crawl.model.LocatedFeature;
 import org.genedb.crawl.model.Organism;
 import org.genedb.crawl.modelling.RegionFeatureBuilder;
 
-public class GFFAnnotatationAndFastaExtractor {
+public class GFFAnnotatationExtractor {
 
-    private static Logger             logger      = Logger.getLogger(GFFAnnotatationAndFastaExtractor.class);
+    private static Logger logger = Logger.getLogger(GFFAnnotatationExtractor.class);
 
-    
-    //Set<String> features = new HashSet<String>();
-    //Map<String, String>       features    = new HashMap<String, LocatedFeature>();
-//    Map<String, LocatedFeature>       genes       = new HashMap<String, LocatedFeature>();
-//    Map<String, List<LocatedFeature>> transcripts = new HashMap<String, List<LocatedFeature>>();
-
-    public GFFAnnotatationAndFastaExtractor(BufferedReader buf, Organism organism, ElasticSearchFeatureMapper featureMapper, ElasticSearchRegionsMapper regionsMapper) throws IOException {
-
-        List<RegionFeatureBuilder>        sequences   = new ArrayList<RegionFeatureBuilder>();
-
+    public GFFAnnotatationExtractor(BufferedReader buf, String filePath, Organism organism, ElasticSearchFeatureMapper featureMapper, ElasticSearchRegionsMapper regionsMapper) throws IOException {
+        
+        List<RegionFeatureBuilder> sequences = new ArrayList<RegionFeatureBuilder>();
+        
         try {
 
-            String line = "";
             boolean parsingAnnotations = true;
+            LocatedFeature lastFeature = null;
             RegionFeatureBuilder sequence = null;
+            String line = "";
 
             while ((line = buf.readLine()) != null) {
                 logger.debug(line);
@@ -57,29 +52,24 @@ public class GFFAnnotatationAndFastaExtractor {
                         feature.type.name = "exon";
                     }
                     
-                    LocatedFeature existingFeature = featureMapper.get(feature.uniqueName);
+                    /*
+                     * If the last feature has the same uniqueName, then add the extra 
+                     * coordinates to the last one, else store this feature.
+                     */
+                    if (lastFeature != null && lastFeature.uniqueName.equals(feature.uniqueName)) {
+                        if (feature.fmin != lastFeature.fmin || feature.fmax != lastFeature.fmax) {
 
-                    if (existingFeature != null) {                            
-                        if (feature.fmin != existingFeature.fmin || feature.fmax != existingFeature.fmax) {
+                            logger.info(String.format("adding extra coordinates to %s : %s-%s" + lastFeature.uniqueName, feature.coordinates.get(0).fmin, feature.coordinates.get(0).fmax));
 
-                            // else, just add its coordinates (as long as they
-                            // are not already there)
-                            // for now we don't store any other info
-
-                            logger.info("adding extra coordinates to " + existingFeature.uniqueName + " : " + feature.coordinates.get(0).fmin + "-" + feature.coordinates.get(0).fmax);
-                            
-                            existingFeature.coordinates.add(feature.coordinates.get(0));
-                            feature = existingFeature;
-
+                            lastFeature.coordinates.add(feature.coordinates.get(0));
+                            createOrUpdate(lastFeature, featureMapper);
                         }
-
+                    } else {
+                        createOrUpdate(feature, featureMapper);
+                        lastFeature = feature;
                     }
-                    
-                    createOrUpdate(feature,featureMapper);
-                    //featureMapper.waitForStatus(EnumSet.of(ClusterHealthStatus.GREEN, ClusterHealthStatus.YELLOW));
 
                 } else {
-
                     if (line.startsWith(">")) {
                         String sequenceName = line.substring(1);
 
@@ -90,149 +80,26 @@ public class GFFAnnotatationAndFastaExtractor {
                         }
 
                         sequence = new RegionFeatureBuilder(sequenceName, organism.ID);
-                        logger.debug("Parsing sequence : " + sequenceName);
+                        sequence.setSequenceFile(filePath);
+                        
                         sequences.add(sequence);
 
-                    } else if (sequence != null) {
-                        sequence.addSequence(line);
-                    }
-
+                    } 
                 }
 
             }
-
+            
             for (RegionFeatureBuilder regionBuilder : sequences) {
-                Feature region = regionBuilder.getRegion();
-                regionsMapper.createOrUpdate(region);
-            }
+              Feature region = regionBuilder.getRegion();
+              logger.info("Storing region : " + region.uniqueName);
+              regionsMapper.createOrUpdate(region);
+          }
 
         } finally {
-            sequences = null;
             buf.close();
         }
 
     }
-
-//    private void createGeneModelWithExon(LocatedFeature feature) {
-//
-//        assert (feature.type.name.equals("exon"));
-//
-//        LocatedFeature gene = makeGene(feature);
-//
-//        LocatedFeature transcript = makeTranscript(gene, null);
-//        LocatedFeature exon = makeExon(feature, transcript);
-//        LocatedFeature polypeptide = makePolypeptide(feature, transcript);
-//
-//        createOrUpdate(new LocatedFeature[] { gene, transcript, exon, polypeptide });
-//
-//    }
-//
-//    private void updateGeneModelWithExon(LocatedFeature gene, LocatedFeature feature) {
-//
-//        assert (feature.type.name.equals("exon"));
-//
-//        LocatedFeature transcript = makeTranscript(gene, feature);
-//
-//        int minFmin = gene.fmin;
-//        int maxFmax = gene.fmax;
-//
-//        for (LocatedFeature t : transcripts.get(gene.uniqueName)) {
-//            if (t.fmin < minFmin)
-//                minFmin = t.fmin;
-//            if (t.fmax > maxFmax)
-//                maxFmax = t.fmax;
-//        }
-//
-//        gene.fmin = minFmin;
-//        gene.fmax = maxFmax;
-//
-//        gene.coordinates.get(0).fmin = minFmin;
-//        gene.coordinates.get(0).fmax = maxFmax;
-//
-//        logger.info("adding new exon to " + gene.uniqueName + " : " + feature.uniqueName + " " + feature.coordinates.get(0).fmin + "-" + feature.coordinates.get(0).fmax);
-//        logger.info("reset gene coordinates to " + gene.fmin + "-" + gene.fmax);
-//
-//        LocatedFeature exon = makeExon(feature, transcript);
-//        LocatedFeature polypeptide = makePolypeptide(feature, transcript);
-//
-//        createOrUpdate(new LocatedFeature[] { gene, transcript, exon, polypeptide });
-//
-//    }
-//
-//    private LocatedFeature makeGene(LocatedFeature feature) {
-//
-//        assert (feature.type.name.equals("exon"));
-//
-//        LocatedFeature gene = new LocatedFeature();
-//        LocatedFeatureUtil.copyCoordinates(feature, gene);
-//        gene.uniqueName = feature.uniqueName;
-//        gene.type = new Cvterm();
-//        gene.type.name = "gene";
-//
-//        genes.put(gene.uniqueName, gene);
-//        transcripts.put(gene.uniqueName, new ArrayList<LocatedFeature>());
-//
-//        return gene;
-//
-//    }
-//
-//    private LocatedFeature makeTranscript(LocatedFeature gene, LocatedFeature alternativeCoordinates) {
-//        
-//        List<LocatedFeature> geneTranscripts = transcripts.get(gene.uniqueName);
-//
-//        int index = geneTranscripts.size() + 1;
-//
-//        LocatedFeature transcript = new LocatedFeature();
-//
-//        if (alternativeCoordinates != null) {
-//            LocatedFeatureUtil.copyCoordinates(alternativeCoordinates, transcript);
-//        } else {
-//            LocatedFeatureUtil.copyCoordinates(gene, transcript);
-//        }
-//
-//        transcript.type = new Cvterm();
-//        transcript.type.name = "mRNA";
-//        transcript.uniqueName = gene.uniqueName + "." + index;
-//        transcript.parent = gene.uniqueName;
-//        transcript.parentRelationshipType = "part_of";
-//        
-//        geneTranscripts.add(transcript);
-//
-//        return transcript;
-//    }
-//
-//    private LocatedFeature makeExon(LocatedFeature originalGFFFeature, LocatedFeature transcript) {
-//
-//        LocatedFeature exon = new LocatedFeature();
-//        LocatedFeatureUtil.copyCoordinates(originalGFFFeature, exon);
-//
-//        exon.type = new Cvterm();
-//        exon.type.name = "exon";
-//        exon.uniqueName = transcript.uniqueName + ":exon";
-//        exon.parent = transcript.uniqueName;
-//        exon.parentRelationshipType = "part_of";
-//        
-//        return exon;
-//    }
-//
-//    private LocatedFeature makePolypeptide(LocatedFeature originalGFFFeature, LocatedFeature transcript) {
-//
-//        LocatedFeature polypeptide = LocatedFeatureUtil.fromFeature(originalGFFFeature, new LocatedFeature());
-//
-//        polypeptide.type = new Cvterm();
-//        polypeptide.type.name = "polypeptide";
-//
-//        polypeptide.uniqueName = transcript.uniqueName + ":pep";
-//        polypeptide.parent = transcript.uniqueName;
-//        polypeptide.parentRelationshipType = "derives_from";
-//
-//        return polypeptide;
-//    }
-
-//    private void createOrUpdate(LocatedFeature[] features) {
-//        for (LocatedFeature feature : features)
-//            createOrUpdate(feature);
-//    }
 
     private void createOrUpdate(LocatedFeature feature, ElasticSearchFeatureMapper featureMapper) {
         logger.info(info(feature));
