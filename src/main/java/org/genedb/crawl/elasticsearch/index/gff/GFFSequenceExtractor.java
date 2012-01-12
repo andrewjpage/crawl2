@@ -9,15 +9,15 @@ import org.genedb.crawl.elasticsearch.index.NonDatabaseDataSourceIndexBuilder;
 
 public class GFFSequenceExtractor {
 
-    private static Logger logger               = Logger.getLogger(GFFSequenceExtractor.class);
-
-    StringBuffer          sequenceStringbuffer = new StringBuffer();
+    private static Logger logger = Logger.getLogger(GFFSequenceExtractor.class);
 
     public synchronized String read(String regionFilePath, String sequenceNameRequested) throws IOException {
-        
+
         File regionFile = new File(regionFilePath);
         BufferedReader fileReader = NonDatabaseDataSourceIndexBuilder.getReader(regionFile);
-        
+
+        StringBuffer sequenceStringbuffer = new StringBuffer();
+
         try {
 
             String line = "";
@@ -27,15 +27,15 @@ public class GFFSequenceExtractor {
 
                 if (line.startsWith(">")) {
                     String sequenceName = line.substring(1);
-                    
+
                     /* we ignore everything after a space */
                     int spacePos = sequenceName.indexOf(" ");
                     if (spacePos != -1) {
                         sequenceName = sequenceName.substring(0, spacePos);
                     }
-                    
+
                     currentSequenceMatches = sequenceName.equals(sequenceNameRequested);
-                    logger.info(String.format("Foun %s", sequenceName));
+                    logger.info(String.format("Found %s", sequenceName));
 
                 } else if (currentSequenceMatches) {
                     sequenceStringbuffer.append(line);

@@ -370,40 +370,67 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	}
 	
 	
+	/**
+	 * 
+	 * We clone the sequence object here because we don't want to alter 
+     * the one kept in the Hazelcast cache (sequenceTrimmed, for instance 
+     * which calls this method, trims the dna string for instance). The
+     * bean itself is not designed to be immutable.
+     * 
+	 * @param sequenceCached
+	 * @return
+	 */
+	private Sequence clone (Sequence sequenceCached) {
+        
+        Sequence clone = new Sequence();
+        
+        clone.organism_id = sequenceCached.organism_id;
+        clone.dna = sequenceCached.dna;
+        clone.uniqueName = sequenceCached.name;
+        clone.length = sequenceCached.length;
+        clone.region = sequenceCached.region;
+        
+        return clone;
+	}
+	
 	@Override
 	public Sequence sequence(String region) {
 		
-	    Sequence sequence = (Sequence) Hazelcast.getMap("regions").get(region);
+	    Sequence sequenceCached = (Sequence) Hazelcast.getMap("regions").get(region);
+	    if (sequenceCached != null) { 
+	        return clone(sequenceCached);
+	    }
 	    
-	    if (sequence != null) 
-	        return sequence;
-	    
-		sequence = new Sequence();
+		Sequence sequence = new Sequence();
 		sequence.dna = "";
-		sequence.length = 0;
 		sequence.organism_id = -1;
-		
-	
-		
+			
 	    Feature regionFeature = this.getInfo(region, null, null);
 	    String regionFilePath = null;
 	    
-	    for (Property prop : regionFeature.properties){
-	        if (prop.name.equals("file")) {
-	            regionFilePath = prop.value;
+	    if (regionFeature != null) {
+	        
+	        sequence.organism_id = regionFeature.organism_id;
+	        
+	        for (Property prop : regionFeature.properties) {
+	            if (prop.name.equals("file")) {
+	                regionFilePath = prop.value;
+	            }
+	        }
+	        
+	        if (regionFilePath != null) {
+	            try {
+	                sequence.dna = extractor.read(regionFilePath, region);;
+	            } catch (IOException e) {
+	                logger.warn("Could not read sequence file for " + region);
+	            }
 	        }
 	    }
 	    
-	    if (regionFilePath != null) {
-            try {
-                sequence.dna = extractor.read(regionFilePath, region);;
-            } catch (IOException e) {
-                throw new RuntimeException("Could not read sequence file for " + region);
-            }
-	    }
-	    
 	    sequence.length = sequence.dna.length();
-        sequence.organism_id = regionFeature.organism_id;
+	    
+	    
+        
 	    
 	    
 //		    
@@ -431,40 +458,53 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		
 		Hazelcast.getMap("regions").put(region, sequence);
 		
-		return sequence;
+		return clone(sequence);
 		
 	}
 	
 	@Override
 	public Sequence sequenceLength(String region) {
-		return sequence(region);
+	    Sequence sequence = sequence(region);
+	    sequence.dna = "";
+		return sequence;
 	}
 
 	@Override
 	public Sequence sequenceTrimmed(String region, Integer start, Integer end) {
-		Sequence s = sequence(region);
+	    
+	    logger.info(String.format("%s:%s-%s", region,start,end));
+	    
+		Sequence sequence = sequence(region);
 		
 		// if it's a simple case of no start or end position, just return what we've got
 		if (start == null && end == null) {
 			
-			s.start = 0;
-			s.end = s.length -1;
-			s.region = region;
+			sequence.start = 0;
+			sequence.end = sequence.length -1;
+			sequence.region = region;
 			
-			return s;
+			return sequence;
 		}
 		
-		int max = s.dna.length() -1;
+		int max = sequence.dna.length() -1;
 		
-		int actualStart = start -1;
+		if (max < 0) {
+		    sequence.start = 0;
+	        sequence.end = 0;
+	        return sequence;
+		}
+		
+		int actualStart = start ;
 		int actualEnd = (end < max) ? end : max ;
 		
-		s.dna = s.dna.substring(actualStart, actualEnd);
-		s.start = start;
-		s.end = end;
+		logger.info(String.format("max: %s, actualStart: %s, actualEnd %s", max, actualStart, actualEnd));
+		
+		sequence.dna = sequence.dna.substring(actualStart, actualEnd);
+		sequence.start = start;
+		sequence.end = end;
 		//s.length = s.dna.length();
 		
-		return s;
+		return sequence;
 	}
 	
 
