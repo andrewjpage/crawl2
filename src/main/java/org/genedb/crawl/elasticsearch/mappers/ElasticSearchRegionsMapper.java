@@ -479,14 +479,14 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		// if it's a simple case of no start or end position, just return what we've got
 		if (start == null && end == null) {
 			
-			sequence.start = 0;
-			sequence.end = sequence.length -1;
+			sequence.start = 1;
+			sequence.end = sequence.length;
 			sequence.region = region;
 			
 			return sequence;
 		}
 		
-		int max = sequence.dna.length() -1;
+		int max = sequence.dna.length();
 		
 		if (max < 0) {
 		    sequence.start = 0;
@@ -494,7 +494,10 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 	        return sequence;
 		}
 		
-		int actualStart = start ;
+		if (start <= 0) 
+            start = 1;
+		
+		int actualStart = start -1 ;
 		int actualEnd = (end < max) ? end : max ;
 		
 		logger.info(String.format("max: %s, actualStart: %s, actualEnd %s", max, actualStart, actualEnd));
