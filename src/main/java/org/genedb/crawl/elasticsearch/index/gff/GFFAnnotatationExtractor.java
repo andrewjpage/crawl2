@@ -56,7 +56,7 @@ public class GFFAnnotatationExtractor {
                      * If the last feature has the same uniqueName, then add the extra 
                      * coordinates to the last one, else store this feature.
                      */
-                    if (lastFeature != null && lastFeature.uniqueName.equals(feature.uniqueName)) {
+                    if (lastFeature != null && lastFeature.uniqueName != null && lastFeature.uniqueName.equals(feature.uniqueName)) {
                         if (feature.fmin != lastFeature.fmin || feature.fmax != lastFeature.fmax) {
 
                             logger.info(String.format("adding extra coordinates to %s : %s-%s" + lastFeature.uniqueName, feature.coordinates.get(0).fmin, feature.coordinates.get(0).fmax));
