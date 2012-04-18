@@ -25,7 +25,8 @@ public class FTPTest extends TestCase {
 	
 	private static final String[] urls = new String[] {
 		//"ftp://ftp.sanger.ac.uk/pub/mouse_genomes/current_bams/129S1.bam",
-		"ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data/NA19331/alignment/NA19331.chromX.LS454.ssaha2.LWK.exon_targetted.20100311.bam"
+		//"ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data/NA19331/alignment/NA19331.chromX.LS454.ssaha2.LWK.exon_targetted.20100311.bam"
+		"ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data/NA19331/alignment/NA19331.chrom20.ILLUMINA.bwa.LWK.low_coverage.20111114.bam"
 	};
 	
 	public void testURLs() throws SocketException, IOException {
