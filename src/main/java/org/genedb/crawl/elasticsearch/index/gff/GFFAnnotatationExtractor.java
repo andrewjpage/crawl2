@@ -59,7 +59,7 @@ public class GFFAnnotatationExtractor {
                     if (lastFeature != null && lastFeature.uniqueName != null && lastFeature.uniqueName.equals(feature.uniqueName)) {
                         if (feature.fmin != lastFeature.fmin || feature.fmax != lastFeature.fmax) {
 
-                            logger.info(String.format("adding extra coordinates to %s : %s-%s" + lastFeature.uniqueName, feature.coordinates.get(0).fmin, feature.coordinates.get(0).fmax));
+                            logger.info(String.format("adding extra coordinates to %s : %s-%s", lastFeature.uniqueName, feature.coordinates.get(0).fmin, feature.coordinates.get(0).fmax));
 
                             lastFeature.coordinates.add(feature.coordinates.get(0));
                             createOrUpdate(lastFeature, featureMapper);
