@@ -492,7 +492,7 @@ task clientJar(type : Jar) {
  * an elasticsearch installation by means of a web server download. 
  */
 
-pluginDistDir = "tmp/plugin"
+def pluginDistDir = "tmp/plugin"
 String arbitrary_elasticsearch_plugin_webserver_deployment_folder = "/Library/WebServer/Documents/plugins/regex"
 
 /*
