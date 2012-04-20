@@ -337,7 +337,7 @@ war {
 
 war.doFirst{
     
-    resourceType = props["resource.type"]
+    def resourceType = props["resource.type"]
     ant.copy (
         file:'etc/config/crawl-' + resourceType + '.xml', 
         toFile:'tmp/WEB-INF/crawl-repository.xml',
@@ -429,7 +429,7 @@ war.doFirst{
 * Generates the gradlew wrapper. Run this task when you upgrade gradle.
 */
 task createWrapper(type: Wrapper) {
-   gradleVersion = '1.0-milestone-7'
+   gradleVersion = '1.0-rc-1'
 }
 
 
