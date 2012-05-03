@@ -497,9 +497,12 @@ public class ElasticSearchRegionsMapper extends ElasticSearchBaseMapper implemen
 		if (start <= 0) 
             start = 1;
 		
-		int actualStart = start -1 ;
+		int actualStart = start  ;	// region request in interbase coordinates
+									// to reflect chado system
 		int actualEnd = (end < max) ? end : max ;
 		
+		if(actualStart > actualEnd)
+			actualStart = actualEnd;
 		logger.info(String.format("max: %s, actualStart: %s, actualEnd %s", max, actualStart, actualEnd));
 		
 		sequence.dna = sequence.dna.substring(actualStart, actualEnd);
