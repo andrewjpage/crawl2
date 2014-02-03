@@ -32,6 +32,7 @@ import com.sun.net.httpserver.HttpServer;
  * 
  * It can be controlled from the command line using the crawl bash script.
  */
+@SuppressWarnings("restriction")
 public class HazelcastService {
 
     
