@@ -37,6 +37,7 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
 			return null;
 		}
 
+		@SuppressWarnings("unused")
 		String prefix = viewSplit[0];
 		//logger.info(String.format("prefix: '%s'", prefix));
 
@@ -74,6 +75,7 @@ public class CrawlViewResolver implements ViewResolver, Ordered {
 		
 		StringBuilder sb = new StringBuilder (uri);
 		String sep = " - ";
+		@SuppressWarnings("unchecked")
 		Map<String, String[]> parameters = request.getParameterMap();
     	for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
     		sb.append(sep + entry.getKey() + " : " +  Arrays.asList(entry.getValue()).toString());

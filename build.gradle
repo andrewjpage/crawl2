@@ -154,7 +154,7 @@ dependencies {
 	compile group: 'com.hazelcast', name:'hazelcast', version:'1.9.4.4'
     compile group: 'com.hazelcast', name:'hazelcast-spring', version:'1.9.4.4'
 	
-    compile group: 'org.mybatis', name: 'mybatis', version:'3.0.5'
+    compile group: 'org.mybatis', name: 'mybatis', version:'3.0.6'
     compile group: 'org.mybatis', name: 'mybatis-hazelcast', version:'1.0.0'
     
     compile group: 'commons-lang', name: 'commons-lang', version:'2.2'
@@ -170,7 +170,7 @@ dependencies {
     compile group: "org.springframework", name:"org.springframework.web.servlet", version:"3.0.5.RELEASE"
     compile group: "org.springframework", name:"org.springframework.jdbc", version:"3.0.5.RELEASE"
     
-    compile group: 'org.mybatis', name: 'mybatis-spring', version:'1.0.0'
+    compile group: 'org.mybatis', name: 'mybatis-spring', version:'1.0.2'
     
     // used for soap services
     compile group: 'org.apache.cxf', name: 'cxf-rt-frontend-jaxws', version: '2.2.6'
