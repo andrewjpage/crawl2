@@ -6,8 +6,7 @@ public enum CrawlErrorType {
 	    BAD_PARAMETER,
 	    DATA_NOT_FOUND,
 	    MISSING_PARAMETER,
-	    UNKOWN_QUERY,
+	    UNKNOWN_QUERY,
 	    DATA_PARSING_ERROR,
 	    QUERY_FAILURE
-
 }

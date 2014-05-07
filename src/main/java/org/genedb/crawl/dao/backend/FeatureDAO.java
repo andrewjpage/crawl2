@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.biojava.bio.BioException;
 import org.genedb.crawl.CrawlException;
+import org.genedb.crawl.CrawlErrorType;
 import org.genedb.crawl.mappers.FeatureMapper;
 import org.genedb.crawl.mappers.FeaturesMapper;
 import org.genedb.crawl.mappers.OrganismsMapper;
@@ -177,6 +178,10 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
         List<Cvterm> ofType = getRelationshipTypes(Arrays.asList(relationships), terms);
         
         Feature feature = util.getFeature(uniqueName, name, organism);
+
+        if (feature == null) {
+            throw new CrawlException("Could not find feature with unique name '" + uniqueName + "'", CrawlErrorType.DATA_NOT_FOUND);
+        }
         
         Feature hierarchyRoot = util.getAncestorGene(feature, ofType);
         
@@ -217,6 +222,11 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
             String name) {
         
         Feature feature = util.getFeature(featureUniqueName, name, organism);
+
+        if (feature == null) {
+            throw new CrawlException("Could not find feature with unique name '" + featureUniqueName + "'", CrawlErrorType.DATA_NOT_FOUND);
+        }
+
         return featureMapper.domains(feature);
         
     }
@@ -232,12 +242,16 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
             String name) throws BioException, TranslationException {
     
         Feature feature = util.getFeature(featureUniqueName, name, organism);
-        
+
+        if (feature == null) {
+            throw new CrawlException("Could not find feature with unique name '" + featureUniqueName + "'", CrawlErrorType.DATA_NOT_FOUND);
+        }
+
         // assemble a hierarchy for this feature
         List<Cvterm> ofType = getRelationshipTypes(Arrays.asList(defaultRelationshipTypes), terms);
         Feature geneFeature = util.getAncestorGene(feature, ofType);
         util.getDescendants(geneFeature, ofType, false);
-        
+
         return util.getPolypeptideProperties(feature, geneFeature);
         
         
@@ -246,12 +260,22 @@ public class FeatureDAO extends BaseDAO implements org.genedb.crawl.dao.FeatureD
     @Override
     public List<Synonym> synonyms(String featureUniqueName, String organism, String name) {
         Feature feature = util.getFeature(featureUniqueName, name, organism);
+
+        if (feature == null) {
+            throw new CrawlException("Could not find feature with unique name '" + featureUniqueName + "'", CrawlErrorType.DATA_NOT_FOUND);
+        }
+
         return featureMapper.synonyms(feature);
     }
 
     @Override
     public Feature getIsoform(String featureUniqueName, String organism, String name) {
         Feature feature = util.getFeature(featureUniqueName, name, organism);
+
+        if (feature == null) {
+            throw new CrawlException("Could not find feature with unique name '" + featureUniqueName + "'", CrawlErrorType.DATA_NOT_FOUND);
+        }
+
         List<Cvterm> ofType = getRelationshipTypes(Arrays.asList(defaultRelationshipTypes), terms);
         return util.getIsoform(feature, ofType);
     }
