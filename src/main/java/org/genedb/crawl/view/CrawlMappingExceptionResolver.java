@@ -21,9 +21,9 @@ public class CrawlMappingExceptionResolver extends SimpleMappingExceptionResolve
 			Object handler, Exception ex) {
 		
 		ModelAndView mav = new ModelAndView("service:");
-		
 		CrawlError error = new CrawlError();
-		
+		int status = 500; /* default */
+
 		if (ex instanceof CrawlException) {
 			error.setException((CrawlException)ex);
 		} else {
@@ -31,13 +31,24 @@ public class CrawlMappingExceptionResolver extends SimpleMappingExceptionResolve
 		}
 		
 		logger.error(ex.getStackTrace());
+
+		switch(error.type) {
+			case DATA_NOT_FOUND:
+			  status = 404;
+			  break;
+			case INVALID_DATE:
+			case BAD_PARAMETER:
+			case MISSING_PARAMETER:
+              status = 400;
+              break;
+            default:
+              break;
+		}
 		
 		ex.printStackTrace();
-		
 		mav.addObject("error" , error);
-		
-		response.setStatus(500);
-		
+		response.setStatus(status);
+
 		return mav;
 	}
 	
