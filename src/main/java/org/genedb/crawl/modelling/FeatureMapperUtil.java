@@ -36,9 +36,9 @@ import uk.ac.sanger.artemis.sequence.Bases;
 
 /**
  * A class that does useful things with mappers, centering around features.
- * 
+ *
  * @author gv1
- * 
+ *
  */
 public class FeatureMapperUtil {
 
@@ -52,9 +52,9 @@ public class FeatureMapperUtil {
 
     @Autowired
     public FeatureMapper    featureMapper;
-    
+
     public static final Set<String> transcriptTypes = new HashSet<String>(Arrays.asList(new String[] {"mRNA", "ncRNA", "snoRNA", "snRNA", "tRNA", "miscRNA", "rRNA"}));
-    
+
     public Feature getFeature(String uniqueName, String name, String organism) {
         Integer organism_id = null;
 
@@ -122,51 +122,51 @@ public class FeatureMapperUtil {
         feature.pubs = featureMapper.pubs(feature);
         feature.dbxrefs = featureMapper.dbxrefs(feature);
         feature.domains = featureMapper.domains(feature);
-        
+
         for (Feature domain : feature.domains) {
             summarise(domain);
         }
-        
+
         feature.orthologues = featureMapper.orthologues(feature);
 
     }
-    
+
     /**
-     * 
-     * An isoform is defined (in order of searching) : 
-     *   - as the parent transcript (for a multi-isoform gene), or  
-     *   - the first transcript if the requested feature is not a descendant of transcript, or  
+     *
+     * An isoform is defined (in order of searching) :
+     *   - as the parent transcript (for a multi-isoform gene), or
+     *   - the first transcript if the requested feature is not a descendant of transcript, or
      *   - the gene if part of a gene model.
-     *   
-     * If nothing is found, then assume it is not part of a gene model, in which case just 
-     * return the requested feature. 
-     * 
+     *
+     * If nothing is found, then assume it is not part of a gene model, in which case just
+     * return the requested feature.
+     *
      * @param feature
      * @param ofType
      * @return
      */
     public Feature getIsoform(Feature feature, List<Cvterm> ofType) {
-        
+
         Feature gene = this.getAncestorGene(feature, ofType);
-        
+
         if (gene == null)
             return feature;
-        
+
         getDescendants(gene, ofType, false);
         Feature transcript = getTranscript(feature, gene, true);
-        
+
         // if there are no transcripts, must use the gene
         if (transcript == null)
             return gene;
-        
+
         // if the transcript is alone, use the gene
         List<Feature> transcripts = getTranscripts(gene);
-        if (transcripts.size() == 1) 
+        if (transcripts.size() == 1)
             return gene;
-        
+
         return transcript;
     }
-    
+
     public Feature getAncestorGene(Feature currentFeature, List<Cvterm> ofType) {
 
         if (currentFeature.type.name.equals("gene") || currentFeature.type.name.equals("pseudogene"))
@@ -202,7 +202,7 @@ public class FeatureMapperUtil {
         }
 
     }
-    
+
     public List<Feature> getTranscripts(Feature gene) {
         List<Feature> transcripts = new ArrayList<Feature>();
         for (Feature child : gene.children) {
@@ -212,23 +212,23 @@ public class FeatureMapperUtil {
         }
         return transcripts;
     }
-    
+
     public Feature getTranscript(final Feature requested, final Feature hierarchyFeature, final boolean ignoreObsoletes) {
 
         Feature firstTranscript = null;
-        
+
         logger.info(String.format(" -> %s (%s) ", hierarchyFeature.uniqueName, hierarchyFeature.type.name));
-        
+
         Collections.sort(hierarchyFeature.children, new FeatureUniqueNameSorter());
-        
+
         for (Feature child : hierarchyFeature.children) {
             if (child.type.name.equals("mRNA")) {
-                
+
                 if (ignoreObsoletes && child.isObsolete)
                     continue;
-                
+
                 logger.info(String.format(" --> %s (%s) ", child.uniqueName, child.type.name));
-                
+
                 if (requested.uniqueName.equals(hierarchyFeature.uniqueName) || requested.uniqueName.equals(child.uniqueName)) {
                     logger.info("1");
                     return child;
@@ -238,10 +238,10 @@ public class FeatureMapperUtil {
                     firstTranscript = child;
 
                 for (Feature grandChild : child.children) {
-                    
+
                     if (ignoreObsoletes && grandChild.isObsolete)
                         continue;
-                    
+
                     logger.info(String.format(" ---> %s (%s) ", grandChild.uniqueName, grandChild.type.name));
                     String grandChildType = grandChild.type.name;
                     if (requested.type.name.equals(grandChildType) && requested.uniqueName.equals(grandChild.uniqueName)) {
@@ -256,7 +256,7 @@ public class FeatureMapperUtil {
                 }
             }
         }
-        
+
         logger.info(" --->! ");
 
         return firstTranscript;
@@ -279,85 +279,85 @@ public class FeatureMapperUtil {
         for (Feature exon : exons) {
             Coordinates coordinates = exon.coordinates.get(0);
             String dnaString = regionsMapper.sequenceTrimmed(coordinates.region, coordinates.fmin, coordinates.fmax).dna;
-            
+
             // if (coordinates.strand < 0)
             //                 dnaString = Bases.reverseComplement(dnaString);
-            
+
             logger.info(String.format(">%s (%s) %d-%d \n%s", exon.uniqueName, coordinates.region, coordinates.fmin, coordinates.fmax, dnaString));
-            
+
             sequence.append(dnaString);
         }
         return sequence.toString();
     }
-    
+
     class FeatureLocationSorter implements Comparator<Feature> {
 
         @Override
         public int compare(Feature feature1, Feature feature2) {
-            
+
             Coordinates coordinates1 = feature1.coordinates.get(0);
             assert(coordinates1 != null);
-            
+
             Coordinates coordinates2 = feature2.coordinates.get(0);
             assert(coordinates2 != null);
-            
+
             if (coordinates1.fmin > coordinates2.fmin)
                 return 1;
             if (coordinates1.fmin < coordinates2.fmin)
                 return -1;
             return 0;
         }
-        
+
     }
-    
+
     class FeatureUniqueNameSorter implements Comparator<Feature> {
         @Override
         public int compare(Feature feature1, Feature feature2) {
             return feature1.uniqueName.compareTo(feature2.uniqueName);
         }
     }
-    
+
     public List<Property> getPolypeptideProperties(Feature feature, Feature hierarchyFeature) throws NumberFormatException, BioException, TranslationException {
         Feature transcript = getTranscript(feature, hierarchyFeature, false);
         if (transcript == null)
             throw new RuntimeException("Could not find transcript");
-        
+
         //featureMapper.properties(transcript);
-        
-        
+
+
         List<Feature> exons = getExons(transcript);
-        
+
         Collections.sort(exons, new FeatureLocationSorter());
-        
+
         Feature firstExon = exons.get(0);
         if (firstExon == null)
             throw new RuntimeException("Could not find exon");
-        
+
         String exonSequence = getExonSequence(exons);
         logger.info(String.format("transcript : %s, exonSequence : %s", transcript.uniqueName, exonSequence));
-        
+
         Coordinates firstExonCoordinate = firstExon.coordinates.get(0);
-        
+
         boolean isFwd = (firstExonCoordinate.strand > 0) ? true : false;
         if (! isFwd) {
             logger.info("reversing");
             exonSequence = Bases.reverseComplement(exonSequence);
             logger.info(String.format("reversed transcript : %s, exonSequence : %s", transcript.uniqueName, exonSequence));
         }
-            
+
         String phase = firstExonCoordinate.phase;
-        if (phase == null) 
+        if (phase == null)
             phase = "0";
-        
+
         Organism o = organismsMapper.getByID(feature.organism_id);
 
         Property translationTableProp = organismsMapper.getOrganismProp(o, "genedb_misc", "translationTable");
-        
+
         int translationTable = 1;
         if (translationTableProp != null && translationTableProp.value != null) {
             translationTable = Integer.parseInt(translationTableProp.value);
         }
-        
+
         return getPolypeptideProperties(exonSequence, Integer.parseInt(phase), translationTable);
     }
 
@@ -373,13 +373,16 @@ public class FeatureMapperUtil {
         // coordinates.fmin, coordinates.fmax).dna;
 
         String residuesString = translate(translationTable, dnaString, phase, false);
-        
+
         logger.info(residuesString);
+
+        // strip stop codons (to avoid hard failures)
+        residuesString = residuesString.replaceAll("[*#+]","");
 
         SymbolTokenization proteinTokenization = ProteinTools.getTAlphabet().getTokenization("token");
         SymbolList residuesSymbolList = null;
         residuesSymbolList = new SimpleSymbolList(proteinTokenization, residuesString);
-        
+
         logger.info(residuesSymbolList);
 
         if (residuesSymbolList.length() == 0) {
@@ -396,13 +399,13 @@ public class FeatureMapperUtil {
             }
             residuesSymbolList = residuesSymbolList.subList(1, residuesSymbolList.length() - 1);
         }
-        
-        
+
+
         Property aminoProp = new Property();
         aminoProp.name = "Amino Acids";
         aminoProp.value = String.valueOf(residuesSymbolList.length());
         properties.add(aminoProp);
-        
+
         DecimalFormat df = new DecimalFormat("#.0");
         double isoElectricPoint = new IsoelectricPointCalc().getPI(residuesSymbolList, false, false);
 
@@ -426,7 +429,7 @@ public class FeatureMapperUtil {
         properties.add(chargeProp);
 
         return properties;
-        
+
     }
 
     public static String translate(int translationTableId, String dnaSequence, int phase, boolean stopCodonTranslatedAsSelenocysteine) throws TranslationException {
@@ -442,7 +445,7 @@ public class FeatureMapperUtil {
 
     /**
      * Calculate the charge of a polypeptide.
-     * 
+     *
      * @param residues
      *            a string representing the polypeptide residues, using the
      *            single-character code
