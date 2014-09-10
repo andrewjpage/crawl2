@@ -1,23 +1,23 @@
-<?xml version="1.0" encoding="UTF-8" ?>  
-<!DOCTYPE mapper 
-    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.genedb.crawl.mappers.FeatureCvtermMapper">
-    
+
     <cache type="org.mybatis.caches.hazelcast.LoggingHazelcastCache"/>
-    
+
     <select id="featureCvTermPubs" resultMap="featureCvTermPubsResults">
-    
-        SELECT 
+
+        SELECT
                 pub.uniquename as uniqueName,
                 split_part(pub.uniquename, ':', 1) as database,
                 split_part(pub.uniquename, ':', 2) as accession
-            FROM feature_cvterm 
+            FROM feature_cvterm
             JOIN pub on feature_cvterm.pub_id = pub.pub_id
             WHERE feature_cvterm.feature_cvterm_id = #{feature_cvterm_id}
                 AND uniqueName != 'null'
         UNION
-        SELECT 
+        SELECT
                 pub.uniquename as uniqueName,
                 split_part(pub.uniquename, ':', 1) as database,
                 split_part(pub.uniquename, ':', 2) as accession
@@ -25,55 +25,50 @@
             JOIN pub on feature_cvterm_pub.pub_id = pub.pub_id
             WHERE feature_cvterm_pub.feature_cvterm_id = #{feature_cvterm_id}
                 AND uniqueName != 'null'
-    
+
     </select>
-    
+
     <resultMap id="featureCvTermPubsResults" type="org.genedb.crawl.model.Pub">
-        <result property="uniqueName" column="uniqueName"/> 
-        <result property="database" column="database"/> 
-        <result property="accession" column="accession"/> 
+        <result property="uniqueName" column="uniqueName"/>
+        <result property="database" column="database"/>
+        <result property="accession" column="accession"/>
     </resultMap>
-    
-    
-    
-    
-    <select id="featureCvTermDbxrefs" resultMap="org.genedb.crawl.mappers.FeatureMapper.dbxrefs" >
-        
-        SELECT 
+
+
+    <select id="featureCvTermDbxrefs" resultMap="org.genedb.crawl.mappers.FeatureMapper.dbxrefs" parameterType="map" >
+
+        SELECT
             dbxref.accession as accession,
-            dbxref.description, 
-            db.name as database, 
-            db.urlprefix, 
+            dbxref.description,
+            db.name as database,
+            db.urlprefix,
             db.url,
             db.description as db_description
         FROM feature_cvterm
             JOIN feature_cvterm_dbxref ON feature_cvterm.feature_cvterm_id = feature_cvterm_dbxref.feature_cvterm_id
             JOIN dbxref ON feature_cvterm_dbxref.dbxref_id = dbxref.dbxref_id
             JOIN db ON dbxref.db_id = db.db_id
-            WHERE feature_cvterm.feature_cvterm_id = #{feature_cvterm_id}
-        
+            WHERE feature_cvterm.cvterm_id = #{cvterm_id} AND feature_cvterm.feature_id = #{feature_id}
+
     </select>
-    
-   
-    
-    <!-- 
-    
+
+    <!--
+
     "select count(f) from FeatureCvTerm fct, Feature f" +
                 //" where f.organism=:organism and fct.feature = f and fct.cvTerm.name = :name",
                 " where fct.feature = f and f.organism=:organism and fct.cvTerm.name = :name ",
                 new String[]{"name", "organism"},
                 new Object[]{name, o}); -->
-    
-    
+
+
     <select id="countInOrganism" resultType="Integer">
         SELECT count(*) FROM feature
             JOIN feature_cvterm ON feature.feature_id = feature_cvterm.feature_id
             JOIN cvterm ON feature_cvterm.cvterm_id = cvterm.cvterm_id AND cvterm.name = #{cvterm}
             JOIN cv ON cvterm.cv_id = cv.cv_id AND cv.name = #{cv}
-        WHERE 
+        WHERE
             feature.organism_id = ${organism.ID}
     </select>
-    
-    
+
+
 </mapper>
- 
