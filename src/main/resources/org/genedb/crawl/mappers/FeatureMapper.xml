@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?>  
-<!DOCTYPE mapper 
-    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.genedb.crawl.mappers.FeatureMapper">
 
@@ -24,21 +24,21 @@
 	</select>
 
 
-	<!-- <select id="getOfType" resultMap="typedFeatureResult" > SELECT feature_id, 
-		organism_id, uniqueName, f.name, type.name as type, f.timelastmodified, f.timeaccessioned 
-		FROM feature f JOIN cvterm type ON type.cvterm_id = f.type_id <if test="type 
-		!= null"> and type.name = #{type} </if> WHERE <include refid="featureSelector"/> 
-		</select> <resultMap type="org.genedb.crawl.model.Feature" id="typedFeatureResult" 
-		extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"> if 
-		none of the types are found by this discriminator, the resultmap defined 
-		outside of the discriminator block will be returned instead as this resultMap 
-		inherits from basicFeatureResult, this will be whatever is contained in basicFeatureResult 
-		<discriminator column="type" javaType="String" > <case value="gene" resultMap="geneResult" 
-		/> <case value="exon" resultMap="exonResult" /> <case value="transcript" 
-		resultMap="transcriptResult" /> </discriminator> </resultMap> <resultMap 
-		type="org.genedb.crawl.model.Gene" id="geneResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap> 
-		<resultMap type="org.genedb.crawl.model.Transcript" id="transcriptResult" 
-		extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap> 
+	<!-- <select id="getOfType" resultMap="typedFeatureResult" > SELECT feature_id,
+		organism_id, uniqueName, f.name, type.name as type, f.timelastmodified, f.timeaccessioned
+		FROM feature f JOIN cvterm type ON type.cvterm_id = f.type_id <if test="type
+		!= null"> and type.name = #{type} </if> WHERE <include refid="featureSelector"/>
+		</select> <resultMap type="org.genedb.crawl.model.Feature" id="typedFeatureResult"
+		extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"> if
+		none of the types are found by this discriminator, the resultmap defined
+		outside of the discriminator block will be returned instead as this resultMap
+		inherits from basicFeatureResult, this will be whatever is contained in basicFeatureResult
+		<discriminator column="type" javaType="String" > <case value="gene" resultMap="geneResult"
+		/> <case value="exon" resultMap="exonResult" /> <case value="transcript"
+		resultMap="transcriptResult" /> </discriminator> </resultMap> <resultMap
+		type="org.genedb.crawl.model.Gene" id="geneResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap>
+		<resultMap type="org.genedb.crawl.model.Transcript" id="transcriptResult"
+		extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap>
 		<resultMap type="org.genedb.crawl.model.Exon" id="exonResult" extends="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult"></resultMap> -->
 
 
@@ -75,7 +75,9 @@
 		fc.is_not as is_not,
 		d.accession,
 		f.uniquename as feature,
+		f.feature_id as feature_id,
 		ct.name as cvterm,
+		ct.cvterm_id as cvterm_id,
 		c.name as cv,
 		fcp.value as prop,
 		fcpct.name as type_name,
@@ -110,7 +112,7 @@
 
 	</select>
 
-	<!-- <if test="cvs != null"> AND c.name IN <foreach item="item" index="index" 
+	<!-- <if test="cvs != null"> AND c.name IN <foreach item="item" index="index"
 		collection="cvs" open="(" separator="," close=")">#{item}</foreach> </if> -->
 
 	<resultMap id="terms" type="org.genedb.crawl.model.Cvterm">
@@ -133,7 +135,7 @@
 			resultMap="org.genedb.crawl.mappers.FeatureMapper.pub"/>
 		<collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref"
 			select="org.genedb.crawl.mappers.FeatureCvtermMapper.featureCvTermDbxrefs"
-			column="feature_cvterm_id" />
+			column="{cvterm_id=cvterm_id,feature_id=feature_id}" />
 	</resultMap>
 
 	<resultMap id="pub" type="org.genedb.crawl.model.Pub">
@@ -280,22 +282,22 @@
 
 
 
-	<!-- <resultMap type="org.genedb.crawl.model.Feature" id="parents"> <association 
-		property="object" javaType="org.genedb.crawl.model.Feature" > <result column="object_uniquename" 
-		property="uniqueName" /> <association property="type" javaType="org.genedb.crawl.model.Cvterm"> 
-		<result column="object_type" property="name" /> </association> </association> 
-		<association property="type" javaType="org.genedb.crawl.model.Cvterm"> <result 
+	<!-- <resultMap type="org.genedb.crawl.model.Feature" id="parents"> <association
+		property="object" javaType="org.genedb.crawl.model.Feature" > <result column="object_uniquename"
+		property="uniqueName" /> <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+		<result column="object_type" property="name" /> </association> </association>
+		<association property="type" javaType="org.genedb.crawl.model.Cvterm"> <result
 		column="type" property="name" /> </association> </resultMap> -->
 
-	<!-- <resultMap type="org.genedb.crawl.model.FeatureRelationship" id="relationships"> 
-		<association property="subject" javaType="org.genedb.crawl.model.Feature" 
-		> <result column="subject_uniquename" property="uniqueName" /> <association 
-		property="type" javaType="org.genedb.crawl.model.Cvterm"> <result column="subject_type" 
-		property="name" /> </association> </association> <association property="object" 
-		javaType="org.genedb.crawl.model.Feature" > <result column="object_uniquename" 
-		property="uniqueName" /> <association property="type" javaType="org.genedb.crawl.model.Cvterm"> 
-		<result column="object_type" property="name" /> </association> </association> 
-		<association property="type" javaType="org.genedb.crawl.model.Cvterm"> <result 
+	<!-- <resultMap type="org.genedb.crawl.model.FeatureRelationship" id="relationships">
+		<association property="subject" javaType="org.genedb.crawl.model.Feature"
+		> <result column="subject_uniquename" property="uniqueName" /> <association
+		property="type" javaType="org.genedb.crawl.model.Cvterm"> <result column="subject_type"
+		property="name" /> </association> </association> <association property="object"
+		javaType="org.genedb.crawl.model.Feature" > <result column="object_uniquename"
+		property="uniqueName" /> <association property="type" javaType="org.genedb.crawl.model.Cvterm">
+		<result column="object_type" property="name" /> </association> </association>
+		<association property="type" javaType="org.genedb.crawl.model.Cvterm"> <result
 		column="type" property="name" /> </association> </resultMap> -->
 
 
@@ -420,10 +422,10 @@
 
 		<collection property="dbxrefs" select="dbxrefs" column="feature_id"></collection>
 
-		<!-- <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref" 
-			> <result property="accession" column="accession"/> <result property="version" 
-			column="version"/> <result property="database" column="database"/> <result 
-			property="url" column="url"/> <result property="urlprefix" column="urlprefix"/> 
+		<!-- <collection property="dbxrefs" ofType="org.genedb.crawl.model.Dbxref"
+			> <result property="accession" column="accession"/> <result property="version"
+			column="version"/> <result property="database" column="database"/> <result
+			property="url" column="url"/> <result property="urlprefix" column="urlprefix"/>
 			<result property="description" column="description"/> </collection> -->
 
 	</resultMap>
