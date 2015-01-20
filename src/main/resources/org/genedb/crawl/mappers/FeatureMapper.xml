@@ -80,6 +80,7 @@
 		ct.cvterm_id as cvterm_id,
 		c.name as cv,
 		fcp.value as prop,
+		fc.rank as rank,
 		fcpct.name as type_name,
 		fcpc.name as type_cv,
 		NULLIF(pub.uniquename, 'null') as pub_uniqueName,
@@ -119,6 +120,7 @@
 		<id property="accession" column="accession" />
 		<result property="is_not" column="is_not" />
 		<result property="name" column="cvterm" />
+		<result property="rank" column="rank" />
 		<result property="count" column="count" />
 		<association property="cv" javaType="org.genedb.crawl.model.Cv">
 			<result property="name" column="cv" />
