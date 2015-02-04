@@ -437,6 +437,7 @@
 		SELECT
 		feature.uniquename as uniqueName,
 		feature.name as name,
+		dbxref.dbxref_id as dbxref_id,
 		dbxref.accession as accession,
 		dbxref.description as description,
 		db.name as database,
@@ -452,6 +453,7 @@
 		SELECT
 		feature.uniquename as uniqueName,
 		feature.name as name,
+		dbxref.dbxref_id as dbxref_id,
 		dbxref.accession as accession,
 		dbxref.description as description,
 		db.name as database,
@@ -467,6 +469,7 @@
 
 
 	<resultMap id="dbxrefs" type="org.genedb.crawl.model.Dbxref">
+		<id property="chado_id" column="dbxref_id" />
 		<result property="accession" column="accession" />
 		<result property="description" column="description" />
 		<association property="db" javaType="org.genedb.crawl.model.Db">
