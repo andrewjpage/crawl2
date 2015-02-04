@@ -1,8 +1,8 @@
 /*********************************************************
- *********************** Plugins *************************  
+ *********************** Plugins *************************
  *********************************************************/
 
- 
+
 
 apply plugin: 'java'
 apply plugin: 'war'
@@ -17,7 +17,7 @@ apply plugin: 'eclipse'
  *********************************************************/
 
 /*
- * We need the crawl.jar for command line tasks.  
+ * We need the crawl.jar for command line tasks.
  */
 jar.enabled = true
 
@@ -67,16 +67,16 @@ props.load(new FileInputStream(config))
 
 
 /*********************************************************
- *************** Ivy/Maven dependencies ******************  
+ *************** Ivy/Maven dependencies ******************
  *********************************************************/
 
 repositories {
-	
+
     // a local repository for jars that are not available from online ones
     // at the top so it looks here first
     flatDir name: 'localRepository', dirs: [local_lib_dir, local_cache_dir, local_experimental_dir]
-    
-	maven {
+
+/*	maven {
 	    url "https://developer.genedb.org/nexus/content/repositories/jboss/"
 	}
 	maven {
@@ -109,6 +109,8 @@ repositories {
 	maven {
         url "https://developer.genedb.org/nexus/content/repositories/Gradle/"
 	}
+    */
+
 	maven {
         url "http://oss.sonatype.org/content/repositories/releases"
 	}
@@ -136,48 +138,48 @@ repositories {
 	maven {
         url "http://repository.springsource.com/maven/bundles/milestone"
 	}
-	
+
 	// never use this!
     // mavenCentral()
 }
 
 
 dependencies {
-    
-    providedCompile group: 'javax.servlet', name: 'com.springsource.javax.servlet', version:'2.5.0'    
+
+    providedCompile group: 'javax.servlet', name: 'com.springsource.javax.servlet', version:'2.5.0'
     testCompile group: 'junit', name: 'junit', version: '4.+'
-    
+
     compile group: 'log4j', name: 'log4j', version:'1.2.16'
-    
+
     compile group: 'org.postgresql', name: 'com.springsource.org.postgresql.jdbc4', version:'8.3.604'
-    
+
 	compile group: 'com.hazelcast', name:'hazelcast', version:'1.9.4.4'
     compile group: 'com.hazelcast', name:'hazelcast-spring', version:'1.9.4.4'
-	
+
     compile group: 'org.mybatis', name: 'mybatis', version:'3.0.6'
     compile group: 'org.mybatis', name: 'mybatis-hazelcast', version:'1.0.0'
-    
+
     compile group: 'commons-lang', name: 'commons-lang', version:'2.2'
 	compile group: 'commons-net', name: 'commons-net', version:'2.2'
-	
+
     compile group: 'org.elasticsearch', name: 'elasticsearch', version:'0.17.5'
-    
+
     compile group: 'org.codehaus.jackson', name: 'jackson-xc', version:'1.7.5'
-    
+
     compile group: 'args4j', name: 'args4j', version:'2.0.12'
-    
+
     compile group: "org.apache.commons", name:"com.springsource.org.apache.commons.dbcp", version:"1.2.2.osgi"
     compile group: "org.springframework", name:"org.springframework.web.servlet", version:"3.0.5.RELEASE"
     compile group: "org.springframework", name:"org.springframework.jdbc", version:"3.0.5.RELEASE"
-    
+
     compile group: 'org.mybatis', name: 'mybatis-spring', version:'1.0.2'
-    
+
     // used for soap services
     compile group: 'org.apache.cxf', name: 'cxf-rt-frontend-jaxws', version: '2.2.6'
     compile group: 'org.apache.cxf', name: 'cxf-rt-transports-http', version: '2.2.6'
-    
+
     compile group: 'uk.ac.ebi.das', name:'jdas', version: '1.0.1'
-	
+
 	// note that this information is matched up to jars in the local repository by the use of naming convention assumptions
 	// as well as some trial and error by ivy
 	compile group: 'net.sf', name: 'sam', version: '1.45', ext: 'jar'
@@ -185,14 +187,14 @@ dependencies {
     compile group: 'org.biojava', name: 'biojava', version: '1.6', ext:'jar'
     compile group: 'org.obo', name: 'obo', version: '1.0', ext:'jar'
     compile group: 'org.obo', name: 'bbop', version: '1.0', ext:'jar'
-    
+
     compile group:'jgrapht', name:'jgrapht', version: '0.7.3'
-    
+
 	// finally, any jars in lib/local
     compile fileTree(dir: local_lib_dir, includes: ['**.jar'])
     compile fileTree(dir: local_experimental_dir, includes: ['**.jar'])
-     
-    
+
+
 }
 
 
@@ -225,20 +227,20 @@ test.doFirst {
  * There is an option to build a fat jar. It is slow. Off by default.
  */
 jar {
-    
+
     archiveName = "crawl.jar" // override to not include the version number in the archive name
-    
+
     manifest {
         attributes 'Implementation-Title': 'Crawl', 'Implementation-Version': '0.1'
     }
-    
+
     // must be executed during the jar task (as of gradle 1 milestone 7)
     if (fat == "true") {
         from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
     }
 }
 
-// must be executed at the end of the jar task 
+// must be executed at the end of the jar task
 jar << {
     if (fat != "true") {
         copy {
@@ -256,13 +258,13 @@ jar << {
 * Currently using a custom install task because the gradle application plugin only supports one main class.
 */
 task install(dependsOn: ['jar']) << {
-    
+
     description = "Installs the crawl and dependencies in a convenient location (by default in the user.home/bin folder"
-    
+
     def the_dir = null;
-    
+
     if (project.hasProperty("dir") && prompt_for_custom_installs) {
-        
+
         if (new File(dir).isDirectory()) {
             println "Using user supplied dir " + dir + ", which means wiping this folder."
             def answer = yesno("Are you prepared to wipe this folder if it exists? (yes/no) \n")
@@ -271,18 +273,18 @@ task install(dependsOn: ['jar']) << {
                 System.exit(1)
             }
         }
-        
+
         the_dir = dir;
-        
+
     } else {
-    
+
         println "Using default dir " + System.properties["user.home"]
         the_dir = System.properties["user.home"] + "/bin/crawl"
-        
+
     }
-    
+
     ant.delete(dir:the_dir)
-    
+
     copy {
         from tree = fileTree(project.buildDir.getPath() + "/libs").include('**/*.jar')
         into the_dir + "/lib"
@@ -315,19 +317,19 @@ task install(dependsOn: ['jar']) << {
  */
 
 war {
-    
-    /* 
-     * We always want to force the war to be repackaged because the file copying 
-     * done during the war task (see war.doFirst) must be done even if the 
-     * classes aren't changed, because a different property file might be being 
+
+    /*
+     * We always want to force the war to be repackaged because the file copying
+     * done during the war task (see war.doFirst) must be done even if the
+     * classes aren't changed, because a different property file might be being
      * used.
-     * 
-     * Gradle has a convention whereby "cleanTask" forces that task to be 
-     * considered not up to date. Thus we use cleanWar to ensure that the war 
+     *
+     * Gradle has a convention whereby "cleanTask" forces that task to be
+     * considered not up to date. Thus we use cleanWar to ensure that the war
      * used has the correct property and spring xml files put in.
      */
     dependsOn cleanWar
-    
+
     webInf { from 'tmp/WEB-INF' }
     baseName = props["deploy.name"]
     archiveName = props["deploy.name"] + ".war"
@@ -336,25 +338,25 @@ war {
 
 
 war.doFirst{
-    
+
     def resourceType = props["resource.type"]
     ant.copy (
-        file:'etc/config/crawl-' + resourceType + '.xml', 
+        file:'etc/config/crawl-' + resourceType + '.xml',
         toFile:'tmp/WEB-INF/crawl-repository.xml',
         overwrite:'true' )
-    
-	
+
+
 	new File("tmp/WEB-INF/classes/").mkdirs()
-	
+
     if (props["hazelcast"] != null)
         hazelcast = props["hazelcast"]
-    
+
 	ant.copy (
 		file: hazelcast,
 		toFile:'tmp/WEB-INF/classes/hazelcast.xml',
 		overwrite:'true' )
-	
-	
+
+
 	/*
 	* To simplify getting started, a default alignments.json is provided
 	* and used in the documentation examples, and it is specified as
@@ -364,55 +366,55 @@ war.doFirst{
 	* specified. Rather than copying the file into the war, its absolute
 	* path is determined at build time.
 	*/
-   
+
 	File project_properties = new File("tmp/WEB-INF/classes/project.properties")
 	project_properties.write("#generated by gradle build \n")
 	props.each() { key, value ->
-		
+
 		if (key == "alignments") {
 			File alignmentsFile = new File(value)
-			
+
 			if (alignmentsFile != null && alignmentsFile.isFile()) {
 				value = alignmentsFile.getAbsolutePath()
-			} 
+			}
 		}
-		
+
 		def line = key + "=" + value + "\n"
 		//print line
 		project_properties.append(line)
     }
-	
+
 	def webArtemisClone = new File(tmpResourcesPath + "/" + webArtemisClonePath)
-	
+
 	if (pullWebArtemis == "true") {
-	
+
 		def proc = ['rm', '-rf', tmpResourcesPath + "/" + webArtemisClonePath].execute()
 		proc.waitFor()
 		if (proc.exitValue() > 1) throw new Exception (proc.err.text)
-	
+
 		println "Cloning Web-Artemis into " + tmpResourcesPath + webArtemisClonePath
 		gitClone(webArtemisGitUri, webArtemisGitBranch, file(tmpResourcesPath))
-		
+
 		String ws = "/" + props["deploy.name"];
-		
+
 		String indexFileName = tmpResourcesPath + "/" + webArtemisClonePath + "/index.html";
 		String html =   new File(indexFileName).getText();
-		
+
 		String toReplace = "'directory':'.'";
 		String with = "webService:'${ws}', 'directory':'.'";
-		
+
 		// println("Attempting to replace \n ${toReplace} \nwith \n ${with}");
-		String replaced = html.replace(toReplace, with); 
-		
+		String replaced = html.replace(toReplace, with);
+
 		new File(indexFileName).setText(replaced);
-		
+
 	}
-	
+
 	copy {
 		from tree = fileTree("./doc")
 		into tmpResourcesPath
 	}
-	
+
 }
 
 
@@ -422,7 +424,7 @@ war.doFirst{
 
 
 /*********************************************************
- ******************** Custom tasks ***********************  
+ ******************** Custom tasks ***********************
  *********************************************************/
 
 /*
@@ -439,7 +441,7 @@ task createWrapper(type: Wrapper) {
 task deploy(dependsOn: 'war') << {
     copy {
         from war.archivePath
-        into props["deploy.dir"] 
+        into props["deploy.dir"]
     }
 }
 
@@ -448,9 +450,9 @@ task deploy(dependsOn: 'war') << {
  * Copies the dependencies (i.e., jars) into a local cached folder for inclusion into the git repository.
  */
 task copyLibs << {
-    
+
     new File(local_cache_dir).mkdirs()
-    
+
     def newFiles = []
     for(file in configurations.compile) {
         String fileName = file.getPath()
@@ -458,7 +460,7 @@ task copyLibs << {
             newFiles.add(fileName)
         }
     }
-    
+
     copy {
         from files(newFiles)
         into local_cache_dir
@@ -467,7 +469,7 @@ task copyLibs << {
 
 
 /*
- * Builds a 'lightweight' client jar. 
+ * Builds a 'lightweight' client jar.
  */
 task clientJar(type : Jar) {
     from sourceSets.main.output
@@ -487,9 +489,9 @@ task clientJar(type : Jar) {
  **********************************************************/
 
 /*
- * To allow custom regex searches (e.g. of sequences), the following tasks 
- * will generate a special elasticsearch plugin, which can be included in 
- * an elasticsearch installation by means of a web server download. 
+ * To allow custom regex searches (e.g. of sequences), the following tasks
+ * will generate a special elasticsearch plugin, which can be included in
+ * an elasticsearch installation by means of a web server download.
  */
 
 def pluginDistDir = "tmp/plugin"
