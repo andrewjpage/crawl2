@@ -23,6 +23,36 @@
 		<include refid="featureSelector" />
 	</select>
 
+	<select id="getWithSynonym"
+		resultMap="org.genedb.crawl.mappers.FeaturesMapper.basicFeatureResult">
+		SELECT
+		feature_id,
+		organism_id,
+		uniqueName,
+		f.name,
+		type.name as type,
+		f.timelastmodified,
+		f.timeaccessioned
+		FROM feature f
+		JOIN cvterm type ON type.cvterm_id = f.type_id
+		<if test="type != null"> and type.name = #{type} </if>
+		WHERE
+			(f.uniquename = #{uniqueName}
+	        OR (f.uniquename IN
+	          (SELECT f.uniquename FROM feature f
+	            JOIN feature_synonym fs ON fs.feature_id = f.feature_id
+	            JOIN synonym s ON s.synonym_id = fs.synonym_id
+	            WHERE s.name = #{uniqueName})))
+
+		<if test="organism_id != null">
+			AND f.organism_id = #{organism_id}
+		</if>
+
+		<if test="name != null">
+			AND f.name = #{name}
+		</if>
+	</select>
+
 
 	<!-- <select id="getOfType" resultMap="typedFeatureResult" > SELECT feature_id,
 		organism_id, uniqueName, f.name, type.name as type, f.timelastmodified, f.timeaccessioned
@@ -280,10 +310,6 @@
 
 	</resultMap>
 
-
-
-
-
 	<!-- <resultMap type="org.genedb.crawl.model.Feature" id="parents"> <association
 		property="object" javaType="org.genedb.crawl.model.Feature" > <result column="object_uniquename"
 		property="uniqueName" /> <association property="type" javaType="org.genedb.crawl.model.Cvterm">
@@ -302,13 +328,11 @@
 		<association property="type" javaType="org.genedb.crawl.model.Cvterm"> <result
 		column="type" property="name" /> </association> </resultMap> -->
 
-
-
 	<sql id="featureSelector">
 
 		f.uniquename = #{uniqueName}
 
-		<if test="organism_id != null">
+	    <if test="organism_id != null">
 			AND f.organism_id = #{organism_id}
 		</if>
 

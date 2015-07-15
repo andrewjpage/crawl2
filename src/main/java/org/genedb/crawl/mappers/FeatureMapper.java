@@ -17,37 +17,43 @@ import org.genedb.crawl.model.Synonym;
 import org.genedb.crawl.model.Transcript;
 
 public interface FeatureMapper {
-	
+
 	Feature get(
 		@Param("uniqueName") String uniqueName,
 		@Param("name") String name,
 		@Param("organism_id") Integer organism_id,
 		@Param("type") String type);
-	
+
+	Feature getWithSynonym(
+		@Param("uniqueName") String uniqueName,
+		@Param("name") String name,
+		@Param("organism_id") Integer organism_id,
+		@Param("type") String type);
+
 	List<Property> properties(Feature feature);
-	
+
 	List<Cvterm> terms (Feature feature);
-	
+
 	List<Coordinates> coordinates(Feature feature);
-	
+
 	List<Synonym> synonyms(Feature feature);
 	List<Pub> pubs (Feature feature);
-	
+
 	List<LocatedFeature> domains (Feature feature);
 	List<Dbxref> dbxrefs (Feature feature);
 	List<Orthologue> orthologues (Feature feature);
-	
+
 	void delete(Feature feature);
-	
+
 //	LocatedFeature getOfType(
 //			@Param("uniqueName") String uniqueName,
 //			@Param("organism_id") Integer organism_id,
 //			@Param("name") String name,
 //			@Param("type") String type);
-	
+
 	List<Transcript> transcripts(@Param("gene") Gene gene, @Param("exons") boolean exons);
-	
+
 	List<Feature> parents(@Param("feature") Feature feature, @Param("relationships") List<Cvterm> relationships);
 	List<Feature> children(@Param("feature") Feature feature, @Param("relationships") List<Cvterm> relationships );
-	
+
 }
