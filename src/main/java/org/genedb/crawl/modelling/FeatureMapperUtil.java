@@ -64,7 +64,7 @@ public class FeatureMapperUtil {
                 organism_id = o.ID;
         }
 
-        Feature resultFeature = featureMapper.get(uniqueName, name, organism_id, null);
+        Feature resultFeature = featureMapper.getWithSynonym(uniqueName, name, organism_id, null);
 
         return resultFeature;
     }
