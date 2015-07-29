@@ -38,11 +38,13 @@
 		<if test="type != null"> and type.name = #{type} </if>
 		WHERE
 			(f.uniquename = #{uniqueName}
-	        OR (f.uniquename IN
-	          (SELECT f.uniquename FROM feature f
-	            JOIN feature_synonym fs ON fs.feature_id = f.feature_id
-	            JOIN synonym s ON s.synonym_id = fs.synonym_id
-	            WHERE s.name = #{uniqueName})))
+		        OR (f.uniquename IN
+		          (SELECT f.uniquename FROM feature f
+		            JOIN feature_synonym fs ON fs.feature_id = f.feature_id
+		            JOIN synonym s ON s.synonym_id = fs.synonym_id
+		            WHERE s.name = #{uniqueName})))
+
+	        AND f.is_obsolete = false
 
 		<if test="organism_id != null">
 			AND f.organism_id = #{organism_id}
