@@ -76,7 +76,7 @@ repositories {
     // at the top so it looks here first
     flatDir name: 'localRepository', dirs: [local_lib_dir, local_cache_dir, local_experimental_dir]
 
-/*	maven {
+	maven {
 	    url "https://developer.genedb.org/nexus/content/repositories/jboss/"
 	}
 	maven {
@@ -109,13 +109,14 @@ repositories {
 	maven {
         url "https://developer.genedb.org/nexus/content/repositories/Gradle/"
 	}
-    */
-
 	maven {
         url "http://oss.sonatype.org/content/repositories/releases"
 	}
-	maven {
-        url "http://repo.gradle.org/gradle/repo"
+//	maven {
+//      url "http://repo.gradle.org/gradle/repo"
+//	}
+        maven {
+        url "http://central.maven.org/maven2"
 	}
 	maven {
         url "http://download.java.net/maven/2"
