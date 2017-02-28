@@ -362,7 +362,8 @@ public class FeatureMapperUtil {
     }
 
     public static List<Property> getPolypeptideProperties(String dnaString, int phase, int translationTable) throws BioException, TranslationException {
-
+	 
+	// This code is very slow adding a few seconds to each gene page load (about 30% of the loading time). Its also blocking.
         List<Property> properties = new ArrayList<Property>();
 
         // Coordinates coordinates = feature.coordinates.get(0);
@@ -371,7 +372,7 @@ public class FeatureMapperUtil {
 
         // String dnaString = regionsMapper.sequenceTrimmed(coordinates.region,
         // coordinates.fmin, coordinates.fmax).dna;
-
+	/*
         String residuesString = translate(translationTable, dnaString, phase, false);
 
         logger.info(residuesString);
@@ -427,7 +428,7 @@ public class FeatureMapperUtil {
         chargeProp.name = "Charge";
         chargeProp.value = df.format(charge);
         properties.add(chargeProp);
-
+	*/
         return properties;
 
     }
