@@ -58,14 +58,6 @@ props.load(new FileInputStream(config))
 
 
 
-
-
-
-
-
-
-
-
 /*********************************************************
  *************** Ivy/Maven dependencies ******************
  *********************************************************/
@@ -75,60 +67,8 @@ repositories {
     // a local repository for jars that are not available from online ones
     // at the top so it looks here first
     flatDir name: 'localRepository', dirs: [local_lib_dir, local_cache_dir, local_experimental_dir]
-
-	maven {
-	    url "https://developer.genedb.org/nexus/content/repositories/jboss/"
-	}
-	maven {
-        url "https://developer.genedb.org/nexus/content/repositories/sonatype-releases/"
-	}
-	maven {
-        url "https://developer.genedb.org/nexus/content/repositories/java.net-m2"
-	}
-	maven {
-        url "https://developer.genedb.org/nexus/content/repositories/central/"
-	}
-	maven {
-        url "https://developer.genedb.org/nexus/content/repositories/ApacheReleases/"
-	}
-	maven {
-        url "https://developer.genedb.org/nexus/content/repositories/ApachePublic/"
-	}
-	maven {
-        url "https://developer.genedb.org/nexus/content/repositories/apache-snapshots/"
-	}
-	maven {
-        url "https://developer.genedb.org/nexus/content/repositories/codehaus-snapshots/"
-	}
-	maven {
-        url "https://developer.genedb.org/nexus/content/repositories/spring-external/"
-	}
-	maven {
-        url "https://developer.genedb.org/nexus/content/repositories/spring-release/"
-	}
-	maven {
-        url "https://developer.genedb.org/nexus/content/repositories/Gradle/"
-	}
-	maven {
-        url "http://oss.sonatype.org/content/repositories/releases"
-	}
-//	maven {
-//      url "http://repo.gradle.org/gradle/repo"
-//	}
         maven {
         url "http://central.maven.org/maven2"
-	}
-	maven {
-        url "http://download.java.net/maven/2"
-	}
-	maven {
-        url "http://repository.jboss.org/maven2"
-	}
-	maven {
-        url "http://www.ebi.ac.uk/~maven/m2repo"
-	}
-	maven {
-        url "http://repository.apache.org/content/groups/public/"
 	}
 	maven {
         url "http://repository.springsource.com/maven/bundles/release"
@@ -139,9 +79,21 @@ repositories {
 	maven {
         url "http://repository.springsource.com/maven/bundles/milestone"
 	}
-
-	// never use this!
-    // mavenCentral()
+	maven {
+        url "http://www.ebi.ac.uk/~maven/m2repo"
+	}
+	maven {
+        url "http://oss.sonatype.org/content/repositories/releases"
+	}
+	maven {
+        url "http://download.java.net/maven/2"
+	}
+	maven {
+        url "http://repository.jboss.org/maven2"
+	}
+	maven {
+        url "http://repository.apache.org/content/groups/public/"
+	}
 }
 
 
